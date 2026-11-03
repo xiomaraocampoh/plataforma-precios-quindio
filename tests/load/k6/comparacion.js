@@ -1,5 +1,5 @@
 // EC-04 / M-08, M-09: 500 usuarios concurrentes consultando comparaciones (pico de quincena).
-// Uso: k6 run -e BASE_URL=https://staging.example -e PRODUCTOS=1,2,3 loadtests/k6/comparacion.js
+// Uso: k6 run -e BASE_URL=https://staging.example -e PRODUCTOS=1,2,3 tests/load/k6/comparacion.js
 import http from "k6/http";
 import { check, sleep } from "k6";
 

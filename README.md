@@ -22,7 +22,7 @@ python manage.py runserver
 
 - App: http://localhost:8000 · API docs (OpenAPI): http://localhost:8000/api/docs/
 - Pruebas: `pytest -m unit` (TDD rápido) · `pytest --cov` (todo)
-- Carga: `k6 run loadtests/k6/comparacion.js`
+- Carga: `k6 run tests/load/k6/comparacion.js`
 
 ## Documentación
 
@@ -30,6 +30,7 @@ python manage.py runserver
 - `docs/adr/` — decisiones arquitectónicas
 - `docs/calidad/trazabilidad-metricas.md` — métrica → prueba/herramienta
 - `docs/arquitectura/c4/` — diagramas C4 (contexto, contenedores, componentes)
+- `docs/operacion/auditoria-accesos.md` — revisión periódica de colaboradores (sin bots)
 
 ## Declaración de uso de IA
 

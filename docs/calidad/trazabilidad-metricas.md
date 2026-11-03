@@ -7,7 +7,7 @@ Fuente de métricas y umbrales: documento *Modelo Proyecto nuclear* (pasos 4 y 5
 | M-02 | Protección contra errores | Validación de precio/cantidad | `tests/integration/test_api_reportes.py`, `tests/unit/catalogo/` |
 | M-05 | Corrección funcional | Reglas de dominio con TDD | `tests/unit/**` |
 | M-06 | Neutralidad | Orden independiente de promociones | `tests/unit/comparacion/test_ranking.py` |
-| M-08/M-09 | Comportamiento temporal / capacidad | k6 con umbrales p95 < 2 s, error < 1 % | `loadtests/k6/comparacion.js` |
+| M-08/M-09 | Comportamiento temporal / capacidad | k6 con umbrales p95 < 2 s, error < 1 % | `tests/load/k6/comparacion.js` |
 | M-11/M-12 | Integridad (anómalos / falsos positivos) | Heurística de mediana + dataset sembrado | `apps/precios/domain/confianza.py` (+ dataset pendiente) |
 | M-13 | Autenticidad | Escritura exige autenticación | `test_registrar_exige_autenticacion` |
 | M-14 | Responsabilidad | Autor y fecha en cada reporte | `test_reportante_registra_precio` |

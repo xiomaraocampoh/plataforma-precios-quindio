@@ -97,7 +97,8 @@ prefijo de versión (`v1`).
 - `tests/unit/` — dominio puro, marcador `unit`, sin BD, rápido.
 - `tests/integration/` — API/servicios con BD, marcador `integration`.
 - Cobertura: dominio ≥ 90 %, total ≥ 80 % (mínimos 80/70; el CI falla por debajo de 70).
-- Carga: `loadtests/k6/comparacion.js` (umbral p95 < 2000 ms, errores < 1 %).
+- `tests/load/k6/comparacion.js` — prueba de carga; se ejecuta con **k6**, no con pytest
+  (umbral p95 < 2000 ms, errores < 1 %).
 - Cada prueba nueva que verifique una métrica lleva el ID en un comentario (`# M-15`).
 
 ## 6. Checklists ISO/IEC 25010:2023 (aplicar en cada cambio)

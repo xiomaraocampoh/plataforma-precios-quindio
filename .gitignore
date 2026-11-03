@@ -46,7 +46,7 @@ coverage.xml
 .ruff_cache/
 .mypy_cache/
 .scannerwork/
-loadtests/k6/resultados/
+tests/load/k6/resultados/
 
 # ── IDE / SO ──────────────────────────────────────────
 .vscode/*
