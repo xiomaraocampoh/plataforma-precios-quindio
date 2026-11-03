@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block titulo %}{{ producto }} — comparación{% endblock %}
+{% block contenido %}
+<h1>{{ producto }}</h1>
+<div id="resultados"
+     hx-get="{% url 'comparacion:comparar' producto.pk %}"
+     hx-trigger="every 60s"
+     hx-swap="innerHTML">
+  {% include "comparacion/partials/_resultados.html" %}
+</div>
+{% endblock %}

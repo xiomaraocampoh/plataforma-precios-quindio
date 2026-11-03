@@ -1,0 +1,8 @@
+<div role="status">
+  {% if reporte.estado == "en_revision" %}
+    <p>Gracias. Tu precio quedó <strong>en revisión</strong> porque es muy distinto a los reportados recientemente.</p>
+  {% else %}
+    <p>¡Listo! Tu precio ya ayuda a otros a comparar.</p>
+  {% endif %}
+  <a href="{% url 'precios:registrar' %}" hx-get="{% url 'precios:registrar' %}" hx-target="#registro">Registrar otro</a>
+</div>

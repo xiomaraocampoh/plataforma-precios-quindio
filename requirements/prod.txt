@@ -1,0 +1,4 @@
+-r base.txt
+gunicorn>=23
+redis>=5                    # backend de caché de Django (RedisCache)
+whitenoise>=6.7             # estáticos sin servidor aparte

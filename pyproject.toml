@@ -1,0 +1,53 @@
+[project]
+name = "plataforma-precios-quindio"
+version = "0.1.0"
+description = "Plataforma colaborativa de comparación de precios entre tiendas y supermercados (Armenia / Quindío)"
+requires-python = ">=3.12"
+
+# ── Ruff: linter + formateador (PEP 8) ────────────────
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["**/migrations/*"]
+
+[tool.ruff.lint]
+select = [
+  "E", "W",   # pycodestyle (PEP 8)
+  "F",        # pyflakes
+  "I",        # isort
+  "N",        # pep8-naming
+  "B",        # bugbear
+  "UP",       # pyupgrade
+  "DJ",       # flake8-django
+  "S",        # bandit (seguridad)
+  "C90",      # complejidad ciclomática
+]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S105", "S106"]
+"config/settings/*.py" = ["F403", "F405", "S105"]
+
+# ── Pytest ────────────────────────────────────────────
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.test"
+pythonpath = ["."]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-ra --strict-markers"
+markers = [
+  "unit: reglas de dominio puras, sin base de datos",
+  "integration: requiere base de datos / API",
+]
+
+# ── Cobertura (M-19) ──────────────────────────────────
+[tool.coverage.run]
+source = ["apps", "core"]
+branch = true
+omit = ["*/migrations/*", "*/admin.py", "*/apps.py"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true

@@ -1,0 +1,25 @@
+{% load static %}<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Precios Quindío{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  {# htmx servido localmente (sin CDN): funciona con red móvil limitada y sin terceros #}
+  <script src="{% static 'vendor/htmx.min.js' %}" defer></script>
+</head>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+  <a class="saltar" href="#contenido">Saltar al contenido</a>  {# WCAG 2.4.1 #}
+  <header role="banner">
+    <nav aria-label="Principal">
+      <a href="{% url 'comparacion:inicio' %}">Comparar precios</a>
+      <a href="{% url 'precios:registrar' %}">Registrar un precio</a>
+    </nav>
+  </header>
+  <main id="contenido" tabindex="-1">
+    {% block contenido %}{% endblock %}
+  </main>
+  {# Región viva para anunciar resultados HTMX a lectores de pantalla (WCAG 4.1.3) #}
+  <div id="avisos" role="status" aria-live="polite" class="sr-only"></div>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block titulo %}Compara precios en Armenia y el Quindío{% endblock %}
+{% block contenido %}
+<h1>¿Qué producto buscas?</h1>
+<label for="q">Nombre del producto</label>
+<input id="q" name="q" type="search" autocomplete="off"
+       hx-get="{% url 'comparacion:sugerencias' %}"
+       hx-trigger="input changed delay:300ms, search"
+       hx-target="#sugerencias"
+       aria-controls="sugerencias">
+<ul id="sugerencias" aria-label="Sugerencias de productos"></ul>
+{% endblock %}

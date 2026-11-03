@@ -1,0 +1,33 @@
+# Entorno local reproducible: docker compose up
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: precios
+      POSTGRES_PASSWORD: precios
+      POSTGRES_DB: precios
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U precios"]
+      interval: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.dev
+      DATABASE_URL: postgres://precios:precios@db:5432/precios
+    ports: ["8000:8000"]
+    volumes: [".:/app"]
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

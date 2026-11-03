@@ -1,0 +1,11 @@
+/* Mobile-first. Contraste ≥ 4.5:1 (WCAG 1.4.3). Áreas táctiles ≥ 24px (WCAG 2.5.8). */
+:root { --texto: #1a1a1a; --fondo: #ffffff; --acento: #0b5cad; --promo: #7a3e00; }
+body { font-family: system-ui, sans-serif; color: var(--texto); background: var(--fondo); margin: 0 1rem; line-height: 1.5; }
+a { color: var(--acento); }
+button, input, select { font-size: 1rem; min-height: 44px; }
+:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+.saltar { position: absolute; left: -9999px; } .saltar:focus { left: 1rem; top: 1rem; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.etiqueta-promo { border: 1px solid var(--promo); color: var(--promo); padding: 0 .3rem; font-size: .85rem; margin-left: .3rem; }
+table { border-collapse: collapse; width: 100%; } th, td { text-align: left; padding: .4rem; border-bottom: 1px solid #ddd; }
+.htmx-request button { opacity: .6; }
