@@ -1,6 +1,6 @@
 # Plataforma colaborativa de comparación de precios — Armenia / Quindío
 
-Seminario Nuclear 4 (II-2026) · Arquitectura de Software II · Modelos de Calidad
+Proyecto Nuclear · 6.º semestre (II-2026) · Arquitectura de Software II · Modelos de Calidad
 Corporación Universitaria Empresarial Alexander von Humboldt
 
 **Equipo:** María Luisa Londoño Moncada · Xiomara Ocampo Hurtado · Juan Manuel Rodríguez

@@ -9,7 +9,7 @@
   precios de la canasta familiar entre tiendas de barrio, minimercados y supermercados.
 - **Qué NO es:** no vende, no cobra, no hace pedidos ni domicilios, no recomienda por perfilamiento,
   no es sistema oficial de precios. Si una propuesta toca eso, está fuera de alcance.
-- **Curso:** Seminario Nuclear 4 (VI, II-2026) — Arquitectura de Software II + Modelos de Calidad,
+- **Curso:** Proyecto Nuclear, 6.º semestre (II-2026) — Arquitectura de Software II + Modelos de Calidad,
   Ing. Rubén Darío Díaz Bautista. Corporación Universitaria Empresarial Alexander von Humboldt.
 - **Equipo:** María Luisa Londoño Moncada, Xiomara Ocampo Hurtado, Juan Manuel Rodríguez.
 - **Actores:** Consumidor (con o sin cuenta) · Reportante · Comercio (voluntario) · Moderador.
@@ -32,7 +32,9 @@
    antes invalida la medición de EC-05 (M-17, M-18).
 5. **TDD en reglas de negocio:** primero la prueba roja en `tests/unit/`, luego el código en
    `apps/<app>/domain/`, luego refactor. Cada commit de dominio debe poder mostrar ese ciclo.
-6. **Repositorio:** privado. Única colaboradora invitada además de la propietaria: `LuisaL1`.
+6. **Repositorio:** privado. Colaboradores autorizados además de la propietaria
+   (`xiomaraocampoh`): `LuisaL1`, `ddeelena` (Derlye) y Juan Manuel (invitado por correo; anotar
+   aquí su usuario de GitHub cuando acepte). Cualquier otro acceso lo decide solo la propietaria.
    Nunca proponer agregar bots, cuentas de IA ni integraciones con permisos de escritura
    como colaboradores.
 7. **Integridad académica:** el uso de IA se declara en la plantilla de PR; cada integrante debe

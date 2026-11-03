@@ -9,10 +9,11 @@ set -euo pipefail
 
 REPO_NAME="${REPO_NAME:-plataforma-precios-quindio}"
 COLABORADORA="LuisaL1"
-DESCRIPCION="Plataforma colaborativa de comparación de precios (Armenia/Quindío) - Seminario Nuclear 4"
+DESCRIPCION="Plataforma colaborativa de comparación de precios (Armenia/Quindío) - Proyecto Nuclear 6.º semestre (II-2026)"
 
 # Regla inviolable: lista blanca de colaboradores. Nada de bots ni identidades de IA.
-ALLOWLIST=("$COLABORADORA")
+# Añadir aquí el usuario de GitHub de Juan Manuel cuando acepte la invitación por correo.
+ALLOWLIST=("$COLABORADORA" "ddeelena")
 
 err() { echo "ERROR: $*" >&2; exit 1; }
 info() { echo "▶ $*"; }
