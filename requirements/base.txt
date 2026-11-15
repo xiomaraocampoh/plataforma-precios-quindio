@@ -4,3 +4,4 @@ drf-spectacular>=0.28       # OpenAPI 3 (mínimo exigible: API documentada)
 django-environ>=0.12
 django-htmx>=1.21
 psycopg[binary]>=3.2        # PostgreSQL
+redis>=5                    # RedisCache (dev con compose y producción; ADR-0002)
