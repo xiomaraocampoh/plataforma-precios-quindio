@@ -55,7 +55,9 @@ MIDDLEWARE = [
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
 AUTH_USER_MODEL = "cuentas.Usuario"
-LOGIN_URL = "admin:login"  # provisional hasta construir el flujo de cuentas (Corte II)
+LOGIN_URL = "cuentas:ingresar"
+LOGIN_REDIRECT_URL = "comparacion:inicio"
+LOGOUT_REDIRECT_URL = "comparacion:inicio"
 
 TEMPLATES = [
     {
