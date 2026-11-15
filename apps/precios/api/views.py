@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError as DjangoValidationError
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import Throttled, ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -33,4 +33,6 @@ class RegistrarReporteAPI(APIView):
             )
         except DjangoValidationError as exc:
             raise ValidationError(exc.message_dict) from exc
+        except services.LimiteDeRegistrosExcedidoError as exc:
+            raise Throttled(detail=str(exc)) from exc  # 429, RN-10
         return Response(ReportePrecioSalidaSerializer(reporte).data, status=status.HTTP_201_CREATED)

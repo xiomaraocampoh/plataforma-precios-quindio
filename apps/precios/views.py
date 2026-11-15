@@ -23,6 +23,8 @@ def registrar(request):
             )
         except ValidationError as exc:
             form.add_error(None, exc)
+        except services.LimiteDeRegistrosExcedidoError as exc:
+            form.add_error(None, str(exc))  # RN-10
         else:
             return render(request, "precios/partials/_confirmacion.html", {"reporte": reporte})
     plantilla = "precios/partials/_formulario.html" if request.htmx else "precios/registrar.html"

@@ -25,6 +25,21 @@ from .selectors import politica_vigencia
 TOLERANCIA_RELOJ = timedelta(minutes=5)  # relojes de celular desfasados
 
 
+class LimiteDeRegistrosExcedidoError(Exception):
+    """RN-10: el usuario superó el máximo de registros por hora (ADR-006, M-16)."""
+
+
+def _exigir_cupo(autor, ahora: datetime) -> None:
+    limite = settings.PRECIOS["LIMITE_REPORTES_HORA"]
+    recientes = ReportePrecio.objects.filter(
+        autor=autor, creado_en__gte=ahora - timedelta(hours=1)
+    ).count()
+    if recientes >= limite:
+        raise LimiteDeRegistrosExcedidoError(
+            f"Alcanzaste el límite de {limite} registros por hora. Intenta más tarde."
+        )
+
+
 def _precios_recientes(presentacion_id: int, establecimiento_id: int, desde: datetime):
     return list(
         ReportePrecio.objects.filter(
@@ -66,6 +81,7 @@ def registrar_reporte(
         raise ValidationError({"establecimiento": "El establecimiento no existe o está inactivo."})
 
     ahora = timezone.now()
+    _exigir_cupo(autor, ahora)  # RN-10: después de la idempotencia, un reenvío no consume cupo
     ventana = ventana_vigencia(
         Fuente.REPORTANTE,
         perecedero=presentacion.producto.categoria.perecedera,
