@@ -1,5 +1,5 @@
 {% for p in productos %}
   <li><a href="{% url 'comparacion:comparar' p.pk %}">{{ p }}</a></li>
 {% empty %}
-  <li>Escribe al menos dos letras.</li>
+  <li class="vacio">Escribe al menos dos letras o no hay coincidencias.</li>
 {% endfor %}
