@@ -7,15 +7,15 @@ materializada / tabla de lectura alimentada por los servicios de escritura (ver 
 
 from datetime import timedelta
 
-from django.conf import settings
 from django.core.cache import cache
 from django.utils import timezone
 
 from apps.catalogo.domain.normalizacion import precio_por_unidad
 from apps.catalogo.models import Producto
 from apps.precios.domain.confianza import nivel_confianza
-from apps.precios.domain.vigencia import Fuente, PoliticaVigencia, es_vigente
+from apps.precios.domain.vigencia import Fuente, es_vigente
 from apps.precios.models import ReportePrecio
+from apps.precios.selectors import politica_vigencia
 from core.cache import clave_comparacion, ttl_comparacion
 
 from .domain.ranking import ResultadoComparacion, ordenar_neutral
@@ -28,18 +28,9 @@ def buscar_productos(texto: str, limite: int = 10):
     return Producto.objects.filter(nombre__icontains=texto).order_by("nombre")[:limite]
 
 
-def _politica() -> PoliticaVigencia:
-    p = settings.PRECIOS
-    return PoliticaVigencia(
-        dias_reporte=p["VIGENCIA_REPORTE_DIAS"],
-        dias_perecedero=p["VIGENCIA_PERECEDERO_DIAS"],
-        dias_oficial=p["VIGENCIA_OFICIAL_DIAS"],
-    )
-
-
 def _calcular_comparacion(producto_id: int) -> list[ResultadoComparacion]:
     ahora = timezone.now()
-    politica = _politica()
+    politica = politica_vigencia()
     desde = ahora - timedelta(days=max(politica.dias_reporte, politica.dias_oficial))
     reportes = (
         ReportePrecio.objects.filter(
