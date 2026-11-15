@@ -21,9 +21,7 @@ TOLERANCIA = timedelta(minutes=5)
 
 
 def _normalizar(fecha):
-    return normalizar_fecha_observacion(
-        fecha, AHORA, ventana=VENTANA, tolerancia_reloj=TOLERANCIA
-    )
+    return normalizar_fecha_observacion(fecha, AHORA, ventana=VENTANA, tolerancia_reloj=TOLERANCIA)
 
 
 def test_fecha_pasada_dentro_de_la_ventana_se_conserva():

@@ -17,7 +17,10 @@ from apps.establecimientos.models import Establecimiento
 from core.cache import invalidar_comparacion
 
 from .domain.confianza import es_anomalo
+from .domain.validaciones import FechaObservacionInvalidaError, normalizar_fecha_observacion
+from .domain.vigencia import Fuente, ventana_vigencia
 from .models import ReportePrecio
+from .selectors import politica_vigencia
 
 TOLERANCIA_RELOJ = timedelta(minutes=5)  # relojes de celular desfasados
 
@@ -51,16 +54,29 @@ def registrar_reporte(
         if existente is not None:
             return existente
 
-    ahora = timezone.now()
-    fecha = fecha_observacion or ahora
-    if fecha > ahora + TOLERANCIA_RELOJ:
-        raise ValidationError({"fecha_observacion": "La fecha no puede estar en el futuro."})
-
-    presentacion = Presentacion.objects.only("id", "producto_id").filter(pk=presentacion_id).first()
+    presentacion = (
+        Presentacion.objects.select_related("producto__categoria")
+        .only("id", "producto_id", "producto__categoria__perecedera")
+        .filter(pk=presentacion_id)
+        .first()
+    )
     if presentacion is None:
         raise ValidationError({"presentacion": "La presentación no existe."})
     if not Establecimiento.objects.filter(pk=establecimiento_id, activo=True).exists():
         raise ValidationError({"establecimiento": "El establecimiento no existe o está inactivo."})
+
+    ahora = timezone.now()
+    ventana = ventana_vigencia(
+        Fuente.REPORTANTE,
+        perecedero=presentacion.producto.categoria.perecedera,
+        politica=politica_vigencia(),
+    )
+    try:  # RN-08
+        fecha = normalizar_fecha_observacion(
+            fecha_observacion or ahora, ahora, ventana=ventana, tolerancia_reloj=TOLERANCIA_RELOJ
+        )
+    except FechaObservacionInvalidaError as exc:
+        raise ValidationError({"fecha_observacion": str(exc)}) from exc
 
     recientes = _precios_recientes(
         presentacion_id,
