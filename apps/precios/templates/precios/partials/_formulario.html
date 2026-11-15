@@ -2,15 +2,15 @@
       hx-post="{% url 'precios:registrar' %}" hx-target="#registro" hx-swap="innerHTML"
       hx-disabled-elt="find button">
   {% csrf_token %}
-  {{ form.non_field_errors }}
+  {% if form.non_field_errors %}<div class="campo" role="alert">{% for e in form.non_field_errors %}<span class="error">{{ e }}</span>{% endfor %}</div>{% endif %}
   {% for campo in form.visible_fields %}
-    <p>
+    <div class="campo">
       {{ campo.label_tag }}
       {{ campo }}
-      {% if campo.errors %}<span role="alert">{{ campo.errors|join:", " }}</span>{% endif %}
-    </p>
+      {% if campo.errors %}<span class="error" role="alert">{{ campo.errors|join:", " }}</span>{% endif %}
+    </div>
   {% endfor %}
   {% for oculto in form.hidden_fields %}{{ oculto }}{% endfor %}
-  <button type="submit">Guardar precio</button>
+  <button class="btn btn-bloque" type="submit">Guardar precio</button>
 </form>
 {# TODO(Corte II): cola offline en localStorage/IndexedDB que reenvía con id_cliente (M-22) #}
