@@ -1,12 +1,148 @@
 {% extends "base.html" %}
-{% block titulo %}Compara precios en Armenia y el Quindío{% endblock %}
+{% load static %}
+{% block titulo %}AhorraPues · Compara precios en Armenia y el Quindío{% endblock %}
+{% block head %}<link rel="preload" as="image" href="{% static 'img/hero-supermercado.webp' %}" media="(min-width: 900px)" fetchpriority="high">
+<script src="{% static 'js/hero.js' %}?v=3" defer></script>{% endblock %}
+{% block hero %}
+<div class="hero-fondo">
+<div class="hero-contenedor">
+<section class="hero" aria-labelledby="titulo-buscar">
+  <p class="etiqueta">AhorraPues · Armenia y el Quindío</p>
+  <h1 id="titulo-buscar" aria-label="Ahorra en cada compra.">Ahorra en <span class="unidad">cada <span class="rota" data-palabras="compra,semana,quincena,tienda,visita,comida,mercado" aria-hidden="true"><span class="rota-palabra">compra</span></span>.</span></h1>
+  <p class="bajada">Compara los precios de tu mercado entre tiendas, minimercados y supermercados, en segundos.</p>
+
+  <div class="hero-buscador">
+    <label for="q" class="sr-only">Nombre del producto</label>
+    <div class="buscador">
+      <svg class="ico" aria-hidden="true"><use href="#i-search"/></svg>
+      <input id="q" name="q" type="search" autocomplete="off" placeholder="Busca arroz, leche, panela…"
+             hx-get="{% url 'comparacion:sugerencias' %}"
+             hx-trigger="input changed delay:300ms, search"
+             hx-target="#sugerencias"
+             aria-controls="sugerencias">
+    </div>
+  </div>
+  <ul id="sugerencias" class="sugerencias" aria-label="Sugerencias de productos" aria-live="polite"></ul>
+
+  {% if destacados %}
+  <div class="chips hero-chips" aria-label="Productos frecuentes">
+    {% for p in destacados|slice:":6" %}<a class="chip" href="{% url 'comparacion:comparar' p.pk %}">{{ p }}</a>{% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="hero-acciones">
+    {% if user.is_authenticated %}
+      <a class="btn btn-grande" href="{% url 'precios:registrar' %}">Registrar un precio</a>
+    {% else %}
+      <a class="btn btn-grande" href="{% url 'cuentas:registro' %}">Crear cuenta gratis</a>
+    {% endif %}
+    <a class="enlace-flecha" href="#como-funciona">Cómo funciona</a>
+  </div>
+</section>
+
+<div class="cifras" role="group" aria-label="La plataforma en cifras">
+  <div><p class="cifra">{{ resumen.productos }}</p><p>productos comparables</p></div>
+  <div><p class="cifra">{{ resumen.establecimientos }}</p><p>establecimientos</p></div>
+  <div><p class="cifra">{{ resumen.reportes }}</p><p>precios publicados</p></div>
+</div>
+</div>
+</div>
+{% endblock %}
+
 {% block contenido %}
-<h1>¿Qué producto buscas?</h1>
-<label for="q">Nombre del producto</label>
-<input id="q" name="q" type="search" autocomplete="off"
-       hx-get="{% url 'comparacion:sugerencias' %}"
-       hx-trigger="input changed delay:300ms, search"
-       hx-target="#sugerencias"
-       aria-controls="sugerencias">
-<ul id="sugerencias" aria-label="Sugerencias de productos"></ul>
+<section class="seccion" id="como-funciona" aria-labelledby="t-valor">
+  <div class="seccion-cabecera">
+    <h2 id="t-valor">Todo lo que necesitas para comprar mejor.</h2>
+    <p>Información clara, hecha por tu comunidad y sin letra pequeña.</p>
+  </div>
+  <div class="bento">
+
+    <article class="tile tile-oscuro tile-4" aria-labelledby="t-ejemplo">
+      <p class="etiqueta">Comparación real{% if ejemplo_producto %} · {{ ejemplo_producto }}{% endif %}</p>
+      <h3 class="titular" id="t-ejemplo">Mira la diferencia antes de salir de casa.</h3>
+      {% if ejemplo %}
+      <ol class="barras" style="list-style:none;padding:0" aria-label="Precio por {{ ejemplo.0.unidad_base }}, de menor a mayor">
+        {% for f in ejemplo %}
+        <li class="barra-fila {% if forloop.first %}es-primero{% endif %}">
+          <span class="quien">{{ f.establecimiento }} <span class="suave">· {{ f.presentacion }}</span></span>
+          <span class="valor">${{ f.precio_unitario|floatformat:0 }}/{{ f.unidad_base }}</span>
+          <span class="barra-pista" aria-hidden="true"><span class="barra-relleno" style="width:{{ f.porcentaje }}%"></span></span>
+        </li>
+        {% endfor %}
+      </ol>
+      <a class="enlace-flecha" href="{% url 'comparacion:comparar' ejemplo_producto.pk %}">Ver la comparación completa</a>
+      {% else %}
+      <p class="suave">Cuando haya precios reportados, aquí verás un ejemplo real.</p>
+      {% endif %}
+    </article>
+
+    <article class="tile tile-2" aria-labelledby="t-unidad">
+      <span class="icono-caja" aria-hidden="true"><svg class="ico"><use href="#i-scale"/></svg></span>
+      <h3 class="titular" id="t-unidad">Precio por unidad.</h3>
+      <p class="suave">500 g contra 1 kg, sin hacer cuentas. Comparamos lo que de verdad cuesta cada kilo o litro.</p>
+    </article>
+
+    <article class="tile tile-2 tile-marca" aria-labelledby="t-neutral">
+      <span class="icono-caja" aria-hidden="true"><svg class="ico"><use href="#i-check"/></svg></span>
+      <h3 class="titular" id="t-neutral">Orden neutral.</h3>
+      <p class="suave">Nadie paga por salir primero. Las promociones se señalan, pero no suben posiciones.</p>
+    </article>
+
+    <article class="tile tile-2" aria-labelledby="t-anonimo">
+      <span class="icono-caja" aria-hidden="true"><svg class="ico"><use href="#i-shield"/></svg></span>
+      <h3 class="titular" id="t-anonimo">Reportes anónimos.</h3>
+      <p class="suave">Nunca mostramos quién reportó un precio ni dónde estaba.</p>
+    </article>
+
+    <article class="tile tile-2" aria-labelledby="t-vigente">
+      <span class="icono-caja" aria-hidden="true"><svg class="ico"><use href="#i-clock"/></svg></span>
+      <h3 class="titular" id="t-vigente">Siempre al día.</h3>
+      <p class="suave">Los precios viejos dejan de mostrarse como vigentes.</p>
+    </article>
+
+  </div>
+</section>
+
+{% if destacados %}
+<section class="seccion" aria-labelledby="t-populares">
+  <div class="seccion-cabecera">
+    <h2 id="t-populares">Productos con más precios.</h2>
+    <p>Empieza por lo que más se consulta en la comunidad.</p>
+  </div>
+  <div class="tarjetas">
+    {% for p in destacados %}
+    <a class="tarjeta" href="{% url 'comparacion:comparar' p.pk %}">
+      <span class="meta">{{ p.categoria }}</span>
+      <span class="nombre">{{ p }}</span>
+      <span class="meta">{{ p.n_reportes }} precio{{ p.n_reportes|pluralize }}</span>
+      <span class="ir">Comparar</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="seccion" aria-labelledby="t-pasos">
+  <div class="seccion-cabecera">
+    <h2 id="t-pasos">Tan simple como tres pasos.</h2>
+  </div>
+  <div class="bento">
+    <article class="tile tile-2"><span class="puesto">01</span><h3 class="titular" >Busca.</h3><p class="suave">Escribe el producto que necesitas.</p></article>
+    <article class="tile tile-2"><span class="puesto">02</span><h3 class="titular">Compara.</h3><p class="suave">Mira dónde cuesta menos por kilo, litro o unidad.</p></article>
+    <article class="tile tile-2"><span class="puesto">03</span><h3 class="titular">Aporta.</h3><p class="suave">Reporta lo que ves en góndola en menos de 15 segundos.</p></article>
+  </div>
+</section>
+
+<section class="seccion" aria-labelledby="t-cta">
+  <div class="tile tile-oscuro cta-final">
+    <h2 id="t-cta">Tu aporte ayuda a que todos ahorren.</h2>
+    <p class="suave">Crear una cuenta es gratis y tu identidad nunca se publica.</p>
+    {% if user.is_authenticated %}
+      <a class="btn btn-claro btn-grande" href="{% url 'precios:registrar' %}">Registrar un precio</a>
+    {% else %}
+      <a class="btn btn-claro btn-grande" href="{% url 'cuentas:registro' %}">Crear cuenta gratis</a>
+    {% endif %}
+  </div>
+</section>
+
 {% endblock %}
