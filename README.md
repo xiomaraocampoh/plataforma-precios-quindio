@@ -11,10 +11,8 @@ Corporación Universitaria Empresarial Alexander von Humboldt
 python -m venv .venv && source .venv/bin/activate     # Windows: .venv\Scripts\activate
 pip install -r requirements/dev.txt
 cp .env.example .env
-# htmx se sirve localmente (sin CDN) — descargar una vez:
-curl -L -o static/vendor/htmx.min.js https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js
+# htmx 2.0.4 ya viene versionado en static/vendor/ (sin CDN; licencia 0BSD en htmx.LICENSE)
 docker compose up -d db redis
-python manage.py makemigrations cuentas catalogo establecimientos precios moderacion
 python manage.py migrate
 python manage.py createsuperuser
 python manage.py runserver
@@ -22,6 +20,8 @@ python manage.py runserver
 
 - App: http://localhost:8000 · API docs (OpenAPI): http://localhost:8000/api/docs/
 - Pruebas: `pytest -m unit` (TDD rápido) · `pytest --cov` (todo)
+- Límites de arquitectura: `lint-imports` (contratos en `.importlinter`)
+- Salud: http://localhost:8000/healthz/ (PostgreSQL y caché)
 - Carga: `k6 run tests/load/k6/comparacion.js`
 
 ## Documentación
