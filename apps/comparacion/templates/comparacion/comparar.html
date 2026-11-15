@@ -1,11 +1,21 @@
 {% extends "base.html" %}
-{% block titulo %}{{ producto }} — comparación{% endblock %}
+{% block titulo %}{{ producto }} — comparación de precios · AhorraPues{% endblock %}
 {% block contenido %}
-<h1>{{ producto }}</h1>
+<nav class="migas" aria-label="Ruta de navegación">
+  <a href="{% url 'comparacion:inicio' %}">Comparar</a><span aria-hidden="true">/</span><span aria-current="page">{{ producto }}</span>
+</nav>
+<div class="encabezado">
+  <div>
+    <p class="etiqueta">{{ producto.categoria }}</p>
+    <h1>{{ producto }}</h1>
+  </div>
+  <a class="btn btn-sec" href="{% url 'precios:registrar' %}"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>Registrar un precio</a>
+</div>
 <div id="resultados"
      hx-get="{% url 'comparacion:comparar' producto.pk %}"
      hx-trigger="every 60s"
-     hx-swap="innerHTML">
+     hx-swap="innerHTML"
+     aria-live="polite">
   {% include "comparacion/partials/_resultados.html" %}
 </div>
 {% endblock %}

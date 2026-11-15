@@ -7,18 +7,21 @@ materializada / tabla de lectura alimentada por los servicios de escritura (ver 
 
 from datetime import timedelta
 
-from django.conf import settings
 from django.core.cache import cache
+from django.db.models import Count, Q
 from django.utils import timezone
 
 from apps.catalogo.domain.normalizacion import precio_por_unidad
 from apps.catalogo.models import Producto
+from apps.establecimientos.models import Establecimiento
 from apps.precios.domain.confianza import nivel_confianza
-from apps.precios.domain.vigencia import Fuente, PoliticaVigencia, es_vigente
+from apps.precios.domain.vigencia import Fuente, es_vigente
 from apps.precios.models import ReportePrecio
-from core.cache import clave_comparacion, ttl_comparacion
+from apps.precios.selectors import politica_vigencia
+from core.cache import clave_comparacion, clave_resumen, ttl_comparacion
 
 from .domain.ranking import ResultadoComparacion, ordenar_neutral
+from .domain.resumen import ResumenComparacion, resumir_precios
 
 
 def buscar_productos(texto: str, limite: int = 10):
@@ -28,18 +31,9 @@ def buscar_productos(texto: str, limite: int = 10):
     return Producto.objects.filter(nombre__icontains=texto).order_by("nombre")[:limite]
 
 
-def _politica() -> PoliticaVigencia:
-    p = settings.PRECIOS
-    return PoliticaVigencia(
-        dias_reporte=p["VIGENCIA_REPORTE_DIAS"],
-        dias_perecedero=p["VIGENCIA_PERECEDERO_DIAS"],
-        dias_oficial=p["VIGENCIA_OFICIAL_DIAS"],
-    )
-
-
 def _calcular_comparacion(producto_id: int) -> list[ResultadoComparacion]:
     ahora = timezone.now()
-    politica = _politica()
+    politica = politica_vigencia()
     desde = ahora - timedelta(days=max(politica.dias_reporte, politica.dias_oficial))
     reportes = (
         ReportePrecio.objects.filter(
@@ -93,3 +87,56 @@ def comparar_producto(producto_id: int) -> list[ResultadoComparacion]:
         lambda: _calcular_comparacion(producto_id),
         ttl_comparacion(),
     )
+
+
+def comparar_con_resumen(
+    producto_id: int,
+) -> tuple[list[ResultadoComparacion], ResumenComparacion]:
+    resultados = comparar_producto(producto_id)
+    return resultados, resumir_precios(resultados)
+
+
+def _calcular_resumen_plataforma() -> dict[str, int]:
+    return {
+        "productos": Producto.objects.count(),
+        "establecimientos": Establecimiento.objects.filter(activo=True).count(),
+        "reportes": ReportePrecio.objects.filter(estado=ReportePrecio.Estado.PUBLICADO).count(),
+    }
+
+
+def resumen_plataforma() -> dict[str, int]:
+    """Cifras de la portada. Se invalida junto con la comparación al registrar un precio."""
+    return cache.get_or_set(clave_resumen(), _calcular_resumen_plataforma, ttl_comparacion())
+
+
+def productos_destacados(limite: int = 8):
+    """Productos con más reportes publicados (un solo query; sin criterio comercial)."""
+    return list(
+        Producto.objects.select_related("categoria")
+        .annotate(
+            n_reportes=Count(
+                "presentaciones__reportes",
+                filter=Q(presentaciones__reportes__estado=ReportePrecio.Estado.PUBLICADO),
+            )
+        )
+        .filter(n_reportes__gt=0)
+        .order_by("-n_reportes", "nombre")[:limite]
+    )
+
+
+def ejemplo_comparacion(producto_id: int, limite: int = 4) -> list[dict]:
+    """Filas para el gráfico de barras de la portada (precio por unidad, orden neutral)."""
+    filas = comparar_producto(producto_id)[:limite]
+    if len(filas) < 2 or len({f.unidad_base for f in filas}) != 1:
+        return []
+    maximo = max(f.precio_unitario for f in filas)
+    return [
+        {
+            "establecimiento": f.establecimiento,
+            "presentacion": f.presentacion,
+            "precio_unitario": f.precio_unitario,
+            "unidad_base": f.unidad_base,
+            "porcentaje": int(f.precio_unitario / maximo * 100) if maximo else 0,
+        }
+        for f in filas
+    ]

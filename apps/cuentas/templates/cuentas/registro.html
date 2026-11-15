@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block titulo %}Crear cuenta · AhorraPues{% endblock %}
+{% block contenido %}
+<div class="auth bento">
+  <section class="tile tile-3" aria-labelledby="t-registro">
+    <h1 id="t-registro">Crear cuenta</h1>
+    <p class="suave" style="margin-bottom:.6rem">Toma un minuto. Solo necesitas un nombre de usuario y una contraseña.</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next }}">
+      {% if form.non_field_errors %}<div class="campo" role="alert">{% for e in form.non_field_errors %}<span class="error">{{ e }}</span>{% endfor %}</div>{% endif %}
+      {% for campo in form %}
+        {% if campo.name == "acepto_tratamiento_datos" %}
+        <div class="campo">
+          <div class="check">{{ campo }}<label for="{{ campo.id_for_label }}">{{ campo.label }}</label></div>
+          {% if campo.errors %}<span class="error" role="alert">{{ campo.errors|join:", " }}</span>{% endif %}
+        </div>
+        {% else %}
+        <div class="campo">
+          {{ campo.label_tag }}
+          {{ campo }}
+          {% if campo.help_text and not campo.errors %}<p class="ayuda">{{ campo.help_text }}</p>{% endif %}
+          {% if campo.errors %}<span class="error" role="alert">{{ campo.errors|join:" " }}</span>{% endif %}
+        </div>
+        {% endif %}
+      {% endfor %}
+      <button class="btn btn-bloque" type="submit">Crear cuenta</button>
+    </form>
+    <p class="enlace-pie">¿Ya tienes cuenta? <a href="{% url 'cuentas:ingresar' %}">Ingresar</a></p>
+  </section>
+
+  <aside class="tile tile-3 tile-oscuro" aria-label="Qué puedes hacer con tu cuenta" style="justify-content:center">
+    <h2 style="font-size:1.3rem">Con tu cuenta puedes</h2>
+    <ul class="pasos">
+      <li><div><strong>Reportar precios</strong><span class="suave">Registra lo que ves en góndola en menos de 15 segundos.</span></div></li>
+      <li><div><strong>Mantenerte anónimo</strong><span class="suave">Tu nombre y ubicación nunca se publican.</span></div></li>
+      <li><div><strong>Ayudar a tu comunidad</strong><span class="suave">Más precios vigentes hacen mejores comparaciones.</span></div></li>
+    </ul>
+  </aside>
+</div>
+{% endblock %}

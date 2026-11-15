@@ -55,7 +55,9 @@ MIDDLEWARE = [
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
 AUTH_USER_MODEL = "cuentas.Usuario"
-LOGIN_URL = "admin:login"  # provisional hasta construir el flujo de cuentas (Corte II)
+LOGIN_URL = "cuentas:ingresar"
+LOGIN_REDIRECT_URL = "comparacion:inicio"
+LOGOUT_REDIRECT_URL = "comparacion:inicio"
 
 TEMPLATES = [
     {
@@ -129,6 +131,7 @@ PRECIOS = {
     "VIGENCIA_OFICIAL_DIAS": env.int("VIGENCIA_OFICIAL_DIAS", default=30),
     "CACHE_COMPARACION_TTL": env.int("CACHE_COMPARACION_TTL", default=60),  # D-01 ≤ 1 min
     "TOLERANCIA_ANOMALIA": env.str("TOLERANCIA_ANOMALIA", default="0.5"),
+    "LIMITE_REPORTES_HORA": env.int("LIMITE_REPORTES_HORA", default=30),  # RN-10
 }
 
 INTEGRACIONES = {

@@ -6,12 +6,25 @@ from django.views.decorators.http import require_GET
 from apps.catalogo.models import Producto
 
 from .domain.ranking import CRITERIO_DECLARADO
-from .selectors import buscar_productos, comparar_producto
+from .selectors import (
+    buscar_productos,
+    comparar_con_resumen,
+    ejemplo_comparacion,
+    productos_destacados,
+    resumen_plataforma,
+)
 
 
 @require_GET
 def inicio(request):
-    return render(request, "comparacion/buscar.html")
+    destacados = productos_destacados()
+    contexto = {
+        "resumen": resumen_plataforma(),
+        "destacados": destacados,
+        "ejemplo_producto": destacados[0] if destacados else None,
+        "ejemplo": ejemplo_comparacion(destacados[0].pk) if destacados else [],
+    }
+    return render(request, "comparacion/buscar.html", contexto)
 
 
 @require_GET
@@ -23,10 +36,12 @@ def sugerencias(request):
 
 @require_GET
 def comparar(request, producto_id: int):
-    producto = get_object_or_404(Producto, pk=producto_id)
+    producto = get_object_or_404(Producto.objects.select_related("categoria"), pk=producto_id)
+    resultados, resumen = comparar_con_resumen(producto_id)
     contexto = {
         "producto": producto,
-        "resultados": comparar_producto(producto_id),
+        "resultados": resultados,
+        "resumen": resumen,
         "criterio": CRITERIO_DECLARADO,
     }
     plantilla = (

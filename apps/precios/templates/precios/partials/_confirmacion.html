@@ -1,8 +1,11 @@
-<div role="status">
+<div role="status" style="display:grid;gap:.75rem;justify-items:start">
+  <span class="icono-caja" aria-hidden="true"><svg class="ico"><use href="#{% if reporte.estado == 'en_revision' %}i-clock{% else %}i-check{% endif %}"/></svg></span>
   {% if reporte.estado == "en_revision" %}
-    <p>Gracias. Tu precio quedó <strong>en revisión</strong> porque es muy distinto a los reportados recientemente.</p>
+    <h2>Gracias, quedó en revisión</h2>
+    <p class="suave">Tu precio es muy distinto a los reportados recientemente; una persona moderadora lo revisará antes de publicarlo.</p>
   {% else %}
-    <p>¡Listo! Tu precio ya ayuda a otros a comparar.</p>
+    <h2>Listo, tu precio ya está publicado</h2>
+    <p class="suave">Ayuda a otras personas a comparar. ¡Gracias por aportar!</p>
   {% endif %}
-  <a href="{% url 'precios:registrar' %}" hx-get="{% url 'precios:registrar' %}" hx-target="#registro">Registrar otro</a>
+  <a class="btn" href="{% url 'precios:registrar' %}" hx-get="{% url 'precios:registrar' %}" hx-target="#registro">Registrar otro precio</a>
 </div>

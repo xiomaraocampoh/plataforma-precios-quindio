@@ -1,32 +1,48 @@
-{# Criterio de orden explícito para el usuario (neutralidad, EC-06) #}
-<p class="criterio"><strong>Orden:</strong> {{ criterio }}</p>
+{# El orden viene del selector (neutralidad, EC-06): aquí solo se presenta. #}
 {% if resultados %}
-<table>
-  <caption>Precios vigentes por establecimiento</caption>
-  <thead>
-    <tr>
-      <th scope="col">Establecimiento</th>
-      <th scope="col">Presentación</th>
-      <th scope="col">Precio</th>
-      <th scope="col">Precio por unidad</th>
-      <th scope="col">Confiabilidad</th>
-      <th scope="col">Observado</th>
-    </tr>
-  </thead>
-  <tbody>
+<ol class="bento" style="padding:0" aria-label="Precios vigentes por establecimiento, en orden">
   {% for r in resultados %}
-    <tr>
-      <td>{{ r.establecimiento }}
-        {% if r.es_promocion %}<span class="etiqueta-promo">Promoción</span>{% endif %}</td>
-      <td>{{ r.presentacion }}</td>
-      <td>${{ r.precio|floatformat:0 }}</td>
-      <td>${{ r.precio_unitario|floatformat:0 }}/{{ r.unidad_base }}</td>
-      <td>{{ r.confianza|capfirst }}{% if r.confianza == "baja" %} <span role="note">⚠ verificar</span>{% endif %}</td>
-      <td><time datetime="{{ r.fecha_observacion|date:'c' }}">{{ r.fecha_observacion|timesince }}</time></td>
-    </tr>
+  <li class="tile {% if forloop.first %}tile-oscuro tile-4{% else %}tile-2{% endif %}">
+    <span class="{% if forloop.first %}etiqueta{% else %}puesto{% endif %}">
+      {% if forloop.first %}Primero en el orden · menor precio por unidad{% else %}N.º {{ forloop.counter }}{% endif %}
+    </span>
+    <p class="nombre-tienda">{{ r.establecimiento }}</p>
+    <p class="suave">{{ r.presentacion }}</p>
+    <p class="precio"><span class="sr-only">Precio: </span>${{ r.precio|floatformat:0 }}</p>
+    <p class="por-unidad">${{ r.precio_unitario|floatformat:0 }} por {{ r.unidad_base }}</p>
+    <div class="pie-tile">
+      {% if r.es_promocion %}<span class="chip chip-promo">Promoción</span>{% endif %}
+      <span class="chip {% if r.confianza == 'baja' %}chip-alerta{% endif %}">Confiabilidad {{ r.confianza }}{% if r.confianza == "baja" %} · verificar{% endif %}</span>
+      <span class="chip"><time datetime="{{ r.fecha_observacion|date:'c' }}">hace {{ r.fecha_observacion|timesince }}</time></span>
+    </div>
+  </li>
+  {% if forloop.first %}
+  <li class="tile tile-2 tile-marca">
+    <span class="icono-caja" aria-hidden="true" style="background:var(--superficie)"><svg class="ico"><use href="#i-chart"/></svg></span>
+    {% if resumen.diferencia_pct is not None %}
+      <p class="cifra">{{ resumen.diferencia_pct }}%</p>
+      <p class="suave">de diferencia entre el más barato y el más caro (por {{ resumen.unidad_base }}).</p>
+    {% else %}
+      <p class="cifra">{{ resumen.cantidad }}</p>
+      <p class="suave">establecimiento{{ resumen.cantidad|pluralize }} con precio vigente.</p>
+    {% endif %}
+  </li>
+  {% endif %}
   {% endfor %}
-  </tbody>
-</table>
+
+  <li class="tile tile-6 tile-tenue criterio">
+    <svg class="ico" aria-hidden="true" style="color:var(--marca);margin-top:.2rem"><use href="#i-info"/></svg>
+    {# Criterio de orden explícito para el usuario (neutralidad, EC-06) #}
+    <p><strong>Orden:</strong> {{ criterio }} <span class="suave">Las promociones se señalan, pero no cambian la posición.</span></p>
+  </li>
+</ol>
 {% else %}
-<p>Aún no hay precios vigentes para este producto. <a href="{% url 'precios:registrar' %}">¿Lo viste en alguna tienda?</a></p>
+<div class="bento">
+  <section class="tile tile-6 tile-marca vacio-estado">
+    <span class="icono-caja" aria-hidden="true" style="background:var(--superficie)"><svg class="ico"><use href="#i-search"/></svg></span>
+    <h2>Aún no hay precios vigentes para este producto</h2>
+    <p class="suave">Si lo viste en alguna tienda, tu reporte ayuda a que otras personas comparen.</p>
+    <a class="btn" href="{% url 'precios:registrar' %}">¿Lo viste en alguna tienda?</a>
+  </section>
+</div>
 {% endif %}

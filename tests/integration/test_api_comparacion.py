@@ -1,7 +1,9 @@
+from datetime import timedelta
 from decimal import Decimal
 
 import pytest
 from django.urls import reverse
+from django.utils import timezone
 
 from apps.precios import services
 
@@ -60,3 +62,21 @@ def test_nuevo_reporte_invalida_la_cache(api, reportante, arroz, tiendas):  # D-
         precio=Decimal("4500"),
     )
     assert len(api.get(url).json()["resultados"]) == 1
+
+
+def test_reporte_con_reloj_adelantado_no_rompe_la_comparacion(api, reportante, arroz, tiendas):
+    """Un celular con el reloj 2 min adelantado está dentro de la tolerancia del servicio.
+
+    La comparación no debe responder 500 por ese reporte (RN-08, EC-01, M-21).
+    """
+    prod, p500, _ = arroz
+    services.registrar_reporte(
+        autor=reportante,
+        presentacion_id=p500.pk,
+        establecimiento_id=tiendas[0].pk,
+        precio=Decimal("4500"),
+        fecha_observacion=timezone.now() + timedelta(minutes=2),
+    )
+    respuesta = api.get(reverse("api-comparacion", args=[prod.pk]))
+    assert respuesta.status_code == 200
+    assert len(respuesta.json()["resultados"]) == 1
