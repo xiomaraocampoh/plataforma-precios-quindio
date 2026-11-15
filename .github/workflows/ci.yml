@@ -34,6 +34,8 @@ jobs:
         run: |
           ruff check .
           ruff format --check .
+      - name: Límites de arquitectura (ADR-0001, M-18)
+        run: lint-imports
       - name: Migraciones al día
         run: python manage.py makemigrations --check --dry-run
       - name: Pruebas + cobertura (M-05, M-19)

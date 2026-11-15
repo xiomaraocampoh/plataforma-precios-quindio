@@ -1,0 +1,125 @@
+# Contratos de importación (import-linter) — hacen verificable la regla de dependencias
+# de CLAUDE.md §3 y del ADR-0001 (Consolidado, secc. 16.2). Se ejecutan en CI: `lint-imports`.
+# Un contrato roto = erosión del monolito modular (riesgo para EC-05 / M-18).
+# Si el módulo comercial (Corte III) obliga a relajar un contrato, eso se registra como
+# evidencia de M-18 en el análisis de impacto.
+#
+# Mantenimiento: import-linter exige que los módulos listados existan. Al crear una capa nueva
+# (p. ej. apps/catalogo/services.py o apps/moderacion/views.py) o un dominio nuevo, agréguela
+# al contrato correspondiente en el mismo PR.
+
+[importlinter]
+root_packages =
+    apps
+    core
+    config
+include_external_packages = True
+
+[importlinter:contract:dominio-puro]
+name = El dominio es Python puro: no importa Django ni DRF
+type = forbidden
+source_modules =
+    apps.catalogo.domain
+    apps.precios.domain
+    apps.comparacion.domain
+forbidden_modules =
+    django
+    rest_framework
+
+[importlinter:contract:dominio-sin-capas-superiores]
+name = El dominio no depende de modelos, servicios, selectores ni interfaces
+type = forbidden
+source_modules =
+    apps.catalogo.domain
+    apps.precios.domain
+    apps.comparacion.domain
+forbidden_modules =
+    core
+    config
+    apps.cuentas.models
+    apps.catalogo.models
+    apps.establecimientos.models
+    apps.precios.models
+    apps.precios.services
+    apps.precios.views
+    apps.precios.api
+    apps.precios.forms
+    apps.precios.urls
+    apps.comparacion.selectors
+    apps.comparacion.views
+    apps.comparacion.api
+    apps.comparacion.urls
+    apps.moderacion.models
+allow_indirect_imports = True
+
+[importlinter:contract:capas-por-modulo]
+name = Capas de cada módulo: interfaces > aplicación > persistencia > dominio
+type = layers
+containers =
+    apps.cuentas
+    apps.catalogo
+    apps.establecimientos
+    apps.precios
+    apps.comparacion
+    apps.moderacion
+    apps.integraciones
+    apps.comercios
+layers =
+    (urls)
+    (admin)
+    (views)
+    (forms)
+    (api)
+    (services) : (selectors)
+    (models)
+    (domain)
+
+[importlinter:contract:interfaces-privadas-precios]
+name = Ningún otro módulo importa las interfaces de precios (views, api, forms, urls)
+type = forbidden
+source_modules =
+    apps.cuentas
+    apps.catalogo
+    apps.establecimientos
+    apps.comparacion
+    apps.moderacion
+    apps.integraciones
+    apps.comercios
+    core
+forbidden_modules =
+    apps.precios.views
+    apps.precios.api
+    apps.precios.forms
+    apps.precios.urls
+
+[importlinter:contract:interfaces-privadas-comparacion]
+name = Ningún otro módulo importa las interfaces de comparacion (views, api, forms, urls)
+type = forbidden
+source_modules =
+    apps.cuentas
+    apps.catalogo
+    apps.establecimientos
+    apps.precios
+    apps.moderacion
+    apps.integraciones
+    apps.comercios
+    core
+forbidden_modules =
+    apps.comparacion.views
+    apps.comparacion.api
+    apps.comparacion.urls
+
+[importlinter:contract:comercios-no-adelantado]
+name = El núcleo no depende del módulo comercial (se integra en el Corte III; EC-05)
+type = forbidden
+source_modules =
+    apps.cuentas
+    apps.catalogo
+    apps.establecimientos
+    apps.precios
+    apps.comparacion
+    apps.moderacion
+    apps.integraciones
+    core
+forbidden_modules =
+    apps.comercios
