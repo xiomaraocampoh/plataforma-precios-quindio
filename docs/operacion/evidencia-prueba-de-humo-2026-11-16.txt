@@ -1,0 +1,31 @@
+Prueba de humo contra http://localhost:8080
+== Lectura pública ==
+  ✔ /healthz/ (PostgreSQL y caché)                                  {"estado": "ok", "bd": "ok", "cache": "ok"}
+  ✔ / portada                                                        200
+  ✔ /sugerencias/?q=ar (HTMX)                                        200
+  ✔ /productos/?q=ARROZ (sin tildes ni mayúsculas)                  1
+  ✔ /productos/1/ (comparación)                                     200
+  ✔   el criterio de orden está a la vista                          1
+  ✔   filtro por municipio y barrio                                  200
+  ✔ /establecimientos/ (directorio con mapa)                         6
+== API y documentación ==
+  ✔ /api/docs/ (Swagger)                                             200
+  ✔ /api/schema/ (OpenAPI)                                           200
+  ✔ /api/v1/comparacion/1/                                           200
+  ✔   la respuesta pública NO expone autor ni correo (M-15)         0/1
+  ✔ /api/v1/catalogo/productos/?q=arroz                              200
+== Escribir exige cuenta (M-13) ==
+  ✔ POST /api/v1/precios/reportes/ sin sesión                       403
+  ✔ /precios/registrar/ sin sesión redirige                         302
+== Cuenta nueva, registro de un precio y CSRF ==
+  ✔ crear cuenta con autorización de datos                          302
+  ✔ formulario de registro con token CSRF                            si
+  ✔ registrar un precio muestra la confirmación                     1
+  ✔   aparece en «Mis aportes»                                     1
+  ✔ POST sin token CSRF es rechazado                                 403
+== Moderación (solo rol moderador) ==
+  ✔ /moderacion/ con una cuenta común                               403
+  ✔ ingresar como moderador_demo                                     302
+  ✔ /moderacion/ como moderador                                      200
+
+RESULTADO: todas las comprobaciones pasaron.
