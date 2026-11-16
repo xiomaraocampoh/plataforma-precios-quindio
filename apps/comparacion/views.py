@@ -99,8 +99,12 @@ def buscar_por_foto(request):
 @require_GET
 def sugerencias(request):
     """hx-get con hx-trigger='keyup changed delay:300ms' → solo el fragmento de sugerencias."""
-    productos = buscar_productos(request.GET.get("q", ""))
-    return render(request, "comparacion/partials/_sugerencias.html", {"productos": productos})
+    texto = request.GET.get("q", "")
+    contexto = {
+        "productos": buscar_productos(texto),
+        "consulta_larga": len(texto.strip()) >= 2,  # con menos letras no se muestra nada
+    }
+    return render(request, "comparacion/partials/_sugerencias.html", contexto)
 
 
 def _leer_filtro_precio(parametros) -> tuple[FiltroPrecio, str]:

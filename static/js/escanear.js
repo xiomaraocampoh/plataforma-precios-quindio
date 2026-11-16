@@ -200,25 +200,33 @@
   /* Foto pegada en la página: miniatura junto al buscador; Enter (o «Buscar») la identifica ahí mismo. */
   var buscador = document.getElementById("q");
   var chip = document.querySelector("[data-adjunto]");
+  var barra = document.querySelector("[data-buscador]");
+  var ident = document.querySelector("[data-buscar-adjunto]");
+  var marcador = buscador ? buscador.getAttribute("placeholder") : "";
+  function marcarAdjunto(si) {
+    if (barra) barra.classList.toggle("con-foto", si);
+    if (ident) ident.hidden = !si;
+    if (chip) chip.hidden = !si;
+    if (buscador) buscador.setAttribute("placeholder", si ? "Enter para identificar" : marcador);
+  }
   var panel = document.querySelector("[data-pagina-resultado]");
   var adjunto = null, urlMiniatura = "";
   function ponerPanel(html, esHtml) {
     if (!panel) return;
     if (esHtml) panel.innerHTML = html; else panel.textContent = html; // html: fragmento propio
     panel.hidden = !panel.textContent.trim() && !panel.children.length;
-    if (esHtml && !panel.hidden) panel.scrollIntoView({ block: "nearest" });
   }
   function quitarAdjunto() {
     adjunto = null;
     if (urlMiniatura) { URL.revokeObjectURL(urlMiniatura); urlMiniatura = ""; }
-    if (chip) chip.hidden = true;
+    marcarAdjunto(false);
   }
   function adjuntar(archivo) {
     quitarAdjunto();
     adjunto = archivo;
     urlMiniatura = URL.createObjectURL(archivo);
     chip.querySelector("img").src = urlMiniatura;
-    chip.hidden = false;
+    marcarAdjunto(true);
     ponerPanel("");
     if (buscador) buscador.focus();
   }
@@ -242,11 +250,14 @@
     }
   }
   if (chip) {
-    chip.querySelector("[data-buscar-adjunto]").addEventListener("click", buscarAdjunto);
+    ident.addEventListener("click", buscarAdjunto);
     chip.querySelector("[data-quitar-adjunto]").addEventListener("click", function () {
       quitarAdjunto(); ponerPanel(""); if (buscador) buscador.focus();
     });
   }
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && panel && !panel.hidden && !dlg.open) ponerPanel("");
+  });
   if (buscador) {
     buscador.addEventListener("keydown", function (e) {
       if (e.key === "Enter" && adjunto) { e.preventDefault(); buscarAdjunto(); }
