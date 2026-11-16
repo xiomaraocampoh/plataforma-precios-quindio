@@ -1,13 +1,19 @@
 """Punto 0: cargar_demo crea accesos sin contraseñas en el código y carga precios vencidos."""
 
+from datetime import timedelta
+from decimal import Decimal
 from io import StringIO
 
 import pytest
 from django.core.management import call_command
+from django.utils import timezone
 
-from apps.catalogo.models import Producto
+from apps.catalogo.models import Presentacion, Producto
 from apps.comparacion.selectors import comparar_producto
 from apps.cuentas.models import Usuario
+from apps.establecimientos.models import Establecimiento
+from apps.precios import services
+from apps.precios.models import ReportePrecio
 
 pytestmark = pytest.mark.integration
 
@@ -57,3 +63,29 @@ def test_con_vencidos_la_comparacion_oculta_los_precios_vencidos(db, monkeypatch
     assert {r.establecimiento for r in comparar_producto(queso.pk)} == {
         "Minimercado Nuevo Centro"  # perecedero, 2 días
     }
+
+
+def test_los_precios_de_ejemplo_no_agotan_el_cupo_de_registro(db, monkeypatch):
+    # RN-10: 30 registros por hora. Los datos de ejemplo son históricos: no deben contar.
+    monkeypatch.setenv("DEMO_ADMIN_PASSWORD", CLAVE)
+    monkeypatch.setenv("DEMO_PASSWORD", CLAVE)
+    _cargar("--con-vencidos")
+    desde = timezone.now() - timedelta(hours=1)
+    for usuario in Usuario.objects.filter(username__startswith="demo"):
+        recientes = ReportePrecio.objects.filter(autor=usuario, creado_en__gte=desde).count()
+        assert recientes == 0, (
+            f"{usuario.username} ya tiene {recientes} registros en la última hora"
+        )
+
+
+def test_el_usuario_demo_puede_registrar_un_precio_justo_despues_de_cargar(db, monkeypatch):
+    monkeypatch.setenv("DEMO_ADMIN_PASSWORD", CLAVE)
+    monkeypatch.setenv("DEMO_PASSWORD", CLAVE)
+    _cargar("--con-vencidos")
+    reporte = services.registrar_reporte(  # no debe lanzar LimiteDeRegistrosExcedidoError
+        autor=Usuario.objects.get(username="demo"),
+        presentacion_id=Presentacion.objects.first().pk,
+        establecimiento_id=Establecimiento.objects.filter(activo=True).first().pk,
+        precio=Decimal("3333"),
+    )
+    assert reporte.pk is not None

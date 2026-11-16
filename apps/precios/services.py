@@ -132,8 +132,10 @@ def cargar_reporte_historico(
 ) -> ReportePrecio:
     """Crea un reporte con una fecha pasada arbitraria, sin RN-08 ni RN-10.
 
-    Solo para datos de demostración (`cargar_demo --con-vencidos`) y pruebas de vigencia: los
-    registros de usuarios pasan siempre por `registrar_reporte`.
+    Solo para datos de demostración (`cargar_demo`) y pruebas de vigencia: los registros de
+    usuarios pasan siempre por `registrar_reporte`. Es una carga histórica: el registro queda
+    fechado cuando se observó el precio (`creado_en`), de modo que no consume el cupo por hora
+    de nadie (RN-10).
     """
     reporte = ReportePrecio.objects.create(
         autor=autor,
@@ -143,6 +145,9 @@ def cargar_reporte_historico(
         fecha_observacion=fecha_observacion,
         fuente=fuente.value,
     )
+    # `creado_en` es auto_now_add: se fecha después de crear para que sea histórico
+    ReportePrecio.objects.filter(pk=reporte.pk).update(creado_en=fecha_observacion)
+    reporte.creado_en = fecha_observacion
     producto_id = reporte.presentacion.producto_id
     transaction.on_commit(lambda: invalidar_comparacion(producto_id))
     return reporte
