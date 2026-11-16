@@ -1,5 +1,6 @@
 {# El orden viene del selector (neutralidad, EC-06): aquí solo se presenta. Los filtros solo reducen. #}
-{% if filtro.activo %}<p class="suave" role="status">Mostrando {{ filas|length }} resultado{{ filas|length|pluralize }} {% if filtro.municipio %}en {{ filtro.municipio }}{% endif %}{% if filtro.barrio %}{% if filtro.municipio %}, {% else %}en el {% endif %}barrio {{ filtro.barrio }}{% endif %}.</p>{% endif %}
+{% if error_precio %}<p class="error" role="alert" id="error-precio">{{ error_precio }}</p>{% endif %}
+{% if filtro.activo or filtro_precio.activo %}<p class="suave" role="status">Mostrando {{ filas|length }} resultado{{ filas|length|pluralize }}{% if filtro.municipio %} en {{ filtro.municipio }}{% endif %}{% if filtro.barrio %}{% if filtro.municipio %}, {% else %} en el {% endif %}barrio {{ filtro.barrio }}{% endif %}{% if filtro_precio.activo %}{% if filtro.activo %}, {% else %} {% endif %}{% if filtro_precio.minimo is not None and filtro_precio.maximo is not None %}entre ${{ filtro_precio.minimo|floatformat:0 }} y ${{ filtro_precio.maximo|floatformat:0 }}{% elif filtro_precio.minimo is not None %}desde ${{ filtro_precio.minimo|floatformat:0 }}{% else %}hasta ${{ filtro_precio.maximo|floatformat:0 }}{% endif %}{% endif %}.</p>{% endif %}
 {% if filas %}
 <ol class="bento" style="padding:0" aria-label="Precios vigentes por establecimiento, en orden">
   {% for fila in filas %}{% with r=fila.resultado %}
@@ -58,8 +59,8 @@
 <div class="bento">
   <section class="tile tile-6 tile-marca vacio-estado">
     <span class="icono-caja" aria-hidden="true" style="background:var(--superficie)"><svg class="ico"><use href="#i-search"/></svg></span>
-    <h2>{% if filtro.activo %}No hay precios vigentes con esos filtros{% else %}Aún no hay precios vigentes para este producto{% endif %}</h2>
-    <p class="suave">{% if filtro.activo %}Quita algún filtro para ver más establecimientos. {% endif %}Si lo viste en alguna tienda, tu reporte ayuda a que otras personas comparen.</p>
+    <h2>{% if filtro.activo or filtro_precio.activo %}No hay precios vigentes con esos filtros{% else %}Aún no hay precios vigentes para este producto{% endif %}</h2>
+    <p class="suave">{% if filtro.activo or filtro_precio.activo %}Quita algún filtro para ver más establecimientos. {% endif %}Si lo viste en alguna tienda, tu reporte ayuda a que otras personas comparen.</p>
     <a class="btn" href="{% url 'precios:registrar' %}">¿Lo viste en alguna tienda?</a>
   </section>
   <p class="tile tile-6 tile-tenue criterio"><strong>Orden:</strong>&nbsp;{{ criterio }}</p>
