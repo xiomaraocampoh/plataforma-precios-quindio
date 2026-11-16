@@ -1,0 +1,8 @@
+{% extends "correo/base.html" %}
+{% block preheader %}Usa el enlace para crear una contraseña nueva. Vence en 1 hora.{% endblock %}
+{% block chip %}{% include 'correo/_chip.html' with tono='seguridad' texto='Seguridad' %}{% endblock %}
+{% block titulo %}Crea una contraseña nueva{% endblock %}
+{% block cuerpo %}<p style="margin:0 0 16px 0;font-size:16px;line-height:1.5;color:#5f5f64;">Hola {{ nombre }}, recibimos una solicitud para recuperar el acceso a tu cuenta.</p><p style="margin:0 0 16px 0;font-size:16px;line-height:1.5;color:#5f5f64;">El enlace vence en 1 hora y sirve una sola vez.</p>{% endblock %}
+{% block accion %}{% include 'correo/_boton.html' with url=enlace texto='Crear contraseña nueva' %}{% endblock %}
+{% block despues %}<p style="margin:0 0 16px 0;font-size:16px;line-height:1.5;color:#5f5f64;">Si no la pediste, ignora este correo: tu contraseña no cambia.</p>{% endblock %}
+{% block motivo %}se pidió recuperar la contraseña de tu cuenta{% endblock %}

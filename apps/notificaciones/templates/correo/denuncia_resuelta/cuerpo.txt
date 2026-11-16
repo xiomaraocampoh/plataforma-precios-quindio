@@ -1,0 +1,13 @@
+{% extends "correo/base.txt" %}
+{% block titulo %}{% if aprobado %}[Denuncia aceptada]{% else %}[Denuncia revisada]{% endif %} {% if aprobado %}Gracias: retiramos el precio{% else %}Revisamos el precio que denunciaste{% endif %}{% endblock %}
+{% block cuerpo %}{{ producto }} en {{ establecimiento }}.
+
+{% if aprobado %}Moderación confirmó que el precio no era correcto y lo retiró de la comparación.{% else %}Moderación revisó la denuncia y el precio sigue publicado porque no encontró un error.{% endif %}
+
+Gracias por ayudar a que los precios sean confiables.
+
+{% endblock %}
+{% block accion %}Ver la comparación: {{ enlace_producto }}
+
+{% endblock %}
+{% block motivo %}denunciaste un precio en AhorraPues{% endblock %}

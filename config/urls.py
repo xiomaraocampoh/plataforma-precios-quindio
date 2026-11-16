@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import include, path
+from django.views.generic import RedirectView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from core.views import healthz
@@ -13,7 +14,13 @@ api_v1 = [
 ]
 
 urlpatterns = [
+    # El ingreso a /admin/ pasa por el de la plataforma: así también exige el segundo factor
+    path(
+        "admin/login/",
+        RedirectView.as_view(pattern_name="cuentas:ingresar", query_string=True),
+    ),
     path("admin/", admin.site.urls),  # se conserva para el superusuario
+    path("panel/correos/", include("apps.notificaciones.urls")),  # vista previa (solo staff)
     path("panel/", include("apps.administracion.urls")),
     path("api/v1/", include(api_v1)),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),

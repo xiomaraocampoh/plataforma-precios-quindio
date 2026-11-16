@@ -1,0 +1,14 @@
+{% extends "correo/base.txt" %}
+{% block titulo %}[Seguridad] Tu contraseña cambió{% endblock %}
+{% block cuerpo %}Hola {{ nombre }}, la contraseña de tu cuenta se cambió el {{ cuando }}.
+
+Si fuiste tú, no tienes que hacer nada.
+
+{% endblock %}
+{% block accion %}No fui yo: proteger mi cuenta: {{ enlace }}
+
+{% endblock %}
+{% block despues %}Con ese botón bloqueamos la contraseña actual, cerramos las sesiones y te enviamos un enlace para crear una nueva.
+
+{% endblock %}
+{% block motivo %}cambió la contraseña de tu cuenta{% endblock %}

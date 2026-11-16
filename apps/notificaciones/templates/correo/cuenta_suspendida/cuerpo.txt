@@ -1,0 +1,8 @@
+{% extends "correo/base.txt" %}
+{% block titulo %}[Cuenta suspendida] Suspendimos tu cuenta{% endblock %}
+{% block cuerpo %}Hola {{ nombre }}, tu cuenta fue suspendida por no cumplir las reglas de la plataforma. Mientras siga así no podrás ingresar ni registrar precios.
+
+Tus aportes anteriores se conservan para auditoría. Si crees que es un error, responde a este correo.
+
+{% endblock %}
+{% block motivo %}tienes una cuenta en AhorraPues{% endblock %}

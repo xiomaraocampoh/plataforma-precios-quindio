@@ -37,6 +37,7 @@ LOCAL_APPS = [
     "apps.comparacion",  # Consumidores (lado lectura)
     "apps.moderacion",
     "apps.integraciones",
+    "apps.notificaciones",  # correo transaccional (ADR-021)
     "apps.administracion",  # panel propio en /panel/ (roles, catálogo, auditoría)
     # Corte III: aquí se agregará la app de comercios al integrar el módulo comercial (EC-05).
 ]
@@ -48,6 +49,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "apps.cuentas.middleware.SegundoFactorMiddleware",  # RF-27: 2FA obligatoria (también API)
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
@@ -59,9 +61,30 @@ AUTH_USER_MODEL = "cuentas.Usuario"
 LOGIN_URL = "cuentas:ingresar"
 LOGIN_REDIRECT_URL = "comparacion:inicio"
 
-# RF-02: recuperación de contraseña por correo. En desarrollo el correo se imprime en consola.
-EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
+# ---------- Correo transaccional (ADR-021): relé SMTP de Brevo en todos los entornos ----------
+# Las credenciales viven solo en el entorno (.env o secretos del proveedor), nunca en el código.
+# Sin EMAIL_HOST no hay a dónde enviar: el correo se imprime en la consola (respaldo seguro).
+EMAIL_HOST = env("EMAIL_HOST", default="")
+EMAIL_PORT = env.int("EMAIL_PORT", default=587)  # 2525 si la red bloquea el 587
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
+EMAIL_TIMEOUT = env.int("EMAIL_TIMEOUT", default=10)
+_CONSOLA = "django.core.mail.backends.console.EmailBackend"
+EMAIL_BACKEND = env(
+    "EMAIL_BACKEND",
+    default="django.core.mail.backends.smtp.EmailBackend" if EMAIL_HOST else _CONSOLA,
+)
+if not EMAIL_HOST and EMAIL_BACKEND.endswith("smtp.EmailBackend"):
+    EMAIL_BACKEND = _CONSOLA
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="AhorraPues <no-responder@localhost>")
+EMAIL_REPLY_TO = env("EMAIL_REPLY_TO", default="")
+# Dirección pública del sitio para los enlaces de los correos (no se toma del Host de la petición)
+SITIO_URL = env("SITIO_URL", default="http://localhost:8000").rstrip("/")
+NOTIFICACIONES = {
+    # Encolar con transaction.on_commit: el correo sale solo si la transacción se confirma
+    "ENVIAR_AL_CONFIRMAR": True,
+}
 PASSWORD_RESET_TIMEOUT = env.int("PASSWORD_RESET_TIMEOUT", default=60 * 60)  # 1 hora
 LOGOUT_REDIRECT_URL = "comparacion:inicio"
 

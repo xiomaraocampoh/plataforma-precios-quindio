@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block titulo %}App autenticadora · AhorraPues{% endblock %}
+{% block contenido %}
+<div class="auth bento">
+  <section class="tile tile-3" aria-labelledby="t-app">
+    <p><span class="chip chip-alerta"><svg class="ico" aria-hidden="true"><use href="#i-shield"/></svg>Seguridad</span></p>
+    <h1 id="t-app">Configura tu app autenticadora</h1>
+    {% if al_ingresar %}<p class="aviso-panel" role="note">Tu rol exige la verificación en dos pasos. Configúrala para terminar de ingresar.</p>{% endif %}
+    <ol class="lista-simple">
+      <li>Abre una app autenticadora (Google Authenticator, Microsoft Authenticator, Aegis u otra).</li>
+      <li>Escanea el código QR o escribe la clave a mano.</li>
+      <li>Escribe aquí el código de 6 dígitos que aparece.</li>
+    </ol>
+    <figure class="qr">
+      <div class="qr-imagen" role="img" aria-label="Código QR para agregar AhorraPues a la app autenticadora">{{ qr|safe }}</div>
+      <figcaption>¿No puedes escanear? Clave: <code class="clave-totp">{{ secreto }}</code></figcaption>
+    </figure>
+    <form method="post" novalidate hx-disabled-elt="find button[type=submit]">
+      {% csrf_token %}
+      {% include "partials/_errores_generales.html" %}
+      {% if form.password %}{% include "partials/_campo.html" with campo=form.password %}{% endif %}
+      {% include "partials/_campo.html" with campo=form.codigo %}
+      <button class="btn btn-bloque" type="submit">Activar</button>
+    </form>
+    {% if not al_ingresar %}<p class="enlace-pie"><a href="{% url 'cuentas:seguridad' %}">Volver a seguridad</a></p>{% endif %}
+  </section>
+</div>
+{% endblock %}

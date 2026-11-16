@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block titulo %}Cambiar contraseña · AhorraPues{% endblock %}
+{% block contenido %}
+<div class="auth bento">
+  <section class="tile tile-3" aria-labelledby="t-clave">
+    <h1 id="t-clave">Cambiar mi contraseña</h1>
+    <p class="suave">Te enviaremos un aviso por correo con un enlace por si no fuiste tú.</p>
+    <form method="post" novalidate hx-disabled-elt="find button">
+      {% csrf_token %}
+      {% include "partials/_errores_generales.html" %}
+      {% for campo in form %}{% include "partials/_campo.html" %}{% endfor %}
+      <button class="btn btn-bloque" type="submit">Cambiar contraseña</button>
+    </form>
+    <p class="enlace-pie"><a href="{% url 'cuentas:seguridad' %}">Volver a seguridad</a></p>
+  </section>
+</div>
+{% endblock %}

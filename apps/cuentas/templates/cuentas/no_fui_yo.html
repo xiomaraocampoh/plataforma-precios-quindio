@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block titulo %}Proteger mi cuenta · AhorraPues{% endblock %}
+{% block contenido %}
+<div class="auth bento">
+  <section class="tile tile-3" aria-labelledby="t-nofui">
+    <p><span class="chip chip-alerta">Seguridad</span></p>
+    <h1 id="t-nofui">¿No cambiaste tu contraseña?</h1>
+    <p>Vamos a bloquear la contraseña actual, cerrar las sesiones abiertas y enviarte un enlace para crear una nueva.</p>
+    <form method="post">{% csrf_token %}<button class="btn btn-peligro btn-bloque" type="submit">Proteger mi cuenta</button></form>
+  </section>
+</div>
+{% endblock %}

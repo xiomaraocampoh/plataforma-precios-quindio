@@ -1,0 +1,1 @@
+{% if aprobado %}{{ establecimiento }} ya está en AhorraPues{% else %}Revisamos el establecimiento que sugeriste{% endif %}

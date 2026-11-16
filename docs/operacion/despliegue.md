@@ -110,6 +110,33 @@ sitio redirige a HTTPS; para comprobar por HTTP en local pon `FORZAR_HTTPS=False
 | `PORT` | No (`8000`) | Puerto interno; los PaaS lo inyectan |
 | `CACHE_COMPARACION_TTL`, `LIMITE_REPORTES_HORA` | No | Parámetros de negocio (60 s y 30 por hora) |
 | `DEMO_PASSWORD`, `DEMO_ADMIN_PASSWORD` | No | Claves de `cargar_demo` |
+| `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USE_TLS` | Para enviar correo | Relé SMTP de Brevo: `smtp-relay.brevo.com`, `587` (o `2525`), `True`. Sin `EMAIL_HOST`, el correo va a la consola |
+| `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD` | Para enviar correo | Login y **clave SMTP** de Brevo. Solo como secreto del proveedor, nunca en el repositorio |
+| `DEFAULT_FROM_EMAIL`, `EMAIL_REPLY_TO` | Para enviar correo | Remitente verificado en Brevo y dirección de respuesta |
+| `EMAIL_TIMEOUT` | No (`10`) | Segundos máximos por conexión SMTP |
+| `SITIO_URL` | Sí, en producción | `https://tu-dominio`: base de los enlaces de los correos (no se toma de la cabecera Host) |
+
+### 6.1 Correo con Brevo (ADR-021)
+
+1. **Crear la cuenta:** regístrate gratis en [brevo.com](https://www.brevo.com). El plan gratuito
+   envía 300 correos al día.
+2. **Verificar el remitente:** en *Senders, Domains & Dedicated IPs → Senders*, agrega
+   `ahorrapuescolombia@gmail.com` con el nombre «AhorraPues». Abre el correo de Brevo que llega a esa
+   bandeja y confírmalo.
+3. **Generar la clave SMTP:** en *Settings → SMTP & API → SMTP*, pulsa *Generate a new SMTP key*.
+   Usa la clave **SMTP**, que empieza por `xsmtpsib-`, y no la de API (`xkeysib-`). El *Login* de
+   esa misma pestaña, que termina en `@smtp-brevo.com`, va en `EMAIL_HOST_USER`.
+4. **Llenar el `.env`:** copia el bloque de correo de `.env.example` y reemplaza el usuario, la
+   clave y el remitente. **El `.env` nunca se versiona:** compruébalo con `git ls-files .env`, que
+   debe salir vacío. Si tu red bloquea el puerto 587, usa `EMAIL_PORT=2525`.
+5. **Probar:** `python manage.py sendtestemail tu-correo@ejemplo.com`. Debe llegar en menos de un
+   minuto; revisa también la carpeta de spam (ver ADR-021, remitente `@gmail.com`).
+6. **Reintentos:** deja corriendo `python manage.py enviar_correos --continuo`, o prográmalo cada
+   minuto, para reenviar lo que falló.
+7. **En el PaaS:** carga las mismas variables como secretos y agrega un segundo proceso
+   `python manage.py enviar_correos --continuo`, o un cron cada minuto. Sin él solo existe el primer
+   intento de cada correo.
+
 
 ## 7. Llevarlo a un PaaS de contenedores (pendiente de proveedor)
 

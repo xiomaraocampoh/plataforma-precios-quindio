@@ -1,0 +1,8 @@
+{% extends "correo/base.html" %}
+{% block preheader %}Si no fuiste tú, protege tu cuenta con un clic.{% endblock %}
+{% block chip %}{% include 'correo/_chip.html' with tono='seguridad' texto='Seguridad' %}{% endblock %}
+{% block titulo %}Tu contraseña cambió{% endblock %}
+{% block cuerpo %}<p style="margin:0 0 16px 0;font-size:16px;line-height:1.5;color:#5f5f64;">Hola {{ nombre }}, la contraseña de tu cuenta se cambió el {{ cuando }}.</p><p style="margin:0 0 16px 0;font-size:16px;line-height:1.5;color:#5f5f64;">Si fuiste tú, no tienes que hacer nada.</p>{% endblock %}
+{% block accion %}{% include 'correo/_boton.html' with url=enlace texto='No fui yo: proteger mi cuenta' %}{% endblock %}
+{% block despues %}<p style="margin:0 0 16px 0;font-size:16px;line-height:1.5;color:#5f5f64;">Con ese botón bloqueamos la contraseña actual, cerramos las sesiones y te enviamos un enlace para crear una nueva.</p>{% endblock %}
+{% block motivo %}cambió la contraseña de tu cuenta{% endblock %}

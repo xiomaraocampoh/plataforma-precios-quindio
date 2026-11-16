@@ -1,0 +1,7 @@
+{% extends "correo/base.html" %}
+{% block preheader %}Moderación revisó tu solicitud de {{ producto }}.{% endblock %}
+{% block chip %}{% if aprobado %}{% include 'correo/_chip.html' with tono='aprobado' texto='Solicitud aprobada' %}{% else %}{% include 'correo/_chip.html' with tono='rechazado' texto='Solicitud no aprobada' %}{% endif %}{% endblock %}
+{% block titulo %}{% if aprobado %}Agregamos {{ producto }} al catálogo{% else %}No agregamos {{ producto }} al catálogo{% endif %}{% endblock %}
+{% block cuerpo %}<p style="margin:0 0 16px 0;font-size:16px;line-height:1.5;color:#5f5f64;">{% if aprobado %}Gracias a tu solicitud ya se puede registrar y comparar su precio.{% else %}Moderación revisó tu solicitud y no la aprobó, por ejemplo porque el producto ya existía o faltaban datos.{% endif %}</p>{% endblock %}
+{% block accion %}{% include 'correo/_boton.html' with url=enlace_registrar texto='Registrar un precio' %}{% endblock %}
+{% block motivo %}solicitaste agregar un producto al catálogo{% endblock %}

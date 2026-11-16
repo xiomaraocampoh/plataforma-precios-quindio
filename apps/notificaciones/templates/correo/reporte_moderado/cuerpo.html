@@ -1,0 +1,7 @@
+{% extends "correo/base.html" %}
+{% block preheader %}{{ presentacion }} en {{ establecimiento }}.{% endblock %}
+{% block chip %}{% if aprobado %}{% include 'correo/_chip.html' with tono='aprobado' texto='Publicado' %}{% else %}{% include 'correo/_chip.html' with tono='rechazado' texto='No publicado' %}{% endif %}{% endblock %}
+{% block titulo %}{% if aprobado %}Tu precio ya está publicado{% else %}Tu precio no se publicó{% endif %}{% endblock %}
+{% block cuerpo %}<p style="margin:0 0 16px 0;font-size:16px;line-height:1.5;color:#5f5f64;">{{ presentacion }} a ${{ precio }} en {{ establecimiento }}.</p><p style="margin:0 0 16px 0;font-size:16px;line-height:1.5;color:#5f5f64;">{% if aprobado %}Quedó en revisión porque era muy distinto a los demás precios. Moderación lo revisó y ya aparece en la comparación.{% else %}Quedó en revisión porque era muy distinto a los demás precios y moderación no pudo confirmarlo. Si el precio es correcto, puedes reportarlo de nuevo.{% endif %}</p>{% endblock %}
+{% block accion %}{% include 'correo/_boton.html' with url=enlace_aportes texto='Ver mis aportes' %}{% endblock %}
+{% block motivo %}reportaste un precio en AhorraPues{% endblock %}

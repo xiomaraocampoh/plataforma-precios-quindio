@@ -1,0 +1,14 @@
+{% extends "correo/base.txt" %}
+{% block titulo %}[Seguridad] Crea una contraseña nueva{% endblock %}
+{% block cuerpo %}Hola {{ nombre }}, recibimos una solicitud para recuperar el acceso a tu cuenta.
+
+El enlace vence en 1 hora y sirve una sola vez.
+
+{% endblock %}
+{% block accion %}Crear contraseña nueva: {{ enlace }}
+
+{% endblock %}
+{% block despues %}Si no la pediste, ignora este correo: tu contraseña no cambia.
+
+{% endblock %}
+{% block motivo %}se pidió recuperar la contraseña de tu cuenta{% endblock %}
