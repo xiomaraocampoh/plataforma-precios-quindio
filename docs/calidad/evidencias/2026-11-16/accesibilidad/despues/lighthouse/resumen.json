@@ -1,0 +1,27 @@
+{
+  "inicio": {
+    "url": "http://127.0.0.1:8000/",
+    "puntaje": 100,
+    "fallos": []
+  },
+  "comparacion": {
+    "url": "http://127.0.0.1:8000/productos/1/",
+    "puntaje": 100,
+    "fallos": []
+  },
+  "registro-precio": {
+    "url": "http://127.0.0.1:8000/precios/registrar/",
+    "puntaje": 100,
+    "fallos": []
+  },
+  "registro-cuenta": {
+    "url": "http://127.0.0.1:8000/cuentas/registro/",
+    "puntaje": 100,
+    "fallos": []
+  },
+  "ingreso": {
+    "url": "http://127.0.0.1:8000/cuentas/ingresar/",
+    "puntaje": 100,
+    "fallos": []
+  }
+}

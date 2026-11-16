@@ -1,0 +1,29 @@
+{
+  "violaciones": [
+    {
+      "id": "color-contrast",
+      "impacto": "serious",
+      "criterios": [
+        "wcag143"
+      ],
+      "ayuda": "Elements must meet minimum color contrast ratio thresholds",
+      "nodos": [
+        {
+          "selector": ".btn-claro",
+          "resumen": "Fix any of the following:\n  Element has insufficient color contrast of 2.14 (foreground color: #6cb6ff, background color: #ffffff, font size: 12.8pt (17px), font weight: normal). Expected contrast ratio of 4.5:1"
+        }
+      ]
+    }
+  ],
+  "revisar": [
+    {
+      "id": "aria-prohibited-attr",
+      "nodos": 1
+    },
+    {
+      "id": "color-contrast",
+      "nodos": 29
+    }
+  ],
+  "url_auditada": "/"
+}
