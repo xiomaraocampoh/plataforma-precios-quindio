@@ -8,6 +8,7 @@ from django.views.decorators.http import require_GET
 
 from apps.catalogo import selectors as catalogo
 from apps.catalogo.models import Producto
+from apps.integraciones.selectors import referencia_sipsa
 
 from .domain.filtros import FiltroUbicacion
 from .domain.ranking import CRITERIO_DECLARADO
@@ -58,6 +59,7 @@ def comparar(request, producto_id: int):
         "filtro": filtro,
         **ubicaciones_de(comparar_filas(producto_id)),
         **estado_del_usuario(request.user, ids),
+        "referencia": referencia_sipsa(producto_id),
     }
     plantilla = (
         "comparacion/partials/_resultados.html" if request.htmx else "comparacion/comparar.html"

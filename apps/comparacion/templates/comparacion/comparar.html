@@ -34,6 +34,13 @@
   </div>
 </form>
 {% endif %}
+{% if referencia %}
+<aside class="tile tile-tenue referencia" aria-labelledby="t-referencia" style="margin-bottom:var(--gap)">
+  <h2 id="t-referencia" style="font-size:1rem">Referencia mayorista SIPSA (DANE)</h2>
+  <p><span class="por-unidad">${{ referencia.precio_por_kg|floatformat:0 }} por kg</span> en {{ referencia.mercado }} · <time datetime="{{ referencia.fecha|date:'Y-m-d' }}">{{ referencia.fecha|date:"j M Y" }}</time></p>
+  <p class="suave">Precio de venta al por mayor, solo como referencia. No es un precio de tienda ni cambia el orden de la comparación.</p>
+</aside>
+{% endif %}
 {% if user.is_authenticated %}<p class="sr-only" id="ayuda-sigue-igual">Confirma que el precio no ha cambiado desde que se reportó. Renueva su vigencia.</p>{% endif %}
 <div id="resultados"
      hx-get="{% url 'comparacion:comparar' producto.pk %}"

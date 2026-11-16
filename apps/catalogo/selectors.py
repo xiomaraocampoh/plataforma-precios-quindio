@@ -71,6 +71,22 @@ def obtener_producto(producto_id: int) -> Producto | None:
     )
 
 
+def producto_por_nombre(nombre: str) -> Producto | None:
+    """Producto con ese nombre normalizado; si no hay, el único con similitud ≥ 0,85 (D-05)."""
+    normal = normalizar_nombre(nombre)
+    if not normal:
+        return None
+    exactos = list(Producto.objects.filter(nombre_normalizado=normal)[:2])
+    if len(exactos) == 1:
+        return exactos[0]
+    similares = [
+        p
+        for p in Producto.objects.only("id", "nombre", "marca", "nombre_normalizado")
+        if son_posibles_duplicados(nombre, p.nombre)
+    ]
+    return similares[0] if len(similares) == 1 else None
+
+
 def productos_similares(nombre: str, marca: str = "", limite: int = 5) -> list[Producto]:
     """RF-06, D-05: productos cuyo nombre (con la marca) se parece ≥ 0,85 al solicitado."""
     buscado = f"{nombre} {marca}".strip()
