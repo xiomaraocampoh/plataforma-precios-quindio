@@ -19,6 +19,7 @@ from django.utils.http import urlsafe_base64_encode
 
 from apps.notificaciones import services as notificaciones
 from apps.notificaciones.domain.catalogo import Tipo
+from apps.notificaciones.models import CorreoPendiente
 
 from ..domain.dispositivos import describir_navegador, huella_dispositivo
 from ..models import DispositivoConocido, SegundoFactor, Usuario
@@ -63,8 +64,22 @@ def enlace_verificacion(usuario: Usuario) -> str:
     return _url(f"/cuentas/verificar-correo/{signing.dumps(datos, salt=_SAL_VERIFICAR)}/")
 
 
+ESPERA_REENVIO = timedelta(minutes=1)
+
+
+def _verificacion_reciente(usuario: Usuario) -> bool:
+    """Un doble clic o un formulario enviado dos veces no debe producir dos correos."""
+    desde = timezone.now() - ESPERA_REENVIO
+    return CorreoPendiente.objects.filter(
+        usuario=usuario,
+        tipo=Tipo.VERIFICAR_CORREO,
+        destinatario__iexact=usuario.email,
+        creado_en__gte=desde,
+    ).exists()
+
+
 def enviar_verificacion(usuario: Usuario) -> None:
-    if not usuario.email or usuario.email_verificado_en:
+    if not usuario.email or usuario.email_verificado_en or _verificacion_reciente(usuario):
         return
     notificaciones.encolar(
         tipo=Tipo.VERIFICAR_CORREO,

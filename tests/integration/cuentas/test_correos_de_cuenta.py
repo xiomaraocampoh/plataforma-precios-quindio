@@ -278,3 +278,11 @@ def test_la_moderacion_repetida_no_duplica_el_aviso(verificada, arroz, tiendas, 
     with pytest.raises(Exception):  # noqa: B017  ya resuelto: el servicio lo rechaza
         moderacion.decidir_reporte(moderador=moderadora, reporte_id=reporte.pk, aprobar=False)
     assert len(mail.outbox) == 1
+
+
+def test_corregir_el_correo_enseguida_si_envia_el_enlace_a_la_nueva_direccion(client, db):
+    client.post(reverse("cuentas:registro"), REGISTRO)
+    client.post(
+        reverse("cuentas:mis_datos"), {"username": "nueva", "email": "corregido@example.com"}
+    )
+    assert [m.to for m in mail.outbox] == [["nueva@example.com"], ["corregido@example.com"]]
