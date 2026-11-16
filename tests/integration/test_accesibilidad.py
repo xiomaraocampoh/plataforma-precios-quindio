@@ -71,3 +71,16 @@ def test_la_region_de_avisos_existe_antes_de_cualquier_cambio(client, db):
     html = client.get(reverse("comparacion:inicio")).content.decode()
     assert re.search(r'id="avisos" role="status" aria-live="polite"', html)
     assert "js/accesibilidad.js" in html
+
+
+@pytest.mark.parametrize(
+    ("q", "esperado"),
+    [
+        ("", ""),  # Esc vacía el buscador: la lista se oculta
+        ("a", "Escribe al menos dos letras."),
+        ("zzz", "No encontramos «zzz». Prueba con otro nombre."),
+    ],
+)
+def test_sugerencias_distinguen_buscador_vacio_corto_y_sin_coincidencias(client, db, q, esperado):
+    html = client.get(reverse("comparacion:sugerencias"), {"q": q}).content.decode().strip()
+    assert esperado in html if esperado else html == ""

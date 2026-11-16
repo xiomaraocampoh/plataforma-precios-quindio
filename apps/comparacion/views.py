@@ -1,5 +1,6 @@
 """Vistas HTMX del consumidor. Renderizan página completa o solo el fragmento (partial)."""
 
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_GET
 
@@ -7,6 +8,7 @@ from apps.catalogo.models import Producto
 
 from .domain.ranking import CRITERIO_DECLARADO
 from .selectors import (
+    MIN_CARACTERES_BUSQUEDA,
     buscar_productos,
     comparar_con_resumen,
     ejemplo_comparacion,
@@ -29,9 +31,16 @@ def inicio(request):
 
 @require_GET
 def sugerencias(request):
-    """hx-get con hx-trigger='keyup changed delay:300ms' → solo el fragmento de sugerencias."""
-    productos = buscar_productos(request.GET.get("q", ""))
-    return render(request, "comparacion/partials/_sugerencias.html", {"productos": productos})
+    """Fragmento de sugerencias (hx-trigger: input changed delay:300ms, search)."""
+    texto = request.GET.get("q", "").strip()
+    if not texto:
+        return HttpResponse("")  # Esc o campo vacío: la lista queda vacía y se oculta
+    contexto = {
+        "productos": buscar_productos(texto),
+        "texto": texto,
+        "muy_corto": len(texto) < MIN_CARACTERES_BUSQUEDA,
+    }
+    return render(request, "comparacion/partials/_sugerencias.html", contexto)
 
 
 @require_GET
