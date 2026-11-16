@@ -4,6 +4,7 @@ Regla de neutralidad (EC-06): un filtro solo REDUCE los resultados; nunca agrega
 El orden lo decide únicamente `ranking.ordenar_neutral`.
 """
 
+import re
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
@@ -65,3 +66,24 @@ def filtrar_por_precio[T](
     items: Sequence[T], filtro: FiltroPrecio, precio: Callable[[T], Decimal]
 ) -> list[T]:
     return [item for item in items if filtro.admite(precio(item))]
+
+
+_MILES = re.compile(r"^\d{1,3}(\.\d{3})+$")  # 2.500 · 1.234.567
+_PLANO = re.compile(r"^\d+(\.\d+)?$")  # 2500 · 2500.50
+
+
+def interpretar_monto(texto: str) -> Decimal | None:
+    """Convierte lo que escribe una persona en un monto; vacío significa «sin límite».
+
+    Formato colombiano: el punto agrupa miles y la coma separa los decimales.
+    """
+    limpio = texto.replace("$", "").strip()
+    if not limpio:
+        return None
+    if "," in limpio:
+        limpio = limpio.replace(".", "").replace(",", ".")
+    elif _MILES.match(limpio):
+        limpio = limpio.replace(".", "")
+    if not _PLANO.match(limpio):
+        raise ValueError(f"No se entiende el monto: {texto!r}.")
+    return Decimal(limpio)
