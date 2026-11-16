@@ -23,10 +23,13 @@ from core.cache import clave_comparacion, clave_resumen, ttl_comparacion
 from .domain.ranking import ResultadoComparacion, ordenar_neutral
 from .domain.resumen import ResumenComparacion, resumir_precios
 
+MIN_CARACTERES_BUSQUEDA = 2  # menos letras devuelven demasiadas coincidencias
+MIN_FILAS_EJEMPLO = 2  # el gráfico de la portada necesita al menos dos precios que comparar
+
 
 def buscar_productos(texto: str, limite: int = 10):
     texto = (texto or "").strip()
-    if len(texto) < 2:
+    if len(texto) < MIN_CARACTERES_BUSQUEDA:
         return Producto.objects.none()
     return Producto.objects.filter(nombre__icontains=texto).order_by("nombre")[:limite]
 
@@ -127,7 +130,7 @@ def productos_destacados(limite: int = 8):
 def ejemplo_comparacion(producto_id: int, limite: int = 4) -> list[dict]:
     """Filas para el gráfico de barras de la portada (precio por unidad, orden neutral)."""
     filas = comparar_producto(producto_id)[:limite]
-    if len(filas) < 2 or len({f.unidad_base for f in filas}) != 1:
+    if len(filas) < MIN_FILAS_EJEMPLO or len({f.unidad_base for f in filas}) != 1:
         return []
     maximo = max(f.precio_unitario for f in filas)
     return [

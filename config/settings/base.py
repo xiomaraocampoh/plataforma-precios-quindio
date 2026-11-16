@@ -37,7 +37,7 @@ LOCAL_APPS = [
     "apps.comparacion",  # Consumidores (lado lectura)
     "apps.moderacion",
     "apps.integraciones",
-    # "apps.comercios",      # Corte III — se activa al integrar el módulo comercial (EC-05)
+    # Corte III: aquí se agregará la app de comercios al integrar el módulo comercial (EC-05).
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 

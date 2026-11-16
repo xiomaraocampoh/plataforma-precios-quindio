@@ -6,7 +6,8 @@ from .models import Usuario
 
 @admin.register(Usuario)
 class UsuarioAdmin(UserAdmin):
-    fieldsets = UserAdmin.fieldsets + (
+    fieldsets = (
+        *UserAdmin.fieldsets,
         ("Plataforma", {"fields": ("rol", "acepto_tratamiento_datos", "fecha_aceptacion_datos")}),
     )
     list_display = ("username", "email", "rol", "is_active")
