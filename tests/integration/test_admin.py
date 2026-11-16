@@ -45,7 +45,10 @@ def test_presentacion_se_busca_por_codigo_y_filtra_por_marca(admin_client_, arro
     Presentacion.objects.filter(pk=p500.pk).update(codigo_barras="7702001001234")
     otra = Categoria.objects.create(nombre="Abarrotes")  # con 2 valores el filtro se muestra
     cafe = Producto.objects.create(
-        nombre="Café", marca="Águila Roja", nombre_normalizado="cafe", categoria=otra
+        nombre="Café",
+        marca=catalogo.marca_por_nombre("Águila Roja"),
+        nombre_normalizado="cafe",
+        categoria=otra,
     )
     Presentacion.objects.create(producto=cafe, cantidad=Decimal(250), unidad="g")
     url = reverse("admin:catalogo_presentacion_changelist")

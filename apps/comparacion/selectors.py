@@ -14,7 +14,6 @@ from django.utils import timezone
 
 from apps.catalogo import selectors as catalogo
 from apps.catalogo.domain.normalizacion import precio_por_unidad
-from apps.catalogo.models import Producto
 from apps.establecimientos.models import Establecimiento
 from apps.moderacion.selectors import denunciados_por
 from apps.precios.domain.confianza import nivel_confianza
@@ -62,10 +61,13 @@ def _reportes_candidatos(producto_id: int, desde: datetime):
         ReportePrecio.objects.filter(
             Q(fecha_observacion__gte=desde) | Q(confirmaciones__creado_en__gte=desde),
             presentacion__producto_id=producto_id,
+            presentacion__activa=True,  # una presentación retirada del catálogo no se compara
             estado=ReportePrecio.Estado.PUBLICADO,
             establecimiento__activo=True,
         )
-        .select_related("presentacion__producto__categoria", "establecimiento")
+        .select_related(
+            "presentacion__producto__categoria", "presentacion__producto__marca", "establecimiento"
+        )
         .order_by("establecimiento_id", "presentacion_id", "-fecha_observacion")
         .distinct()
     )
@@ -154,7 +156,7 @@ def ubicaciones_de(filas: list[FilaComparacion]) -> dict[str, list[str]]:
 
 def _calcular_resumen_plataforma() -> dict[str, int]:
     return {
-        "productos": Producto.objects.count(),
+        "productos": catalogo.productos_publicos().count(),
         "establecimientos": Establecimiento.objects.filter(activo=True).count(),
         "reportes": ReportePrecio.objects.filter(estado=ReportePrecio.Estado.PUBLICADO).count(),
     }
@@ -168,7 +170,7 @@ def resumen_plataforma() -> dict[str, int]:
 def productos_destacados(limite: int = 8):
     """Productos con más reportes publicados (un solo query; sin criterio comercial)."""
     return list(
-        Producto.objects.select_related("categoria")
+        catalogo.productos_publicos()
         .annotate(
             n_reportes=Count(
                 "presentaciones__reportes",

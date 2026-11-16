@@ -11,7 +11,7 @@ def bandeja() -> dict:
     """Pendientes de moderación. Solo la ven moderadores; incluye al autor para poder suspender."""
     reportes = (
         ReportePrecio.objects.filter(estado=ReportePrecio.Estado.EN_REVISION)
-        .select_related("presentacion__producto", "establecimiento", "autor")
+        .select_related("presentacion__producto__marca", "establecimiento", "autor")
         .order_by("creado_en")
     )
     denuncias = (
@@ -40,7 +40,7 @@ def bandeja() -> dict:
 def reportes_en_revision():
     return (
         ReportePrecio.objects.filter(estado=ReportePrecio.Estado.EN_REVISION)
-        .select_related("presentacion__producto", "establecimiento")
+        .select_related("presentacion__producto__marca", "establecimiento")
         .order_by("creado_en")
     )
 

@@ -3,12 +3,33 @@ from django.db import models
 
 from core.models import ModeloConMarcasDeTiempo
 
+from .domain.duplicados import normalizar_nombre
 from .domain.normalizacion import Unidad, formatear_cantidad
+
+
+class Marca(models.Model):
+    """Marca del producto. Única por nombre normalizado: «Águila Roja» = «aguila roja»."""
+
+    nombre = models.CharField(max_length=80)
+    nombre_normalizado = models.CharField(max_length=80, unique=True)
+    activa = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["nombre"]
+
+    def __str__(self) -> str:
+        return self.nombre
+
+    def save(self, *args, **kwargs):
+        self.nombre = " ".join(self.nombre.split())
+        self.nombre_normalizado = normalizar_nombre(self.nombre)
+        super().save(*args, **kwargs)
 
 
 class Categoria(models.Model):
     nombre = models.CharField(max_length=80, unique=True)
     perecedera = models.BooleanField(default=False)
+    activa = models.BooleanField(default=True)
 
     def __str__(self) -> str:
         return self.nombre
@@ -18,19 +39,31 @@ class Producto(ModeloConMarcasDeTiempo):
     """Producto genérico (p. ej. 'Arroz blanco'). Sus presentaciones se comparan por unidad."""
 
     nombre = models.CharField(max_length=150)
-    marca = models.CharField(max_length=80, blank=True)
+    marca = models.ForeignKey(
+        Marca, on_delete=models.PROTECT, null=True, blank=True, related_name="productos"
+    )
     nombre_normalizado = models.CharField(max_length=200, db_index=True)  # D-05 duplicados
     categoria = models.ForeignKey(Categoria, on_delete=models.PROTECT, related_name="productos")
+    activo = models.BooleanField(default=True)
 
     class Meta:
         constraints = [
+            # Con NULL la unicidad no se cumpliría: un índice parcial para cada caso
             models.UniqueConstraint(
-                fields=["nombre_normalizado", "marca"], name="producto_unico_por_marca"
+                fields=["nombre_normalizado", "marca"],
+                condition=models.Q(marca__isnull=False),
+                name="producto_unico_por_marca",
+            ),
+            models.UniqueConstraint(
+                fields=["nombre_normalizado"],
+                condition=models.Q(marca__isnull=True),
+                name="producto_unico_sin_marca",
             ),
         ]
 
     def __str__(self) -> str:
-        return f"{self.nombre} {self.marca}".strip()
+        # Las consultas que listan productos hacen select_related("marca") (sin N+1)
+        return f"{self.nombre} {self.marca or ''}".strip()
 
 
 class Presentacion(models.Model):
@@ -38,6 +71,7 @@ class Presentacion(models.Model):
     cantidad = models.DecimalField(max_digits=10, decimal_places=3)
     unidad = models.CharField(max_length=4, choices=[(u.value, u.value) for u in Unidad])
     codigo_barras = models.CharField(max_length=14, blank=True, db_index=True)
+    activa = models.BooleanField(default=True)
 
     class Meta:
         constraints = [
