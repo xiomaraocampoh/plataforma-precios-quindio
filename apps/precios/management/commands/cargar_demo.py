@@ -38,6 +38,13 @@ MODERADOR = "moderador_demo"
 CATEGORIAS = {"Granos": False, "Abarrotes": False, "Lácteos y huevos": True, "Frescos": True}
 
 # (producto, categoría, [(cantidad, unidad, precio base COP)])
+# Códigos EAN-13 de uso interno (prefijo 20: «restricted circulation» de GS1, no pertenecen a
+# ningún producto real) para ensayar el escáner (RF-04). Clave: (producto, cantidad, unidad).
+CODIGOS_DEMO = {
+    ("Arroz blanco", "500", "g"): "2000000000015",
+    ("Arroz blanco", "1", "kg"): "2000000000022",
+}
+
 PRODUCTOS = [
     ("Arroz blanco", "Granos", [("500", "g", 2600), ("1", "kg", 4900)]),
     ("Lentejas", "Granos", [("500", "g", 4200)]),
@@ -250,7 +257,10 @@ class Command(BaseCommand):
             )
             for cantidad, unidad, base in presentaciones:
                 pres, _ = Presentacion.objects.get_or_create(
-                    producto=producto, cantidad=Decimal(cantidad), unidad=unidad
+                    producto=producto,
+                    cantidad=Decimal(cantidad),
+                    unidad=unidad,
+                    defaults={"codigo_barras": CODIGOS_DEMO.get((nombre, cantidad, unidad), "")},
                 )
                 resultado.append((pres, base))
         return resultado
