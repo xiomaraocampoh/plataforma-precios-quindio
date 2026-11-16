@@ -37,6 +37,7 @@ LOCAL_APPS = [
     "apps.comparacion",  # Consumidores (lado lectura)
     "apps.moderacion",
     "apps.integraciones",
+    "apps.notificaciones",  # correo transaccional (ADR-021)
     "apps.administracion",  # panel propio en /panel/ (roles, catálogo, auditoría)
     # Corte III: aquí se agregará la app de comercios al integrar el módulo comercial (EC-05).
 ]
