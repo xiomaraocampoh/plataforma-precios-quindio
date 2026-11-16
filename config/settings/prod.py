@@ -20,12 +20,18 @@ CACHES = {
     }
 }
 
+# HTTPS obligatorio por defecto. FORZAR_HTTPS=False existe SOLO para verificar la imagen de
+# producción en local sin TLS (docs/operacion/despliegue.md); en un despliegue real nunca se apaga.
+FORZAR_HTTPS = env.bool("FORZAR_HTTPS", default=True)
+# Orígenes con los que el proveedor sirve el sitio (https://dominio); casi todos los exigen.
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
+
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-SECURE_HSTS_SECONDS = 31536000
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_SSL_REDIRECT = FORZAR_HTTPS
+SESSION_COOKIE_SECURE = FORZAR_HTTPS
+CSRF_COOKIE_SECURE = FORZAR_HTTPS
+SECURE_HSTS_SECONDS = 31536000 if FORZAR_HTTPS else 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = FORZAR_HTTPS
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
 

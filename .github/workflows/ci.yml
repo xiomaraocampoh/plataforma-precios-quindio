@@ -44,3 +44,11 @@ jobs:
         with:
           name: coverage
           path: coverage.xml
+
+  # Reproducibilidad del despliegue (ADR-017): la imagen de producción debe construir sin errores.
+  imagen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Construir la imagen de producción
+        run: docker build -t ahorrapues:ci .

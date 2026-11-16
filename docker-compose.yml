@@ -22,7 +22,10 @@ services:
       retries: 10
 
   web:
-    build: .
+    build:
+      context: .
+      args:
+        REQUIREMENTS: dev  # la imagen de producción (docker-compose.prod.yml) no lleva pytest ni ruff
     command: python manage.py runserver 0.0.0.0:8000
     environment:
       DJANGO_SETTINGS_MODULE: config.settings.dev
