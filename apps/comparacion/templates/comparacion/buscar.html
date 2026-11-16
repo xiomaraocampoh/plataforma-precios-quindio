@@ -3,7 +3,7 @@
 {% block titulo %}AhorraPues · Compara precios en Armenia y el Quindío{% endblock %}
 {% block head %}<link rel="preload" as="image" href="{% static 'img/hero-supermercado.webp' %}" media="(min-width: 900px)" fetchpriority="high">
 <script src="{% static 'js/hero.js' %}?v=3" defer></script>
-<script src="{% static 'js/escanear.js' %}?v=3" defer></script>{% endblock %}
+<script src="{% static 'js/escanear.js' %}?v=4" defer></script>{% endblock %}
 {% block hero %}
 <div class="hero-fondo">
 <div class="hero-contenedor">
@@ -31,7 +31,7 @@
   </div>
   <dialog id="escaner" class="escaner" aria-labelledby="t-escaner">
     <h2 id="t-escaner">Buscar por código de barras</h2>
-    <p class="suave">La imagen se lee en tu celular y no se guarda ni se envía: solo se usan los números del código.</p>
+    <p class="suave">Al escanear el código, la imagen se lee en tu celular y no sale de él: solo se usan los números.</p>
     <video playsinline muted hidden aria-label="Vista de la cámara"></video>
     <p data-estado role="status" aria-live="polite"></p>
     <label class="btn btn-sec btn-bloque">
