@@ -3,7 +3,7 @@
 {% block titulo %}AhorraPues · Compara precios en Armenia y el Quindío{% endblock %}
 {% block head %}<link rel="preload" as="image" href="{% static 'img/hero-supermercado.webp' %}" media="(min-width: 900px)" fetchpriority="high">
 <script src="{% static 'js/hero.js' %}?v=3" defer></script>
-<script src="{% static 'js/escanear.js' %}?v=5" defer></script>{% endblock %}
+<script src="{% static 'js/escanear.js' %}?v=6" defer></script>{% endblock %}
 {% block hero %}
 <div class="hero-fondo">
 <div class="hero-contenedor">
@@ -41,7 +41,8 @@
           <input type="file" accept="image/*" capture="environment" class="sr-only"
                  data-foto data-url="{% url 'comparacion:buscar_por_foto' %}">
         </label>
-        <p class="suave">La foto se reduce en tu celular y se envía a Anthropic, un servicio externo de IA, solo para identificar el producto. No se guarda. Evita que salgan personas.</p>
+        <p class="suave">También puedes pegar (Cmd/Ctrl+V) o arrastrar una imagen aquí.</p>
+        <p class="suave">La foto se reduce en tu equipo y se envía a Anthropic, un servicio externo de IA, solo para identificar el producto. No se guarda. Evita que salgan personas.</p>
       {% else %}
         <p class="suave"><a href="{% url 'cuentas:ingresar' %}?next=/">Ingresa</a> para buscar por foto.</p>
       {% endif %}

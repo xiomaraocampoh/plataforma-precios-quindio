@@ -143,21 +143,48 @@
     try { return JSON.parse(document.body.getAttribute("hx-headers"))["X-CSRFToken"]; }
     catch (e) { return ""; }
   }
+  function enviarFotoIA(archivo) {
+    salida.textContent = "Identificando el producto…";
+    reducir(archivo).then(function (blob) {
+      var datos = new FormData();
+      datos.append("foto", blob, "foto.jpg");
+      return fetch(fotoIA.dataset.url, { method: "POST", body: datos, headers: { "X-CSRFToken": csrf() }, credentials: "same-origin" });
+    }).then(function (r) { return r.text(); })
+      .then(function (html) { salida.innerHTML = html; }) // fragmento propio del servidor
+      .catch(function () { salida.textContent = "No pudimos enviar la foto. Busca por nombre o código."; });
+  }
   if (fotoIA) {
     fotoIA.addEventListener("change", function () {
       var archivo = fotoIA.files && fotoIA.files[0];
       fotoIA.value = "";
-      if (!archivo) return;
-      salida.textContent = "Identificando el producto…";
-      reducir(archivo).then(function (blob) {
-        var datos = new FormData();
-        datos.append("foto", blob, "foto.jpg");
-        return fetch(fotoIA.dataset.url, { method: "POST", body: datos, headers: { "X-CSRFToken": csrf() }, credentials: "same-origin" });
-      }).then(function (r) { return r.text(); })
-        .then(function (html) { salida.innerHTML = html; }) // fragmento propio del servidor
-        .catch(function () { salida.textContent = "No pudimos enviar la foto. Busca por nombre o código."; });
+      if (archivo) enviarFotoIA(archivo);
     });
   }
+
+  /* Pegar (Cmd/Ctrl+V) o arrastrar una imagen: mismo flujo que elegir una foto. */
+  function imagenDe(transferencia) {
+    var archivos = transferencia && transferencia.files ? Array.prototype.slice.call(transferencia.files) : [];
+    return archivos.filter(function (a) { return /^image\//.test(a.type); })[0] || null;
+  }
+  function procesarImagen(archivo) {
+    if (!dialogo.open) { dialogo.showModal(); iniciarCamara(); }
+    if (fotoIA) enviarFotoIA(archivo); else leerFoto(archivo);
+  }
+  document.addEventListener("paste", function (e) {
+    var buscadorActivo = document.activeElement && document.activeElement.id === "q";
+    if (!dialogo.open && !buscadorActivo) return;
+    var archivo = imagenDe(e.clipboardData);
+    if (!archivo) return; // texto: comportamiento normal
+    e.preventDefault();
+    procesarImagen(archivo);
+  });
+  ["dragover", "drop"].forEach(function (tipo) {
+    dialogo.addEventListener(tipo, function (e) {
+      if (!imagenDe(e.dataTransfer) && tipo === "drop") return;
+      e.preventDefault();
+      if (tipo === "drop") procesarImagen(imagenDe(e.dataTransfer));
+    });
+  });
 
   boton.addEventListener("click", function () {
     dialogo.showModal();
