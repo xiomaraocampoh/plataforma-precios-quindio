@@ -25,7 +25,7 @@
   <ul id="sugerencias" class="sugerencias" aria-label="Sugerencias de productos" aria-live="polite"></ul>
 
   {% if destacados %}
-  <div class="chips hero-chips" aria-label="Productos frecuentes">
+  <div class="chips hero-chips" role="group" aria-label="Productos frecuentes">
     {% for p in destacados|slice:":6" %}<a class="chip" href="{% url 'comparacion:comparar' p.pk %}">{{ p }}</a>{% endfor %}
   </div>
   {% endif %}
