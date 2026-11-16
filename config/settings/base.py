@@ -117,7 +117,14 @@ REST_FRAMEWORK = {
         "rest_framework.throttling.ScopedRateThrottle",
     ],
     # Resistencia (M-16) ante reportes masivos / coordinados (EC-03)
-    "DEFAULT_THROTTLE_RATES": {"anon": "120/min", "user": "240/min", "reportes": "30/hour"},
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "120/min",
+        "user": "240/min",
+        "reportes": "30/hour",
+        "sugerencias": "10/hour",  # RF-10
+        "denuncias": "20/hour",  # RF-20
+        "moderacion": "600/hour",  # RF-21
+    },
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
 }

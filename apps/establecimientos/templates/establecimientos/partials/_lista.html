@@ -1,0 +1,23 @@
+<p class="suave" role="status">{{ establecimientos|length }} establecimiento{{ establecimientos|length|pluralize }}. Orden alfabético.</p>
+{% if establecimientos %}
+<ul class="tarjetas" style="list-style:none;padding:0">
+  {% for e in establecimientos %}
+  <li class="tarjeta" style="min-height:0">
+    <span class="meta">{{ e.get_tipo_display }}</span>
+    <span class="nombre">{{ e.nombre }}</span>
+    <span>{{ e.direccion }}</span>
+    <span class="meta">{% if e.barrio %}{{ e.barrio }} · {% endif %}{{ e.municipio }}</span>
+    {% if e.enlace_mapa %}
+    <a class="ir" href="{{ e.enlace_mapa }}" target="_blank" rel="noopener noreferrer">Ver en el mapa<span class="sr-only"> «{{ e.nombre }}» en OpenStreetMap (se abre en otra pestaña)</span></a>
+    {% else %}
+    <span class="meta">Sin ubicación en el mapa</span>
+    {% endif %}
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<section class="tile tile-marca vacio-estado">
+  <h2>No hay establecimientos con esos filtros</h2>
+  <p class="suave">Quita algún filtro o sugiere uno nuevo.</p>
+</section>
+{% endif %}

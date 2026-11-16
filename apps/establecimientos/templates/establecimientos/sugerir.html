@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block titulo %}Sugerir establecimiento · AhorraPues{% endblock %}
+{% block contenido %}
+<div class="auth bento">
+  <section class="tile tile-4" aria-labelledby="t-sugerir">
+    <p class="etiqueta">Directorio</p>
+    <h1 id="t-sugerir">Sugerir un establecimiento</h1>
+    <p class="suave">Una persona moderadora lo revisa antes de publicarlo. Mientras tanto no aparece en la comparación ni en el registro de precios.</p>
+    <form method="post" novalidate hx-disabled-elt="find button">
+      {% csrf_token %}
+      {% include "partials/_errores_generales.html" %}
+      {% include "partials/_campo.html" with campo=form.nombre %}
+      {% include "partials/_campo.html" with campo=form.tipo %}
+      {% include "partials/_campo.html" with campo=form.direccion %}
+      {% include "partials/_campo.html" with campo=form.barrio %}
+      {% include "partials/_campo.html" with campo=form.municipio %}
+      <details class="panel-plegable"{% if form.latitud.errors or form.longitud.errors %} open{% endif %}>
+        <summary>Agregar coordenadas (opcional)</summary>
+        {% include "partials/_campo.html" with campo=form.latitud %}
+        {% include "partials/_campo.html" with campo=form.longitud %}
+      </details>
+      <button class="btn btn-bloque" type="submit">Enviar sugerencia</button>
+    </form>
+  </section>
+  <aside class="tile tile-2 tile-marca" aria-labelledby="t-privacidad">
+    <span class="icono-caja" aria-hidden="true" style="background:var(--superficie)"><svg class="ico"><use href="#i-shield"/></svg></span>
+    <h2 id="t-privacidad">Tu sugerencia es anónima</h2>
+    <p class="suave">Guardamos quién la envió solo para moderación. Nunca se publica.</p>
+  </aside>
+</div>
+{% endblock %}
