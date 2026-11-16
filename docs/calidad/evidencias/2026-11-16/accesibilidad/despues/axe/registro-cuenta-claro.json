@@ -1,0 +1,10 @@
+{
+  "violaciones": [],
+  "revisar": [
+    {
+      "id": "color-contrast",
+      "nodos": 7
+    }
+  ],
+  "url_auditada": "/cuentas/registro/"
+}

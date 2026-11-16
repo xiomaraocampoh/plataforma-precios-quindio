@@ -46,6 +46,7 @@ markers = [
 [tool.coverage.run]
 source = ["apps", "core"]
 branch = true
+relative_files = true  # rutas relativas en coverage.xml: SonarQube en Docker y CI las resuelven
 omit = ["*/migrations/*", "*/admin.py", "*/apps.py"]
 
 [tool.coverage.report]

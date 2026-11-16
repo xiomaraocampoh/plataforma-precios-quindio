@@ -34,3 +34,9 @@ def test_reporte_confirmado_por_dos_usuarios_es_confianza_alta():
 
 def test_reporte_aislado_es_confianza_media():
     assert nivel_confianza(Fuente.REPORTANTE, 0, anomalo=False) == NivelConfianza.MEDIA
+
+
+def test_mediana_cero_no_marca_anomalia():
+    # M-12: con mediana 0 no hay base relativa; no se castiga al reportante ni se divide por 0.
+    referencia_cero = [Decimal("0"), Decimal("0"), Decimal("0")]
+    assert not es_anomalo(Decimal("4000"), referencia_cero, TOL)

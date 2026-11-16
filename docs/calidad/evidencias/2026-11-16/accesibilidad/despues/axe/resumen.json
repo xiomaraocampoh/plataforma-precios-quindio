@@ -1,0 +1,150 @@
+{
+  "inicio-claro": {
+    "url": "/",
+    "violaciones": 0,
+    "reglas": [],
+    "revisar": [
+      "color-contrast"
+    ]
+  },
+  "inicio-sugerencias-claro": {
+    "url": "/",
+    "violaciones": 0,
+    "reglas": [],
+    "revisar": [
+      "color-contrast"
+    ]
+  },
+  "comparacion-claro": {
+    "url": "/productos/1/",
+    "violaciones": 0,
+    "reglas": [],
+    "revisar": [
+      "color-contrast"
+    ]
+  },
+  "registro-precio-claro": {
+    "url": "/precios/registrar/",
+    "violaciones": 0,
+    "reglas": [],
+    "revisar": []
+  },
+  "registro-precio-errores-claro": {
+    "url": "/precios/registrar/",
+    "violaciones": 0,
+    "reglas": [],
+    "revisar": []
+  },
+  "registro-precio-confirmacion-claro": {
+    "url": "/precios/registrar/",
+    "violaciones": 0,
+    "reglas": [],
+    "revisar": []
+  },
+  "registro-cuenta-claro": {
+    "url": "/cuentas/registro/",
+    "violaciones": 0,
+    "reglas": [],
+    "revisar": [
+      "color-contrast"
+    ]
+  },
+  "registro-cuenta-errores-claro": {
+    "url": "/cuentas/registro/",
+    "violaciones": 0,
+    "reglas": [],
+    "revisar": [
+      "color-contrast"
+    ]
+  },
+  "ingreso-claro": {
+    "url": "/cuentas/ingresar/",
+    "violaciones": 0,
+    "reglas": [],
+    "revisar": [
+      "color-contrast"
+    ]
+  },
+  "ingreso-errores-claro": {
+    "url": "/cuentas/ingresar/",
+    "violaciones": 0,
+    "reglas": [],
+    "revisar": [
+      "color-contrast"
+    ]
+  },
+  "inicio-oscuro": {
+    "url": "/",
+    "violaciones": 0,
+    "reglas": [],
+    "revisar": [
+      "color-contrast"
+    ]
+  },
+  "inicio-sugerencias-oscuro": {
+    "url": "/",
+    "violaciones": 0,
+    "reglas": [],
+    "revisar": [
+      "color-contrast"
+    ]
+  },
+  "comparacion-oscuro": {
+    "url": "/productos/1/",
+    "violaciones": 0,
+    "reglas": [],
+    "revisar": [
+      "color-contrast"
+    ]
+  },
+  "registro-precio-oscuro": {
+    "url": "/precios/registrar/",
+    "violaciones": 0,
+    "reglas": [],
+    "revisar": []
+  },
+  "registro-precio-errores-oscuro": {
+    "url": "/precios/registrar/",
+    "violaciones": 0,
+    "reglas": [],
+    "revisar": []
+  },
+  "registro-precio-confirmacion-oscuro": {
+    "url": "/precios/registrar/",
+    "violaciones": 0,
+    "reglas": [],
+    "revisar": []
+  },
+  "registro-cuenta-oscuro": {
+    "url": "/cuentas/registro/",
+    "violaciones": 0,
+    "reglas": [],
+    "revisar": [
+      "color-contrast"
+    ]
+  },
+  "registro-cuenta-errores-oscuro": {
+    "url": "/cuentas/registro/",
+    "violaciones": 0,
+    "reglas": [],
+    "revisar": [
+      "color-contrast"
+    ]
+  },
+  "ingreso-oscuro": {
+    "url": "/cuentas/ingresar/",
+    "violaciones": 0,
+    "reglas": [],
+    "revisar": [
+      "color-contrast"
+    ]
+  },
+  "ingreso-errores-oscuro": {
+    "url": "/cuentas/ingresar/",
+    "violaciones": 0,
+    "reglas": [],
+    "revisar": [
+      "color-contrast"
+    ]
+  }
+}

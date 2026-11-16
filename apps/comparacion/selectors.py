@@ -32,6 +32,9 @@ from .domain.filtros import FiltroPrecio, FiltroUbicacion, filtrar, filtrar_por_
 from .domain.ranking import ResultadoComparacion, ordenar_neutral
 from .domain.resumen import ResumenComparacion, resumir_precios
 
+MIN_CARACTERES_BUSQUEDA = catalogo.MIN_CARACTERES_BUSQUEDA  # una sola fuente: el catálogo (RF-04)
+MIN_FILAS_EJEMPLO = 2  # el gráfico de la portada necesita al menos dos precios que comparar
+
 
 def buscar_productos(texto: str, limite: int = 10):
     """RF-04: la búsqueda vive en el catálogo; aquí solo se reexpone para las vistas."""
@@ -180,7 +183,7 @@ def productos_destacados(limite: int = 8):
 def ejemplo_comparacion(producto_id: int, limite: int = 4) -> list[dict]:
     """Filas para el gráfico de barras de la portada (precio por unidad, orden neutral)."""
     filas = comparar_producto(producto_id)[:limite]
-    if len(filas) < 2 or len({f.unidad_base for f in filas}) != 1:
+    if len(filas) < MIN_FILAS_EJEMPLO or len({f.unidad_base for f in filas}) != 1:
         return []
     maximo = max(f.precio_unitario for f in filas)
     return [

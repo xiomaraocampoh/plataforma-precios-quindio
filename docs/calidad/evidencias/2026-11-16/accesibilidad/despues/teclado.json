@@ -1,0 +1,426 @@
+{
+  "inicio": {
+    "recorrido_tab": [
+      {
+        "el": "A Saltar al contenido",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "172x44"
+      },
+      {
+        "el": "A AhorraPues",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "125x28"
+      },
+      {
+        "el": "A Comparar",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "90x40"
+      },
+      {
+        "el": "A Registrar precio",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "128x40"
+      },
+      {
+        "el": "A Ingresar",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "106x44"
+      },
+      {
+        "el": "A Crear cuenta",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "139x44"
+      },
+      {
+        "el": "INPUT#q q",
+        "foco_visible": true,
+        "contorno": "solid 3px color(srgb 0 0.443137 0.890196 / 0.4)",
+        "tam": "366x60"
+      },
+      {
+        "el": "A Arroz blanco",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(0, 113, 227)",
+        "tam": "99x30"
+      },
+      {
+        "el": "A Aceite vegetal",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(0, 113, 227)",
+        "tam": "107x30"
+      },
+      {
+        "el": "A Huevos AA",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(0, 113, 227)",
+        "tam": "89x30"
+      },
+      {
+        "el": "A Leche entera",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(0, 113, 227)",
+        "tam": "99x30"
+      },
+      {
+        "el": "A Papa pastusa",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(0, 113, 227)",
+        "tam": "101x30"
+      },
+      {
+        "el": "A Café molido",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(0, 113, 227)",
+        "tam": "96x30"
+      },
+      {
+        "el": "A Crear cuenta gratis",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(0, 113, 227)",
+        "tam": "208x52"
+      },
+      {
+        "el": "A Cómo funciona",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(0, 113, 227)",
+        "tam": "128x25"
+      },
+      {
+        "el": "BUTTON#pausar-rotacion Pausar animación",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(0, 113, 227)",
+        "tam": "124x44"
+      },
+      {
+        "el": "A Ver la comparación completa",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "321x25"
+      },
+      {
+        "el": "A Granos Arroz blanco 19 precios Comparar",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "366x155"
+      },
+      {
+        "el": "A Abarrotes Aceite vegetal 16 precios Comparar",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "366x155"
+      },
+      {
+        "el": "A Lácteos y huevos Huevos AA 16 precios Comparar",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "366x155"
+      },
+      {
+        "el": "A Lácteos y huevos Leche entera 16 precios Comparar",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "366x155"
+      },
+      {
+        "el": "A Frescos Papa pastusa 9 precios Comparar",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "366x155"
+      },
+      {
+        "el": "A Abarrotes Café molido 8 precios Comparar",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "366x155"
+      },
+      {
+        "el": "A Granos Lentejas 8 precios Comparar",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "366x155"
+      },
+      {
+        "el": "A Abarrotes Panela 8 precios Comparar",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "366x155"
+      }
+    ],
+    "sin_foco_visible": [],
+    "pequenos": []
+  },
+  "comparacion": {
+    "recorrido_tab": [
+      {
+        "el": "A Saltar al contenido",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "172x44"
+      },
+      {
+        "el": "A AhorraPues",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "125x28"
+      },
+      {
+        "el": "A Comparar",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "90x40"
+      },
+      {
+        "el": "A Registrar precio",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "128x40"
+      },
+      {
+        "el": "A Ingresar",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "106x44"
+      },
+      {
+        "el": "A Crear cuenta",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "139x44"
+      }
+    ],
+    "sin_foco_visible": [],
+    "pequenos": []
+  },
+  "registro-precio": {
+    "recorrido_tab": [
+      {
+        "el": "A Saltar al contenido",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "172x44"
+      },
+      {
+        "el": "A AhorraPues",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "125x28"
+      },
+      {
+        "el": "A Comparar",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "90x40"
+      },
+      {
+        "el": "A Registrar precio",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "128x40"
+      },
+      {
+        "el": "BUTTON Salir",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "78x44"
+      },
+      {
+        "el": "SELECT#id_establecimiento --------- Tienda Doña Rosa (Tienda",
+        "foco_visible": true,
+        "contorno": "solid 3px color(srgb 0.160784 0.592157 1 / 0.4)",
+        "tam": "321x48"
+      },
+      {
+        "el": "SELECT#id_presentacion --------- Arroz blanco 5E+2 g Arroz b",
+        "foco_visible": true,
+        "contorno": "solid 3px color(srgb 0.160784 0.592157 1 / 0.4)",
+        "tam": "321x48"
+      },
+      {
+        "el": "INPUT#id_precio precio",
+        "foco_visible": true,
+        "contorno": "solid 3px color(srgb 0.160784 0.592157 1 / 0.4)",
+        "tam": "321x48"
+      },
+      {
+        "el": "BUTTON Guardar precio",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "321x50"
+      }
+    ],
+    "sin_foco_visible": [],
+    "pequenos": []
+  },
+  "registro-cuenta": {
+    "recorrido_tab": [
+      {
+        "el": "A Saltar al contenido",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "172x44"
+      },
+      {
+        "el": "A AhorraPues",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "125x28"
+      },
+      {
+        "el": "A Comparar",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "90x40"
+      },
+      {
+        "el": "A Registrar precio",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "128x40"
+      },
+      {
+        "el": "A Ingresar",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "106x44"
+      },
+      {
+        "el": "A Crear cuenta",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "139x44"
+      },
+      {
+        "el": "INPUT#id_username username",
+        "foco_visible": true,
+        "contorno": "solid 3px color(srgb 0.160784 0.592157 1 / 0.4)",
+        "tam": "321x48"
+      },
+      {
+        "el": "INPUT#id_email email",
+        "foco_visible": true,
+        "contorno": "solid 3px color(srgb 0.160784 0.592157 1 / 0.4)",
+        "tam": "321x48"
+      },
+      {
+        "el": "INPUT#id_password1 password1",
+        "foco_visible": true,
+        "contorno": "solid 3px color(srgb 0.160784 0.592157 1 / 0.4)",
+        "tam": "321x48"
+      },
+      {
+        "el": "INPUT#id_password2 password2",
+        "foco_visible": true,
+        "contorno": "solid 3px color(srgb 0.160784 0.592157 1 / 0.4)",
+        "tam": "321x48"
+      },
+      {
+        "el": "INPUT#id_acepto_tratamiento_datos acepto_tratamiento_datos",
+        "foco_visible": true,
+        "contorno": "solid 3px color(srgb 0.160784 0.592157 1 / 0.4)",
+        "tam": "24x24"
+      },
+      {
+        "el": "BUTTON Crear cuenta",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "321x50"
+      }
+    ],
+    "sin_foco_visible": [],
+    "pequenos": []
+  },
+  "ingreso": {
+    "recorrido_tab": [
+      {
+        "el": "INPUT#id_password password",
+        "foco_visible": true,
+        "contorno": "solid 3px color(srgb 0.160784 0.592157 1 / 0.4)",
+        "tam": "321x48"
+      },
+      {
+        "el": "BUTTON Ingresar",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "321x50"
+      },
+      {
+        "el": "A Crear cuenta",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "85x20"
+      },
+      {
+        "el": "A Saltar al contenido",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "172x44"
+      },
+      {
+        "el": "A AhorraPues",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "125x28"
+      },
+      {
+        "el": "A Comparar",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "90x40"
+      },
+      {
+        "el": "A Registrar precio",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "128x40"
+      },
+      {
+        "el": "A Ingresar",
+        "foco_visible": true,
+        "contorno": "solid 3px rgb(41, 151, 255)",
+        "tam": "106x44"
+      }
+    ],
+    "sin_foco_visible": [],
+    "pequenos": [
+      "A Crear cuenta 85x20"
+    ]
+  },
+  "saltar_contenido": {
+    "primer_tab": "A Saltar al contenido",
+    "foco_tras_enter": "MAIN#contenido",
+    "siguiente_tab": "A Comparar"
+  },
+  "buscador": {
+    "sugerencias": [
+      "Arroz blanco"
+    ],
+    "tras_esc": {
+      "valor": "",
+      "items": [],
+      "visible": false
+    },
+    "tab_desde_buscador": "A Arroz blanco",
+    "url_tras_enter": "/productos/1/"
+  },
+  "rotacion": {
+    "rota_activa": true,
+    "control_pausa": "Pausar animación"
+  },
+  "recarga_automatica": [
+    "resultados: every 60s [!window.actualizacionPausada]"
+  ],
+  "espaciado_texto": [],
+  "reflujo_320": {
+    "inicio": true,
+    "comparacion": true,
+    "registro-precio": true,
+    "registro-cuenta": true,
+    "ingreso": true
+  }
+}

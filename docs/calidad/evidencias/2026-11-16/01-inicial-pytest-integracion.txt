@@ -1,0 +1,39 @@
+# pytest -m integration -v
+# Fecha: 2026-11-16 10:39:14 -0500 · rama feat/cierre-corte-2 @ 56ced8e
+# BD de pruebas: SQLite en memoria (sin Docker/PostgreSQL en este equipo)
+
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0 -- C:\Users\Windows\Desktop\plataforma-precios-quindio\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.18, settings: config.settings.test (from ini)
+rootdir: C:\Users\Windows\Desktop\plataforma-precios-quindio
+configfile: pyproject.toml
+testpaths: tests
+plugins: Faker-40.44.0, platformdirs-4.14.3, cov-7.1.0, django-4.14.0
+collecting ... collected 58 items / 37 deselected / 21 selected
+
+tests/integration/test_api_comparacion.py::test_comparacion_es_publica_y_ordena_por_precio_unitario PASSED [  4%]
+tests/integration/test_api_comparacion.py::test_respuesta_publica_no_expone_al_reportante PASSED [  9%]
+tests/integration/test_api_comparacion.py::test_reporte_con_reloj_adelantado_no_rompe_la_comparacion PASSED [ 14%]
+tests/integration/test_api_reportes.py::test_registrar_exige_autenticacion PASSED [ 19%]
+tests/integration/test_api_reportes.py::test_reportante_registra_precio PASSED [ 23%]
+tests/integration/test_api_reportes.py::test_reenvio_offline_con_mismo_id_cliente_no_duplica PASSED [ 28%]
+tests/integration/test_api_reportes.py::test_presentacion_inexistente_es_400_no_500 PASSED [ 33%]
+tests/integration/test_api_reportes.py::test_precio_cero_es_rechazado PASSED [ 38%]
+tests/integration/test_cuentas.py::test_registro_crea_usuario_con_consentimiento_y_abre_sesion PASSED [ 42%]
+tests/integration/test_cuentas.py::test_registro_exige_consentimiento PASSED [ 47%]
+tests/integration/test_cuentas.py::test_registro_rechaza_claves_distintas PASSED [ 52%]
+tests/integration/test_cuentas.py::test_registro_rechaza_usuario_repetido PASSED [ 57%]
+tests/integration/test_cuentas.py::test_ingreso_y_salida PASSED          [ 61%]
+tests/integration/test_healthz.py::test_healthz_ok_cuando_bd_y_cache_responden PASSED [ 66%]
+tests/integration/test_healthz.py::test_healthz_503_si_la_cache_no_responde PASSED [ 71%]
+tests/integration/test_limite_registros.py::test_servicio_rechaza_el_registro_que_supera_el_limite PASSED [ 76%]
+tests/integration/test_limite_registros.py::test_reenvio_idempotente_no_consume_cupo PASSED [ 80%]
+tests/integration/test_limite_registros.py::test_api_responde_429_al_superar_el_limite PASSED [ 85%]
+tests/integration/test_limite_registros.py::test_formulario_htmx_tambien_respeta_el_limite PASSED [ 90%]
+tests/integration/test_api_comparacion.py::test_nuevo_reporte_invalida_la_cache PASSED [ 95%]
+tests/integration/test_cuentas.py::test_registrar_precio_redirige_al_ingreso_de_la_plataforma PASSED [100%]
+
+====================== 21 passed, 37 deselected in 0.89s ======================
+
+# código de salida: 0

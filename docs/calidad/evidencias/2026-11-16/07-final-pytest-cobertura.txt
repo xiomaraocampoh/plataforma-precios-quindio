@@ -1,0 +1,55 @@
+# pytest --cov --cov-report=term --cov-report=xml
+# Fecha: 2026-11-16 10:43:29 -0500 · rama feat/cierre-corte-2 @ 34e482b
+# BD de pruebas: SQLite en memoria (sin Docker/PostgreSQL en este equipo)
+
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+django: version: 5.2.18, settings: config.settings.test (from ini)
+rootdir: C:\Users\Windows\Desktop\plataforma-precios-quindio
+configfile: pyproject.toml
+testpaths: tests
+plugins: Faker-40.44.0, platformdirs-4.14.3, cov-7.1.0, django-4.14.0
+collected 76 items
+
+tests\integration\test_api_comparacion.py ...                            [  3%]
+tests\integration\test_api_reportes.py .....                             [ 10%]
+tests\integration\test_cuentas.py .....                                  [ 17%]
+tests\integration\test_healthz.py ..                                     [ 19%]
+tests\integration\test_limite_registros.py ....                          [ 25%]
+tests\integration\test_api_comparacion.py .                              [ 26%]
+tests\integration\test_cuentas.py .                                      [ 27%]
+tests\unit\catalogo\test_duplicados.py .................                 [ 50%]
+tests\unit\catalogo\test_normalizacion.py .........                      [ 61%]
+tests\unit\comparacion\test_ranking.py ....                              [ 67%]
+tests\unit\comparacion\test_resumen.py ......                            [ 75%]
+tests\unit\precios\test_confianza.py ........                            [ 85%]
+tests\unit\precios\test_validaciones.py .....                            [ 92%]
+tests\unit\precios\test_vigencia.py ......                               [100%]
+
+=============================== tests coverage ================================
+______________ coverage: platform win32, python 3.12.10-final-0 _______________
+
+Name                                              Stmts   Miss Branch BrPart  Cover   Missing
+---------------------------------------------------------------------------------------------
+apps\catalogo\domain\normalizacion.py                26      0      6      1    97%   56->exit
+apps\catalogo\models.py                              26      1      0      0    96%   13
+apps\comparacion\selectors.py                        60     17     14      2    66%   31-34, 59-60, 68, 98-99, 103, 112, 117, 132-136
+apps\comparacion\views.py                            21     10      0      0    52%   20-27, 33-34, 39-50
+apps\cuentas\forms.py                                25      2      6      1    90%   44->52, 50-51
+apps\cuentas\models.py                               12      1      0      0    92%   19
+apps\cuentas\views.py                                25      1      4      1    93%   20
+apps\integraciones\clients\sipsa.py                  20     20      0      0     0%   9-40
+apps\moderacion\models.py                            24      1      0      0    96%   46
+apps\precios\management\commands\cargar_demo.py      67     67     12      0     0%   8-179
+apps\precios\models.py                               22      1      0      0    95%   47
+apps\precios\services.py                             49      3     10      1    93%   81, 94-95
+apps\precios\views.py                                21      2      2      1    87%   14->30, 25, 29
+core\views.py                                        21      2      0      0    90%   13-14
+---------------------------------------------------------------------------------------------
+TOTAL                                               681    128     86      7    80%
+
+40 files skipped due to complete coverage.
+Coverage XML written to file coverage.xml
+============================= 76 passed in 2.56s ==============================
+
+# código de salida: 0

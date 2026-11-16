@@ -1,0 +1,10 @@
+{
+  "violaciones": [],
+  "revisar": [
+    {
+      "id": "color-contrast",
+      "nodos": 30
+    }
+  ],
+  "url_auditada": "/"
+}

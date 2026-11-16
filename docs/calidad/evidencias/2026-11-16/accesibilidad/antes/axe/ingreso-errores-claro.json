@@ -1,0 +1,25 @@
+{
+  "violaciones": [
+    {
+      "id": "link-in-text-block",
+      "impacto": "serious",
+      "criterios": [
+        "wcag141"
+      ],
+      "ayuda": "Links must be distinguishable without relying on color",
+      "nodos": [
+        {
+          "selector": ".enlace-pie > a[href$=\"registro/\"]",
+          "resumen": "Fix any of the following:\n  The link has insufficient color contrast of 1.14:1 with the surrounding text. (Minimum contrast is 3:1, link text: #0066cc, surrounding text: #5f5f64)\n  The link has no styling (such as underline) to distinguish it from the surrounding text"
+        }
+      ]
+    }
+  ],
+  "revisar": [
+    {
+      "id": "color-contrast",
+      "nodos": 2
+    }
+  ],
+  "url_auditada": "/cuentas/ingresar/"
+}

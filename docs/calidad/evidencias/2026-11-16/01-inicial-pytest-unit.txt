@@ -1,0 +1,55 @@
+# pytest -m unit -v
+# Fecha: 2026-11-16 10:39:11 -0500 · rama feat/cierre-corte-2 @ 56ced8e
+# BD de pruebas: SQLite en memoria (sin Docker/PostgreSQL en este equipo)
+
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0 -- C:\Users\Windows\Desktop\plataforma-precios-quindio\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.18, settings: config.settings.test (from ini)
+rootdir: C:\Users\Windows\Desktop\plataforma-precios-quindio
+configfile: pyproject.toml
+testpaths: tests
+plugins: Faker-40.44.0, platformdirs-4.14.3, cov-7.1.0, django-4.14.0
+collecting ... collected 58 items / 21 deselected / 37 selected
+
+tests/unit/catalogo/test_normalizacion.py::test_precio_por_unidad_normaliza_a_unidad_base[precio0-cantidad0-g-esperado0-kg] PASSED [  2%]
+tests/unit/catalogo/test_normalizacion.py::test_precio_por_unidad_normaliza_a_unidad_base[precio1-cantidad1-kg-esperado1-kg] PASSED [  5%]
+tests/unit/catalogo/test_normalizacion.py::test_precio_por_unidad_normaliza_a_unidad_base[precio2-cantidad2-ml-esperado2-L] PASSED [  8%]
+tests/unit/catalogo/test_normalizacion.py::test_precio_por_unidad_normaliza_a_unidad_base[precio3-cantidad3-und-esperado3-und] PASSED [ 10%]
+tests/unit/catalogo/test_normalizacion.py::test_presentacion_mas_grande_puede_ser_mas_barata_por_unidad PASSED [ 13%]
+tests/unit/catalogo/test_normalizacion.py::test_cantidad_no_positiva_es_rechazada[cantidad0] PASSED [ 16%]
+tests/unit/catalogo/test_normalizacion.py::test_cantidad_no_positiva_es_rechazada[cantidad1] PASSED [ 18%]
+tests/unit/catalogo/test_normalizacion.py::test_precio_no_positivo_es_rechazado PASSED [ 21%]
+tests/unit/catalogo/test_normalizacion.py::test_gramos_y_kilos_son_comparables_pero_no_con_litros PASSED [ 24%]
+tests/unit/comparacion/test_ranking.py::test_ordena_por_menor_precio_unitario PASSED [ 27%]
+tests/unit/comparacion/test_ranking.py::test_empate_se_resuelve_por_nombre_sin_importar_mayusculas PASSED [ 29%]
+tests/unit/comparacion/test_ranking.py::test_marcar_promocion_no_altera_el_orden PASSED [ 32%]
+tests/unit/comparacion/test_ranking.py::test_resultado_promocional_queda_distinguido PASSED [ 35%]
+tests/unit/comparacion/test_resumen.py::test_sin_resultados_no_hay_resumen PASSED [ 37%]
+tests/unit/comparacion/test_resumen.py::test_un_solo_resultado_no_tiene_diferencia PASSED [ 40%]
+tests/unit/comparacion/test_resumen.py::test_diferencia_porcentual_sobre_el_mas_caro PASSED [ 43%]
+tests/unit/comparacion/test_resumen.py::test_precios_iguales_diferencia_cero PASSED [ 45%]
+tests/unit/comparacion/test_resumen.py::test_unidades_base_distintas_no_se_comparan PASSED [ 48%]
+tests/unit/comparacion/test_resumen.py::test_maximo_cero_no_divide PASSED [ 51%]
+tests/unit/precios/test_confianza.py::test_precio_cercano_a_la_mediana_no_es_anomalo PASSED [ 54%]
+tests/unit/precios/test_confianza.py::test_precio_muy_alejado_es_anomalo[precio0] PASSED [ 56%]
+tests/unit/precios/test_confianza.py::test_precio_muy_alejado_es_anomalo[precio1] PASSED [ 59%]
+tests/unit/precios/test_confianza.py::test_sin_muestras_suficientes_no_se_marca_anomalo PASSED [ 62%]
+tests/unit/precios/test_confianza.py::test_anomalo_siempre_es_confianza_baja PASSED [ 64%]
+tests/unit/precios/test_confianza.py::test_reporte_confirmado_por_dos_usuarios_es_confianza_alta PASSED [ 67%]
+tests/unit/precios/test_confianza.py::test_reporte_aislado_es_confianza_media PASSED [ 70%]
+tests/unit/precios/test_validaciones.py::test_fecha_pasada_dentro_de_la_ventana_se_conserva PASSED [ 72%]
+tests/unit/precios/test_validaciones.py::test_reloj_adelantado_dentro_de_la_tolerancia_se_ajusta_a_ahora PASSED [ 75%]
+tests/unit/precios/test_validaciones.py::test_fecha_futura_mas_alla_de_la_tolerancia_es_rechazada PASSED [ 78%]
+tests/unit/precios/test_validaciones.py::test_fecha_en_el_limite_de_la_ventana_se_acepta PASSED [ 81%]
+tests/unit/precios/test_validaciones.py::test_fecha_anterior_a_la_ventana_es_rechazada PASSED [ 83%]
+tests/unit/precios/test_vigencia.py::test_reporte_de_hace_7_dias_sigue_vigente PASSED [ 86%]
+tests/unit/precios/test_vigencia.py::test_reporte_de_hace_mas_de_7_dias_vence PASSED [ 89%]
+tests/unit/precios/test_vigencia.py::test_perecedero_vence_a_los_3_dias PASSED [ 91%]
+tests/unit/precios/test_vigencia.py::test_precio_oficial_de_comercio_dura_30_dias PASSED [ 94%]
+tests/unit/precios/test_vigencia.py::test_politica_es_parametrizable PASSED [ 97%]
+tests/unit/precios/test_vigencia.py::test_fecha_futura_es_error PASSED   [100%]
+
+====================== 37 passed, 21 deselected in 0.82s ======================
+
+# código de salida: 0

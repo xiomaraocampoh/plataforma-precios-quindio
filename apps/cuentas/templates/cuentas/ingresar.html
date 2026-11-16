@@ -9,14 +9,14 @@
       {% csrf_token %}
       <input type="hidden" name="next" value="{{ next }}">
       {% if form.non_field_errors %}<div class="campo" role="alert">{% for e in form.non_field_errors %}<span class="error">{{ e }}</span>{% endfor %}</div>{% endif %}
+      {# Django agrega aria-invalid y aria-describedby; los errores por campo se muestran (3.3.1) #}
+      {% for campo in form %}
       <div class="campo">
-        <label for="{{ form.username.id_for_label }}">Nombre de usuario</label>
-        <input type="text" name="username" id="{{ form.username.id_for_label }}" autocomplete="username" autocapitalize="none" required autofocus value="{{ form.username.value|default:'' }}">
+        <label for="{{ campo.id_for_label }}">{% if campo.name == "username" %}Nombre de usuario{% else %}Contraseña{% endif %}</label>
+        {{ campo }}
+        {% if campo.errors %}<span class="error" id="{{ campo.auto_id }}_error" role="alert">{{ campo.errors|join:" " }}</span>{% endif %}
       </div>
-      <div class="campo">
-        <label for="{{ form.password.id_for_label }}">Contraseña</label>
-        <input type="password" name="password" id="{{ form.password.id_for_label }}" autocomplete="current-password" required>
-      </div>
+      {% endfor %}
       <button class="btn btn-bloque" type="submit">Ingresar</button>
     </form>
     <p class="enlace-pie"><a href="{% url 'cuentas:recuperar' %}">¿Olvidaste tu contraseña?</a></p>
