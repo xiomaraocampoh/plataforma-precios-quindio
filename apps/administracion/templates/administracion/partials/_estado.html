@@ -1,0 +1,2 @@
+{% comment %}Estado con texto, no solo color (WCAG 1.4.1).{% endcomment %}
+{% if activo %}<span class="chip chip-positivo">{{ si|default:"Activo" }}</span>{% else %}<span class="chip chip-alerta">{{ no|default:"Inactivo" }}</span>{% endif %}

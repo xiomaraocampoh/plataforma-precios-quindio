@@ -1,0 +1,22 @@
+{% comment %}Filtros de un listado. HTMX reemplaza #resultados-panel y actualiza la URL; sin JS es un GET normal.{% endcomment %}
+<form class="filtros" method="get" action="{{ request.path }}" role="search" aria-label="Buscar y filtrar {{ etiqueta_busqueda }}"
+      hx-get="{{ request.path }}" hx-target="#resultados-panel" hx-push-url="true"
+      hx-trigger="change, submit, input changed delay:400ms from:#f-q">
+  <div class="campo">
+    <label for="f-q">{{ ayuda_busqueda|default:"Buscar" }}</label>
+    <input id="f-q" name="q" type="search" value="{{ q }}" autocomplete="off">
+  </div>
+  {% for filtro, opciones, valor in filtros %}
+  <div class="campo">
+    <label for="f-{{ filtro.nombre }}">{{ filtro.etiqueta }}</label>
+    <select id="f-{{ filtro.nombre }}" name="{{ filtro.nombre }}">
+      <option value="">{{ filtro.vacio }}</option>
+      {% for clave, texto in opciones %}<option value="{{ clave }}"{% if clave == valor %} selected{% endif %}>{{ texto }}</option>{% endfor %}
+    </select>
+  </div>
+  {% endfor %}
+  <div class="acciones-filtro">
+    <button class="btn" type="submit">Filtrar</button>
+    <a class="btn btn-sec" href="{{ request.path }}">Limpiar</a>
+  </div>
+</form>

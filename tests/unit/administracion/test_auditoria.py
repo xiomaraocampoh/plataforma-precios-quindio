@@ -3,6 +3,7 @@
 from decimal import Decimal
 
 import pytest
+
 from apps.administracion.domain.auditoria import diferencias, valor_auditable
 
 pytestmark = pytest.mark.unit

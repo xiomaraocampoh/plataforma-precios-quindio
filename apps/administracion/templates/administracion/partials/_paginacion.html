@@ -1,0 +1,9 @@
+{% if pagina.paginator.num_pages > 1 %}
+<nav class="paginacion" aria-label="Paginación">
+  {% if pagina.has_previous %}<a class="btn btn-sec" href="?{% if consulta %}{{ consulta }}&amp;{% endif %}pagina={{ pagina.previous_page_number }}"
+     hx-get="?{% if consulta %}{{ consulta }}&amp;{% endif %}pagina={{ pagina.previous_page_number }}" hx-target="#resultados-panel" hx-push-url="true">Anterior</a>{% endif %}
+  <span>Página {{ pagina.number }} de {{ pagina.paginator.num_pages }}</span>
+  {% if pagina.has_next %}<a class="btn btn-sec" href="?{% if consulta %}{{ consulta }}&amp;{% endif %}pagina={{ pagina.next_page_number }}"
+     hx-get="?{% if consulta %}{{ consulta }}&amp;{% endif %}pagina={{ pagina.next_page_number }}" hx-target="#resultados-panel" hx-push-url="true">Siguiente</a>{% endif %}
+</nav>
+{% endif %}

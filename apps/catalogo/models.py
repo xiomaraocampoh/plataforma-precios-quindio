@@ -65,6 +65,10 @@ class Producto(ModeloConMarcasDeTiempo):
         # Las consultas que listan productos hacen select_related("marca") (sin N+1)
         return f"{self.nombre} {self.marca or ''}".strip()
 
+    def save(self, *args, **kwargs):
+        self.nombre_normalizado = normalizar_nombre(self.nombre)  # D-05: siempre la misma regla
+        super().save(*args, **kwargs)
+
 
 class Presentacion(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name="presentaciones")

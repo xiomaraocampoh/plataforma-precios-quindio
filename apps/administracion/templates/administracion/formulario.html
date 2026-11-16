@@ -1,0 +1,49 @@
+{% extends "administracion/_base_panel.html" %}
+{% block titulo_panel %}{% if objeto %}Editar {{ objeto }}{% else %}{{ seccion.nuevo|capfirst }}{% endif %}{% endblock %}
+{% block migas %}<span aria-hidden="true">/</span><a href="{% url 'panel:lista' seccion.slug %}">{{ seccion.titulo }}</a><span aria-hidden="true">/</span><span aria-current="page">{% if objeto %}Editar{% else %}{{ seccion.nuevo|capfirst }}{% endif %}</span>{% endblock %}
+{% block panel %}
+<section class="tile panel-formulario" aria-labelledby="titulo-form">
+  <h1 id="titulo-form">{% if objeto %}Editar {{ seccion.singular }} «{{ objeto }}»{% else %}{{ seccion.nuevo|capfirst }}{% endif %}</h1>
+  <form method="post" novalidate hx-disabled-elt="find button[type=submit]">
+    {% csrf_token %}
+    {% include "partials/_errores_generales.html" %}
+    {% for campo in form.visible_fields %}{% include "partials/_campo.html" %}{% endfor %}
+    {% if formset %}
+    <fieldset class="presentaciones">
+      <legend>Presentaciones</legend>
+      <p class="ayuda" id="ayuda-presentaciones">Cantidad y unidad (g, kg, ml, L o und). El código de barras es opcional: de 8 a 14 dígitos. Una presentación con reportes no se quita: se desactiva.</p>
+      {{ formset.management_form }}
+      {% if formset.non_form_errors %}<div class="campo" role="alert">{% for e in formset.non_form_errors %}<span class="error">{{ e }}</span>{% endfor %}</div>{% endif %}
+      <div class="tabla-envoltura">
+        <table class="tabla tabla-formset" aria-describedby="ayuda-presentaciones">
+          <caption>Presentaciones del producto</caption>
+          <thead><tr><th scope="col">Cantidad</th><th scope="col">Unidad</th><th scope="col">Código de barras</th><th scope="col">Activa</th><th scope="col">Quitar</th></tr></thead>
+          <tbody>
+            {% for f in formset %}
+            {% with n=forloop.counter %}
+            <tr>
+              <td>{% for oculto in f.hidden_fields %}{{ oculto }}{% endfor %}
+                <label class="sr-only" for="{{ f.cantidad.id_for_label }}">Cantidad de la presentación {{ n }}</label>{{ f.cantidad }}
+                {% if f.cantidad.errors %}<span class="error" role="alert">{{ f.cantidad.errors|join:" " }}</span>{% endif %}</td>
+              <td><label class="sr-only" for="{{ f.unidad.id_for_label }}">Unidad de la presentación {{ n }}</label>{{ f.unidad }}</td>
+              <td><label class="sr-only" for="{{ f.codigo_barras.id_for_label }}">Código de barras de la presentación {{ n }}</label>{{ f.codigo_barras }}
+                {% if f.codigo_barras.errors %}<span class="error" role="alert">{{ f.codigo_barras.errors|join:" " }}</span>{% endif %}</td>
+              <td><label class="sr-only" for="{{ f.activa.id_for_label }}">Presentación {{ n }} activa</label>{{ f.activa }}</td>
+              <td>{% if f.instance.pk %}<label class="sr-only" for="{{ f.DELETE.id_for_label }}">Quitar la presentación {{ n }}</label>{{ f.DELETE }}{% else %}<span class="suave">Nueva</span>{% endif %}</td>
+            </tr>
+            {% for e in f.non_field_errors %}<tr><td colspan="5"><span class="error" role="alert">{{ e }}</span></td></tr>{% endfor %}
+            {% endwith %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <p class="ayuda">¿Necesitas más filas? Guarda y vuelve a editar: siempre queda una fila libre.</p>
+    </fieldset>
+    {% endif %}
+    <div class="acciones-fila">
+      <button class="btn" type="submit">Guardar</button>
+      <a class="btn btn-sec" href="{% url 'panel:lista' seccion.slug %}">Cancelar</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

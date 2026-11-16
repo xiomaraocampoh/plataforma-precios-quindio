@@ -3,7 +3,11 @@
 from decimal import Decimal
 
 from django.db import transaction
+from django.db.models import ProtectedError, RestrictedError
 from django.utils import timezone
+
+from core.cache import invalidar_comparacion
+from core.errores import EnUsoError
 
 from .domain.duplicados import normalizar_nombre
 from .models import Marca, Presentacion, Producto, SolicitudCatalogo
@@ -90,3 +94,44 @@ def _resolver(solicitud, estado, moderador, presentacion) -> SolicitudCatalogo:
     solicitud.presentacion_creada = presentacion
     solicitud.save(update_fields=["estado", "resuelto_por", "resuelto_en", "presentacion_creada"])
     return solicitud
+
+
+# ---------- Panel de administración (las vistas llegan por apps.administracion.services) ----------
+
+
+def _invalidar_si_es_producto(objeto) -> None:
+    if isinstance(objeto, Producto):
+        producto_id = objeto.pk
+        transaction.on_commit(lambda: invalidar_comparacion(producto_id))
+
+
+@transaction.atomic
+def guardar_formulario(form, formset=None):
+    """Guarda un formulario del catálogo ya validado y, si hay, sus presentaciones."""
+    objeto = form.save()
+    if formset is not None:
+        formset.instance = objeto
+        try:
+            formset.save()
+        except (ProtectedError, RestrictedError) as exc:  # red de seguridad: lo valida el form
+            raise EnUsoError("Una presentación que quitaste tiene reportes.") from exc
+    _invalidar_si_es_producto(objeto)
+    return objeto
+
+
+def cambiar_estado(objeto, *, activo: bool):
+    """Activa o desactiva una marca, categoría, producto o presentación (no borra nada)."""
+    campo = "activa" if hasattr(objeto, "activa") else "activo"
+    setattr(objeto, campo, activo)
+    objeto.save(update_fields=[campo])
+    _invalidar_si_es_producto(objeto)
+    return objeto
+
+
+def eliminar(objeto) -> None:
+    """Borra solo si nada lo referencia (reportes, productos, solicitudes); si no, EnUsoError."""
+    try:
+        with transaction.atomic():
+            objeto.delete()
+    except (ProtectedError, RestrictedError) as exc:
+        raise EnUsoError("Tiene reportes u otros registros asociados.") from exc

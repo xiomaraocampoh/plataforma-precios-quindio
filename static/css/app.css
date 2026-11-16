@@ -335,3 +335,21 @@ textarea { width: 100%; min-height: 90px; padding: .6rem .95rem; font: inherit; 
 .menu-cuenta li a:hover, .menu-cuenta li button:hover { background: var(--superficie-2); text-decoration: none; }
 /* WCAG 2.5.8: enlaces sueltos (migas, pie de formularios, datos) con objetivo de 24 px o más */
 .migas a, .enlace-pie a, .datos dd a { display: inline-flex; align-items: center; min-height: 24px; }
+
+/* ---------- Panel de administración (/panel/) ---------- */
+.panel { display: grid; gap: var(--gap); }
+@media (min-width: 900px) { .panel { grid-template-columns: 220px minmax(0, 1fr); align-items: start; } }
+.panel-nav ul { list-style: none; margin: 0; padding: .5rem; display: flex; flex-wrap: wrap; gap: .25rem; background: var(--superficie); border-radius: var(--radio-sm); }
+@media (min-width: 900px) { .panel-nav ul { flex-direction: column; position: sticky; top: 1rem; } }
+.panel-nav a { display: flex; align-items: center; min-height: 44px; padding: 0 .9rem; border-radius: 10px; color: var(--texto); font-weight: 500; }
+.panel-nav a:hover { background: var(--superficie-2); text-decoration: none; }
+.panel-nav a[aria-current="page"] { background: var(--marca-suave); color: var(--marca-enlace); }
+.panel-contenido { min-width: 0; }
+.panel-tarjetas { list-style: none; padding: 0; margin: 1rem 0 0; }
+.panel-formulario { max-width: 760px; }
+.presentaciones { border: 0; padding: 0; margin: 1rem 0; min-width: 0; }
+.presentaciones legend { font-weight: 600; font-size: 1.1rem; margin-bottom: .3rem; }
+.tabla-formset input:not([type=checkbox]), .tabla-formset select { min-width: 7rem; }
+.tabla-formset td { vertical-align: middle; }
+.aviso-panel { padding: .8rem 1.1rem; border-radius: 16px; background: var(--marca-suave); color: var(--texto); }
+.confirmar { max-width: 640px; }
