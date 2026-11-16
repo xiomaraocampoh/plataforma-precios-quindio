@@ -1,6 +1,5 @@
 {% extends "correo/base.html" %}
 {% block preheader %}Tu correo quedó confirmado. Compara y comparte precios en Armenia y el Quindío.{% endblock %}
-{% block chip %}{% include 'correo/_chip.html' with tono='aprobado' texto='Correo confirmado' %}{% endblock %}
 {% block titulo %}Te damos la bienvenida a AhorraPues{% endblock %}
 {% block cuerpo %}<p style="margin:0 0 16px 0;font-size:16px;line-height:1.5;color:#5f5f64;">Tu correo quedó confirmado, {{ nombre }}.</p><p style="margin:0 0 16px 0;font-size:16px;line-height:1.5;color:#5f5f64;">Con AhorraPues comparas el precio por unidad entre tiendas de barrio, minimercados y supermercados de Armenia y el Quindío. Cada precio que reportas ayuda a otras familias a ahorrar.</p>{% endblock %}
 {% block accion %}{% include 'correo/_boton.html' with url=enlace_registrar texto='Registrar mi primer precio' %}{% endblock %}
