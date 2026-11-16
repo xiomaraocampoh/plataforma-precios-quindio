@@ -249,3 +249,30 @@ def test_las_paginas_del_panel_son_accesibles(entrar, datos, seccion):
         assert controles_sin_etiqueta(html) == [], url
         assert referencias_rotas(html) == [], url
         assert "<caption" in html or "nuevo" in url  # tablas con título (1.3.1)
+
+
+def test_editar_sin_tocar_la_fila_libre_guarda_y_las_cantidades_se_leen_bien(entrar, datos):
+    # La fila libre no trae unidad elegida: si trajera «g», el navegador la enviaría como
+    # modificada y el producto no se podría guardar sin llenarla.
+    client, _ = entrar("editor_catalogo")
+    url = reverse("panel:editar", args=["productos", datos["arroz"].pk])
+    html = client.get(url).content.decode()
+    assert 'value="500"' in html and "500.000" not in html  # «1.000» se leería como mil
+    libre = html.split('name="presentaciones-1-unidad"')[1].split("</select>")[0]
+    assert '<option value="" selected>' in libre
+    fila_existente = {
+        "id": datos["p500"].pk,
+        "cantidad": "500",
+        "unidad": "g",
+        "codigo_barras": "",
+        "activa": "on",
+    }
+    fila_libre = {"cantidad": "", "unidad": "", "codigo_barras": "", "activa": "on"}
+    datos_form = _formset(
+        filas=[fila_existente, fila_libre],
+        iniciales=1,
+        nombre="Arroz blanco",
+        marca=datos["diana"].pk,
+        categoria=datos["granos"].pk,
+    )
+    assert client.post(url, datos_form).status_code == 302
