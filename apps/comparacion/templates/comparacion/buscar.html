@@ -3,7 +3,7 @@
 {% block titulo %}AhorraPues · Compara precios en Armenia y el Quindío{% endblock %}
 {% block head %}<link rel="preload" as="image" href="{% static 'img/hero-supermercado.webp' %}" media="(min-width: 900px)" fetchpriority="high">
 <script src="{% static 'js/hero.js' %}?v=3" defer></script>
-<script src="{% static 'js/escanear.js' %}?v=7" defer></script>{% endblock %}
+<script src="{% static 'js/escanear.js' %}?v=8" defer></script>{% endblock %}
 {% block hero %}
 <div class="hero-fondo">
 <div class="hero-contenedor">
@@ -29,39 +29,58 @@
       </button>
     </div>
   </div>
-  <dialog id="escaner" class="escaner" aria-labelledby="t-escaner">
-    <h2 id="t-escaner">{% if foto_activa %}Buscar un producto{% else %}Buscar por código de barras{% endif %}</h2>
-    <p class="suave">Al escanear el código, la imagen se lee en tu celular y no sale de él: solo se usan los números.</p>
-    {% if foto_activa %}
-    <section class="escaner-foto escaner-foto-principal" aria-labelledby="t-foto">
-      <h3 id="t-foto">Fotografía el producto</h3>
-      {% if user.is_authenticated %}
-        <label class="btn btn-bloque">
-          Tomar o elegir una foto
-          <input type="file" accept="image/*" capture="environment" class="sr-only"
-                 data-foto data-url="{% url 'comparacion:buscar_por_foto' %}">
-        </label>
-        <p class="suave">También puedes pegar (Cmd/Ctrl+V) o arrastrar una imagen aquí.</p>
-        <p class="suave">La foto se reduce en tu equipo y se envía a Anthropic, un servicio externo de IA, solo para identificar el producto. No se guarda. Evita que salgan personas.</p>
-      {% else %}
-        <p class="suave"><a href="{% url 'cuentas:ingresar' %}?next=/">Ingresa</a> para buscar por foto.</p>
-      {% endif %}
-      <div data-foto-resultado role="status" aria-live="polite"></div>
-    </section>
-    {% endif %}
-    {% if foto_activa %}<h3 class="escaner-sub">O escanea el código de barras</h3>{% endif %}
-    <video playsinline muted hidden aria-label="Vista de la cámara"></video>
-    <p data-estado role="status" aria-live="polite"></p>
-    <label class="btn btn-sec btn-bloque">
-      Foto del código de barras
-      <input type="file" accept="image/*" capture="environment" class="sr-only">
-    </label>
-    <form method="get" action="{% url 'comparacion:escanear' %}" class="escaner-manual">
-      <label for="codigo-manual">O escribe el número bajo las barras</label>
-      <input id="codigo-manual" name="codigo" inputmode="numeric" autocomplete="off" maxlength="20" required>
-      <button class="btn" type="submit">Buscar</button>
+  <dialog id="escaner" class="escaner" aria-label="Escanear un producto"
+          data-login="{% url 'cuentas:ingresar' %}?next=/"
+          {% if foto_activa %}data-foto-url="{% url 'comparacion:buscar_por_foto' %}"{% if user.is_authenticated %} data-sesion{% endif %}{% endif %}>
+    <header class="esc-barra">
+      <button type="button" class="esc-icono" data-cerrar aria-label="Cerrar el escáner"><svg class="ico" aria-hidden="true"><use href="#i-x"/></svg></button>
+      <h2>Escanear</h2>
+      <span class="esc-icono esc-relleno" aria-hidden="true"></span>
+    </header>
+
+    <div class="esc-visor">
+      <video playsinline muted aria-label="Vista de la cámara"></video>
+      <div class="esc-vacio" data-vacio hidden>
+        <svg class="ico" aria-hidden="true"><use href="#i-camara"/></svg>
+        <p>La cámara en vivo no está disponible aquí.<br>Usa el botón de abajo para tomar una foto o elegir una imagen.</p>
+      </div>
+      <div class="esc-marco" aria-hidden="true"><i></i><i></i><i></i><i></i><b class="esc-linea"></b></div>
+      <p class="esc-guia" data-estado role="status" aria-live="polite"></p>
+    </div>
+
+    <form method="get" action="{% url 'comparacion:escanear' %}" class="esc-manual" data-manual hidden>
+      <label for="codigo-manual">Número bajo las barras</label>
+      <div class="esc-manual-fila">
+        <input id="codigo-manual" name="codigo" inputmode="numeric" autocomplete="off" maxlength="20" required>
+        <button class="btn" type="submit">Buscar</button>
+      </div>
     </form>
-    <button type="button" class="btn btn-sec btn-bloque" data-cerrar>Cancelar</button>
+
+    <div class="esc-controles">
+      {% if foto_activa %}
+      <div class="esc-modos" role="group" aria-label="Qué quieres escanear">
+        <button type="button" data-modo="producto" aria-pressed="true">Producto</button>
+        <button type="button" data-modo="codigo" aria-pressed="false">Código de barras</button>
+      </div>
+      {% endif %}
+      <div class="esc-acciones">
+        <label class="esc-lateral" title="Elegir una imagen">
+          <svg class="ico" aria-hidden="true"><use href="#i-imagen"/></svg><span>Galería</span>
+          <input type="file" accept="image/*" class="sr-only" data-galeria>
+        </label>
+        <button type="button" class="esc-disparador" data-disparar aria-label="Tomar la foto"><span></span></button>
+        <button type="button" class="esc-lateral" data-teclado aria-expanded="false">
+          <svg class="ico" aria-hidden="true"><use href="#i-teclado"/></svg><span>Escribir</span>
+        </button>
+      </div>
+      <input type="file" accept="image/*" capture="environment" class="sr-only" data-captura tabindex="-1" aria-hidden="true">
+      <p class="esc-nota" data-nota>{% if foto_activa %}También puedes pegar (Cmd/Ctrl+V) o arrastrar una imagen. {% endif %}{% if foto_activa %}Las fotos de producto se envían a Anthropic (IA) solo para identificarlo y no se guardan; el código de barras se lee en tu equipo.{% else %}La imagen se lee en tu equipo y no sale de él: solo se usan los números.{% endif %}</p>
+    </div>
+
+    <div class="esc-hoja" data-hoja hidden>
+      <div data-resultado role="status" aria-live="polite"></div>
+      <button type="button" class="btn btn-sec btn-bloque" data-otra>Escanear otra vez</button>
+    </div>
   </dialog>
   <ul id="sugerencias" class="sugerencias" aria-label="Sugerencias de productos" aria-live="polite"></ul>
 

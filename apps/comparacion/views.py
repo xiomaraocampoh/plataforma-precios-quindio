@@ -2,7 +2,6 @@
 
 from urllib.parse import urlencode
 
-from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -67,7 +66,6 @@ def _fragmento_foto(request, estado: int, **contexto):
     return render(request, "comparacion/partials/_foto_resultado.html", contexto, status=estado)
 
 
-@login_required
 @require_POST
 def buscar_por_foto(request):
     """Fragmento: qué producto parece ser el de la foto. La IA solo extrae texto; el orden y los
@@ -76,7 +74,9 @@ def buscar_por_foto(request):
     if archivo is None:
         return _fragmento_foto(request, 400, error="Elige o toma una foto del producto.")
     try:
-        pista = integraciones.reconocer_producto(usuario=request.user, imagen=archivo.read())
+        pista = integraciones.reconocer_producto(
+            usuario=request.user, imagen=archivo.read(), ip=request.META.get("REMOTE_ADDR", "")
+        )
     except ImagenInvalidaError as exc:
         return _fragmento_foto(request, 400, error=str(exc))
     except integraciones.LimiteDeReconocimientosExcedidoError as exc:

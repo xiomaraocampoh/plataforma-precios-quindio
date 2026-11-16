@@ -110,13 +110,13 @@ def test_sin_cuenta_tambien_se_puede_buscar_por_foto(client, cafe, falso):
     assert r.status_code == 200 and falso.llamadas == 1
 
 
-def test_sin_cuenta_el_tope_por_hora_es_menor(client, falso):
+def test_sin_cuenta_el_tope_por_hora_es_menor(client, falso, db):
     _subir(client)
     assert _subir(client).status_code == 429
     assert falso.llamadas == 1
 
 
-def test_el_tope_sin_cuenta_es_por_direccion_no_global(client, falso):
+def test_el_tope_sin_cuenta_es_por_direccion_no_global(client, falso, db):
     _subir(client)
     from django.core.files.uploadedfile import SimpleUploadedFile
 
@@ -136,7 +136,7 @@ def test_hay_un_tope_diario_total_para_cuidar_el_saldo(client, usuario, falso, d
         services.reconocer_producto(usuario=usuario, imagen=JPEG)
 
 
-def test_la_direccion_ip_no_se_guarda_en_claro(client, falso):
+def test_la_direccion_ip_no_se_guarda_en_claro(client, falso, db):
     _subir(client)
     claves = list(cache._cache.keys()) if hasattr(cache, "_cache") else []
     assert not any("127.0.0.1" in str(k) for k in claves)
