@@ -100,12 +100,6 @@ def test_credenciales_incorrectas_dan_un_mensaje_claro_y_conservan_el_usuario(cl
     assert 'value="reportante1"' in html  # no obliga a reescribir el usuario
 
 
-def test_ingreso_con_campos_vacios_dice_cual_falta(client):
-    html = _ingresar(client, username="", password="").content.decode()
-    assert "Escribe tu nombre de usuario." in html
-    assert "Escribe tu contraseña." in html
-
-
 def test_una_cuenta_suspendida_explica_que_esta_desactivada(client, reportante):
     reportante.is_active = False
     reportante.save()

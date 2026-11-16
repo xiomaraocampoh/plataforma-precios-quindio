@@ -9,10 +9,11 @@ from django.views.decorators.http import require_http_methods
 from apps.precios.selectors import contar_aportes
 
 from . import services
-from .forms import DatosForm, RegistroForm, SuprimirCuentaForm
+from .forms import DatosForm, IngresarForm, RegistroForm, SuprimirCuentaForm
 
 
 class IngresarView(LoginView):
+    authentication_form = IngresarForm
     template_name = "cuentas/ingresar.html"
     redirect_authenticated_user = True
 
