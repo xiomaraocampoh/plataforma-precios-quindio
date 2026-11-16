@@ -55,3 +55,9 @@ def son_comparables(u1: Unidad | str, u2: Unidad | str) -> bool:
 def exigir_comparables(u1: Unidad | str, u2: Unidad | str) -> None:
     if not son_comparables(u1, u2):
         raise UnidadIncompatibleError(f"No se puede comparar {u1} con {u2}.")
+
+
+def formatear_cantidad(cantidad: Decimal) -> str:
+    if cantidad <= 0:
+        raise ValueError("La cantidad de la presentación debe ser positiva.")
+    return format(cantidad.normalize(), "f").replace(".", ",")

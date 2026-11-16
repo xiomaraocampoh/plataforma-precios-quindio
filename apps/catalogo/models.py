@@ -2,7 +2,7 @@ from django.db import models
 
 from core.models import ModeloConMarcasDeTiempo
 
-from .domain.normalizacion import Unidad
+from .domain.normalizacion import Unidad, formatear_cantidad
 
 
 class Categoria(models.Model):
@@ -47,4 +47,4 @@ class Presentacion(models.Model):
         ]
 
     def __str__(self) -> str:
-        return f"{self.producto} {self.cantidad.normalize()} {self.unidad}"
+        return f"{self.producto} {formatear_cantidad(self.cantidad)} {self.unidad}"

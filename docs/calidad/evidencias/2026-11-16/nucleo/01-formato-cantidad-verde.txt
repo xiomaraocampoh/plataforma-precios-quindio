@@ -1,0 +1,17 @@
+# TDD · 01-formato-cantidad · VERDE
+# 2026-11-16 11:40:23 -0500 · feat/nucleo-completo @ eeca7b9 + cambios
+$ pytest tests/unit/catalogo/test_formato_cantidad.py -v
+============================= test session starts =============================
+collecting ... collected 9 items
+
+tests/unit/catalogo/test_formato_cantidad.py::test_formatear_cantidad_sin_notacion_cientifica[cantidad0-500] PASSED [ 11%]
+tests/unit/catalogo/test_formato_cantidad.py::test_formatear_cantidad_sin_notacion_cientifica[cantidad1-30] PASSED [ 22%]
+tests/unit/catalogo/test_formato_cantidad.py::test_formatear_cantidad_sin_notacion_cientifica[cantidad2-1] PASSED [ 33%]
+tests/unit/catalogo/test_formato_cantidad.py::test_formatear_cantidad_sin_notacion_cientifica[cantidad3-2,5] PASSED [ 44%]
+tests/unit/catalogo/test_formato_cantidad.py::test_formatear_cantidad_sin_notacion_cientifica[cantidad4-0,25] PASSED [ 55%]
+tests/unit/catalogo/test_formato_cantidad.py::test_formatear_cantidad_sin_notacion_cientifica[cantidad5-1000] PASSED [ 66%]
+tests/unit/catalogo/test_formato_cantidad.py::test_formatear_cantidad_sin_notacion_cientifica[cantidad6-12,345] PASSED [ 77%]
+tests/unit/catalogo/test_formato_cantidad.py::test_formatear_cantidad_rechaza_valores_no_positivos[cantidad0] PASSED [ 88%]
+tests/unit/catalogo/test_formato_cantidad.py::test_formatear_cantidad_rechaza_valores_no_positivos[cantidad1] PASSED [100%]
+
+============================== 9 passed in 0.19s ==============================
