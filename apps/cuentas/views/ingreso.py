@@ -18,7 +18,7 @@ from core.limites import ip_de, permitir
 
 from .. import services
 from ..domain.segundo_factor import Resultado
-from ..forms import CodigoForm, PrimerCodigoAppForm
+from ..forms import CodigoForm, IngresarForm, PrimerCodigoAppForm
 from ..models import SegundoFactor, Usuario
 
 sf = services.segundo_factor
@@ -54,6 +54,7 @@ def completar_ingreso(request, usuario, *, verificado: bool, siguiente: str, con
 
 
 class IngresarView(LoginView):
+    authentication_form = IngresarForm  # mensajes claros y cuenta desactivada (UX de ingreso)
     template_name = "cuentas/ingresar.html"
     redirect_authenticated_user = True
 
