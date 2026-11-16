@@ -350,3 +350,5 @@ textarea { width: 100%; min-height: 90px; padding: .6rem .95rem; font: inherit; 
 .escaner-foto h3 { font-size: 1rem; margin: 0 0 .5rem; }
 .foto-error { color: var(--texto); background: var(--marca-suave); border-radius: 12px; padding: .75rem 1rem; }
 .foto-candidatos { list-style: none; padding: 0; margin: .5rem 0; display: grid; gap: .5rem; }
+.escaner-foto-principal { margin-top: .75rem; padding-top: 0; border-top: 0; }
+.escaner-sub { font-size: 1rem; margin: 1rem 0 .25rem; padding-top: 1rem; border-top: 1px solid var(--borde); }

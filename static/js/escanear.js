@@ -13,7 +13,7 @@
 
   var video = dialogo.querySelector("video");
   var estado = dialogo.querySelector("[data-estado]");
-  var foto = dialogo.querySelector("input[type=file]");
+  var foto = dialogo.querySelector("input[type=file]:not([data-foto])");
   var formatos = ["ean_13", "ean_8", "upc_a"];
   var flujo = null, lector = null, detector = null, activo = false, zxingCargado = null;
 
