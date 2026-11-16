@@ -1,0 +1,21 @@
+# TDD · 02-renovacion-vigencia · ROJO
+# 2026-11-16 11:40:44 -0500 · feat/nucleo-completo @ 14bdaba + cambios
+$ pytest tests/unit/precios/test_renovacion.py -v
+============================= test session starts =============================
+collecting ... collected 0 items / 1 error
+
+=================================== ERRORS ====================================
+___________ ERROR collecting tests/unit/precios/test_renovacion.py ____________
+ImportError while importing test module 'C:\Users\Windows\Desktop\plataforma-precios-quindio\tests\unit\precios\test_renovacion.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\unit\precios\test_renovacion.py:7: in <module>
+    from apps.precios.domain.vigencia import es_vigente, fecha_de_referencia
+E   ImportError: cannot import name 'fecha_de_referencia' from 'apps.precios.domain.vigencia' (C:\Users\Windows\Desktop\plataforma-precios-quindio\apps\precios\domain\vigencia.py)
+=========================== short test summary info ===========================
+ERROR tests/unit/precios/test_renovacion.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+============================== 1 error in 0.30s ===============================
