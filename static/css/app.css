@@ -292,3 +292,29 @@ a.chip:hover { text-decoration: none; background: var(--borde); }
 /* ---------- Autenticación ---------- */
 .auth { max-width: 940px; margin: 0 auto; }
 .auth h1 { font-size: clamp(1.9rem, 4.5vw, 2.6rem); }
+
+/* ---------- Núcleo: tablas, filtros, listas y estados ---------- */
+.datos { display: grid; gap: .6rem; margin: 0 0 1rem; }
+.datos div { display: grid; gap: .1rem; }
+.datos dt { font-size: .85rem; color: var(--texto-suave); }
+.datos dd { margin: 0; font-weight: 600; }
+.lista-simple { margin: 0 0 1rem; padding-left: 1.2rem; display: grid; gap: .4rem; }
+.btn-peligro { background: #b3261e; border-color: #b3261e; color: #fff; }  /* fijo: 5,7:1 en claro y oscuro */
+.btn-peligro:hover { background: #8f1d17; border-color: #8f1d17; color: #fff; }
+.btn-pequeno { min-height: 36px; padding: 0 .9rem; font-size: .875rem; }
+.tabla-envoltura { overflow-x: auto; background: var(--superficie); border-radius: var(--radio); padding: .5rem 1rem 1rem; }
+.tabla { width: 100%; border-collapse: collapse; font-size: .95rem; }
+.tabla caption { text-align: left; color: var(--texto-suave); padding: .6rem 0; font-size: .9rem; }
+.tabla th, .tabla td { text-align: left; padding: .65rem .5rem; border-top: 1px solid var(--borde); vertical-align: top; }
+.tabla thead th { border-top: 0; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; color: var(--texto-suave); }
+.tabla .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.paginacion { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+.filtros { display: flex; flex-wrap: wrap; gap: .75rem; align-items: end; background: var(--superficie); border-radius: var(--radio); padding: 1rem 1.2rem; margin-bottom: var(--gap); }
+.filtros .campo { margin: 0; flex: 1 1 160px; }
+.filtros .acciones-filtro { display: flex; gap: .5rem; flex-wrap: wrap; }
+.acciones-fila { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .4rem; }
+.acciones-fila form { margin: 0; }
+.panel-plegable summary { cursor: pointer; min-height: 36px; display: inline-flex; align-items: center; font-weight: 500; color: var(--marca-enlace); }
+.panel-plegable[open] summary { margin-bottom: .5rem; }
+.referencia { border: 1px dashed var(--borde-fuerte); }
+textarea { width: 100%; min-height: 90px; padding: .6rem .95rem; font: inherit; color: var(--texto); background: var(--superficie); border: 1px solid var(--borde-fuerte); border-radius: var(--radio-sm); }

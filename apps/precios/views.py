@@ -1,9 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
+from django.core.paginator import Paginator
 from django.shortcuts import render
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_GET, require_http_methods
 
-from . import services
+from . import selectors, services
 from .forms import RegistroPrecioForm
 
 
@@ -29,3 +30,13 @@ def registrar(request):
             return render(request, "precios/partials/_confirmacion.html", {"reporte": reporte})
     plantilla = "precios/partials/_formulario.html" if request.htmx else "precios/registrar.html"
     return render(request, plantilla, {"form": form})
+
+
+@login_required
+@require_GET
+def mis_aportes(request):
+    """Lista de los reportes del usuario con su estado (prioridad C)."""
+    pagina = Paginator(selectors.listar_aportes(request.user), 20).get_page(
+        request.GET.get("pagina")
+    )
+    return render(request, "precios/mis_aportes.html", {"pagina": pagina})
