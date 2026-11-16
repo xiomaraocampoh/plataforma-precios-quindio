@@ -1,0 +1,21 @@
+# 2026-11-16 12:17:54 -0500 · feat/nucleo-completo @ 6e48f97 · BD: PostgreSQL 16 (Docker)
+98 passed, 115 deselected in 1.17s
+Name                                       Stmts   Miss Branch BrPart  Cover   Missing
+--------------------------------------------------------------------------------------
+apps\catalogo\domain\__init__.py               0      0      0      0   100%
+apps\catalogo\domain\duplicados.py            24      0      8      0   100%
+apps\catalogo\domain\normalizacion.py         30      0      8      1    97%   56->exit
+apps\comparacion\domain\__init__.py            0      0      0      0   100%
+apps\comparacion\domain\filtros.py            17      0      0      0   100%
+apps\comparacion\domain\ranking.py            20      0      0      0   100%
+apps\comparacion\domain\resumen.py            24      0      6      0   100%
+apps\establecimientos\domain\__init__.py       0      0      0      0   100%
+apps\establecimientos\domain\mapas.py         11      0      4      0   100%
+apps\integraciones\domain\__init__.py          0      0      0      0   100%
+apps\integraciones\domain\sipsa.py            28      0     10      0   100%
+apps\precios\domain\__init__.py                0      0      0      0   100%
+apps\precios\domain\confianza.py              22      1      8      1    93%   28
+apps\precios\domain\validaciones.py            8      0      4      0   100%
+apps\precios\domain\vigencia.py               26      0      6      0   100%
+--------------------------------------------------------------------------------------
+TOTAL                                        210      1     54      2    99%

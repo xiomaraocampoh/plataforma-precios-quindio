@@ -1,0 +1,30 @@
+# 2026-11-16 12:17:54 -0500 · feat/nucleo-completo @ 6e48f97 · BD: PostgreSQL 16 (Docker)
+=============================== tests coverage ================================
+______________ coverage: platform win32, python 3.12.10-final-0 _______________
+Name                                                       Stmts   Miss Branch BrPart  Cover   Missing
+------------------------------------------------------------------------------------------------------
+apps\catalogo\domain\normalizacion.py                         30      0      8      1    97%   56->exit
+apps\catalogo\selectors.py                                    50      2     18      2    94%   78, 94
+apps\comparacion\selectors.py                                 81      7     16      1    88%   83-84, 178-182
+apps\cuentas\forms.py                                         47      2     10      1    95%   44->52, 50-51
+apps\cuentas\views.py                                         48      1      8      1    96%   23
+apps\establecimientos\api\serializers.py                      23      1      2      1    92%   42
+apps\establecimientos\services.py                             22      1      2      1    92%   50
+apps\integraciones\clients\sipsa.py                           46      3      4      0    94%   96-97, 103
+apps\integraciones\management\commands\importar_sipsa.py      25      2      6      2    87%   25, 32
+apps\integraciones\models.py                                  15      1      0      0    93%   31
+apps\moderacion\models.py                                     45      2      0      0    96%   46, 79
+apps\moderacion\services.py                                   78      5     18      5    90%   40, 52, 78, 95, 104
+apps\moderacion\views.py                                      47      6      8      3    84%   48-49, 51-52, 70->79, 81-82
+apps\precios\domain\confianza.py                              22      1      8      1    93%   28
+apps\precios\management\commands\cargar_demo.py              103      1     24      1    98%   207
+apps\precios\models.py                                        32      2      0      0    94%   47, 74
+apps\precios\services.py                                      97      6     20      2    93%   94-95, 163, 186-187, 200
+apps\precios\views.py                                         44      8      4      2    79%   16->32, 27, 31, 57-60, 62-63
+core\admin_acciones.py                                        21      3      6      2    81%   24-25, 26->28, 29
+core\views.py                                                 21      2      0      0    90%   13-14
+------------------------------------------------------------------------------------------------------
+TOTAL                                                       1731     56    242     26    96%
+74 files skipped due to complete coverage.
+Coverage XML written to file coverage.xml
+213 passed in 12.35s
