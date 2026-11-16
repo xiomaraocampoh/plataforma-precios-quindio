@@ -1,0 +1,27 @@
+# TDD · 05-sipsa-valores · VERDE
+# 2026-11-16 11:42:57 -0500 · feat/nucleo-completo @ a5c3e55 + cambios
+$ pytest tests/unit/integraciones/test_sipsa.py -v
+============================= test session starts =============================
+collecting ... collected 19 items
+
+tests/unit/integraciones/test_sipsa.py::test_interpretar_precio_cop[4500-esperado0] PASSED [  5%]
+tests/unit/integraciones/test_sipsa.py::test_interpretar_precio_cop[4.500-esperado1] PASSED [ 10%]
+tests/unit/integraciones/test_sipsa.py::test_interpretar_precio_cop[12.345.678-esperado2] PASSED [ 15%]
+tests/unit/integraciones/test_sipsa.py::test_interpretar_precio_cop[4.500,50-esperado3] PASSED [ 21%]
+tests/unit/integraciones/test_sipsa.py::test_interpretar_precio_cop[$ 4.500-esperado4] PASSED [ 26%]
+tests/unit/integraciones/test_sipsa.py::test_interpretar_precio_cop[ 3200,5 -esperado5] PASSED [ 31%]
+tests/unit/integraciones/test_sipsa.py::test_interpretar_precio_cop[4500.75-esperado6] PASSED [ 36%]
+tests/unit/integraciones/test_sipsa.py::test_precio_vacio_cero_negativo_o_mal_formado_se_rechaza[] PASSED [ 42%]
+tests/unit/integraciones/test_sipsa.py::test_precio_vacio_cero_negativo_o_mal_formado_se_rechaza[n.d.] PASSED [ 47%]
+tests/unit/integraciones/test_sipsa.py::test_precio_vacio_cero_negativo_o_mal_formado_se_rechaza[0] PASSED [ 52%]
+tests/unit/integraciones/test_sipsa.py::test_precio_vacio_cero_negativo_o_mal_formado_se_rechaza[-4.500] PASSED [ 57%]
+tests/unit/integraciones/test_sipsa.py::test_precio_vacio_cero_negativo_o_mal_formado_se_rechaza[4,500,00] PASSED [ 63%]
+tests/unit/integraciones/test_sipsa.py::test_interpretar_fecha_en_formato_iso_o_dia_mes_anio[2026-11-14] PASSED [ 68%]
+tests/unit/integraciones/test_sipsa.py::test_interpretar_fecha_en_formato_iso_o_dia_mes_anio[14/11/2026] PASSED [ 73%]
+tests/unit/integraciones/test_sipsa.py::test_interpretar_fecha_en_formato_iso_o_dia_mes_anio[ 14/11/2026 ] PASSED [ 78%]
+tests/unit/integraciones/test_sipsa.py::test_fecha_invalida_se_rechaza[] PASSED [ 84%]
+tests/unit/integraciones/test_sipsa.py::test_fecha_invalida_se_rechaza[11/14/2026] PASSED [ 89%]
+tests/unit/integraciones/test_sipsa.py::test_fecha_invalida_se_rechaza[2026-13-01] PASSED [ 94%]
+tests/unit/integraciones/test_sipsa.py::test_fecha_invalida_se_rechaza[ayer] PASSED [100%]
+
+============================= 19 passed in 0.19s ==============================
