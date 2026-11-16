@@ -18,7 +18,7 @@ class RegistroPrecioForm(forms.Form):
         min_value=1,
         max_digits=12,
         decimal_places=2,
-        label="Precio en góndola ($)",
+        label="Precio que viste ($)",
         widget=forms.NumberInput(attrs={"inputmode": "numeric", "autocomplete": "off"}),
     )
     # Registro sin conexión (ADR-009): la cola del navegador reenvía con el mismo id y la hora
