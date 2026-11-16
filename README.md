@@ -30,6 +30,30 @@ python manage.py runserver
 Sin Docker, el proyecto arranca con SQLite y caché en memoria. En `.env` usa
 `DATABASE_URL=sqlite:///db.sqlite3` y deja `REDIS_URL` vacío.
 
+## Correo con Brevo (ADR-021)
+
+Los correos (verificación, seguridad, códigos de dos pasos y moderación) salen de verdad por el relé
+SMTP de Brevo, en desarrollo y en producción. Sin `EMAIL_HOST` se imprimen en la consola, y las
+pruebas nunca salen a la red.
+
+1. **Crear la cuenta:** regístrate gratis en [brevo.com](https://www.brevo.com). El plan gratuito
+   envía 300 correos al día.
+2. **Verificar el remitente:** en *Senders, Domains & Dedicated IPs → Senders*, agrega
+   `ahorrapuescolombia@gmail.com` con el nombre «AhorraPues». Abre el correo de Brevo que llega a esa
+   bandeja y confírmalo.
+3. **Generar la clave SMTP:** en *Settings → SMTP & API → SMTP*, pulsa *Generate a new SMTP key*.
+   Usa la clave **SMTP**, que empieza por `xsmtpsib-`, y no la de API (`xkeysib-`). El *Login* de
+   esa misma pestaña, que termina en `@smtp-brevo.com`, va en `EMAIL_HOST_USER`.
+4. **Llenar el `.env`:** copia el bloque de correo de `.env.example` y reemplaza el usuario, la
+   clave y el remitente. **El `.env` nunca se versiona:** compruébalo con `git ls-files .env`, que
+   debe salir vacío. Si tu red bloquea el puerto 587, usa `EMAIL_PORT=2525`.
+5. **Probar:** `python manage.py sendtestemail tu-correo@ejemplo.com`. Debe llegar en menos de un
+   minuto; revisa también la carpeta de spam (ver ADR-021, remitente `@gmail.com`).
+6. **Reintentos:** deja corriendo `python manage.py enviar_correos --continuo`, o prográmalo cada
+   minuto, para reenviar lo que falló.
+
+- Vista previa de cada plantilla (como staff): http://localhost:8000/panel/correos/vista-previa/
+
 ## Pruebas y calidad
 
 ```bash

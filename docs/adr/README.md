@@ -15,6 +15,7 @@ Cada ADR sigue la plantilla [`0000-plantilla.md`](0000-plantilla.md) (formato de
 | [0017](0017-despliegue-en-paas-de-contenedores.md) | Despliegue en PaaS de contenedores | Propuesto (proveedor pendiente) |
 | [0018](0018-precio-oficial-verificado-como-principal.md) | Precio oficial verificado como principal | Propuesto |
 | [0019](0019-panel-de-administracion-y-roles.md) | Panel propio, roles con Groups y Marca como entidad | Propuesto |
+| [0021](0021-correo-transaccional-brevo-outbox-y-2fa.md) | Correo transaccional con Brevo (SMTP), outbox y verificación en dos pasos | Propuesto |
 
 ## Sobre la numeración (decisión D-1 pendiente)
 
