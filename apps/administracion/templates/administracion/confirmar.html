@@ -1,0 +1,17 @@
+{% extends "administracion/_base_panel.html" %}
+{% block titulo_panel %}Confirmar{% endblock %}
+{% block panel %}
+<section class="tile confirmar" aria-labelledby="titulo-confirmar">
+  <h1 id="titulo-confirmar">{{ titulo }}</h1>
+  <p>{{ explicacion }}</p>
+  <div class="acciones-fila">
+    {% if boton %}
+    <form method="post" hx-disabled-elt="find button">
+      {% csrf_token %}
+      <button class="btn{% if peligro %} btn-peligro{% endif %}" type="submit">{{ boton }}</button>
+    </form>
+    {% endif %}
+    <a class="btn btn-sec" href="{% if volver %}{% url volver %}{% else %}{% url 'panel:lista' seccion.slug %}{% endif %}">{% if boton %}Cancelar{% else %}Volver{% endif %}</a>
+  </div>
+</section>
+{% endblock %}

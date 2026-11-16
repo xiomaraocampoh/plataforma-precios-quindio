@@ -17,7 +17,7 @@ def aceite(db):
     abarrotes = Categoria.objects.create(nombre="Abarrotes")
     producto = Producto.objects.create(
         nombre="Aceite",
-        marca="Premier",
+        marca=services.marca_por_nombre("Premier"),
         nombre_normalizado=normalizar_nombre("Aceite"),
         categoria=abarrotes,
     )

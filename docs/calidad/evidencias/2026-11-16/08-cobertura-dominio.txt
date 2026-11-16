@@ -1,0 +1,22 @@
+# Cobertura de líneas y ramas solo del dominio (apps/*/domain), con las pruebas unitarias
+# 2026-11-16 10:43:35 -0500 · 34e482b
+$ coverage run -m pytest -m unit -q && coverage report --include="apps/*/domain/*" --show-missing --skip-covered=false
+55 passed, 21 deselected in 1.01s
+Name                                    Stmts   Miss Branch BrPart  Cover   Missing
+-----------------------------------------------------------------------------------
+apps\catalogo\domain\__init__.py            0      0      0      0   100%
+apps\catalogo\domain\duplicados.py         24      0      8      0   100%
+apps\catalogo\domain\normalizacion.py      26      0      6      1    97%   56->exit
+apps\comparacion\domain\__init__.py         0      0      0      0   100%
+apps\comparacion\domain\ranking.py         20      0      0      0   100%
+apps\comparacion\domain\resumen.py         24      0      6      0   100%
+apps\precios\domain\__init__.py             0      0      0      0   100%
+apps\precios\domain\confianza.py           23      0      8      0   100%
+apps\precios\domain\validaciones.py         8      0      4      0   100%
+apps\precios\domain\vigencia.py            23      0      6      0   100%
+-----------------------------------------------------------------------------------
+TOTAL                                     148      0     38      1    99%
+
+# Mismo cálculo con TODA la suite (unitarias + integración)
+76 passed in 1.76s
+TOTAL                                     148      0     38      1    99%

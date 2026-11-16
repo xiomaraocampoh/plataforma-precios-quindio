@@ -65,6 +65,7 @@ Módulos (apps):
 | `precios` | Reportante | Registro, vigencia, confianza, anomalías, idempotencia offline |
 | `comparacion` | Consumidor | Lado lectura: búsqueda, comparación neutral, caché |
 | `moderacion` | Moderador | Denuncias, revisión de reportes `en_revision` |
+| `administracion` | Administrador, Editor de catálogo | Panel `/panel/`: CRUD de catálogo y directorio, roles y auditoría (ADR-0019) |
 | `integraciones` | — | Puertos/adaptadores a fuentes externas (SIPSA) con timeout |
 | `comercios` | Comercio | **Corte III**: perfil, precio oficial, promociones |
 

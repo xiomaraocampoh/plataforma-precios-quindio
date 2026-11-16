@@ -5,4 +5,6 @@ django-environ>=0.12
 django-htmx>=1.21
 psycopg[binary]>=3.2        # PostgreSQL
 redis>=5                    # RedisCache (dev con compose y producción; ADR-0002)
-anthropic>=1.0              # reconocimiento de productos por foto (ADR-019); opcional en tiempo de ejecución
+anthropic>=1.0              # reconocimiento de productos por foto (ADR-022); opcional en tiempo de ejecución
+pyotp>=2.9                  # verificación en dos pasos TOTP, RFC 6238 (ADR-021)
+qrcode>=7.4                 # QR en SVG para configurar la app autenticadora (sin PIL)

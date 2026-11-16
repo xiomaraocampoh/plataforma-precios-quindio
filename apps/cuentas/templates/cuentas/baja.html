@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block titulo %}Dejar de recibir correos informativos · AhorraPues{% endblock %}
+{% block contenido %}
+<div class="auth bento">
+  <section class="tile tile-3" aria-labelledby="t-baja">
+    <h1 id="t-baja">¿Dejar de recibir correos informativos?</h1>
+    <p class="suave">Dejarás de recibir la bienvenida y los resultados de moderación. Los correos de seguridad seguirán llegando porque protegen tu cuenta.</p>
+    <form method="post">{% csrf_token %}<button class="btn btn-bloque" type="submit">Sí, dejar de recibirlos</button></form>
+  </section>
+</div>
+{% endblock %}

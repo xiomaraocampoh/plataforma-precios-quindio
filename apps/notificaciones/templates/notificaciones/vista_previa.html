@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block titulo %}Vista previa de correos · AhorraPues{% endblock %}
+{% block contenido %}
+<div class="encabezado"><div><p class="etiqueta">Panel · solo personal</p><h1>Vista previa de correos</h1></div></div>
+<p class="suave">Cada correo con datos de ejemplo ficticios, en HTML y en texto plano. Así llegan por Brevo.</p>
+<div class="tabla-envoltura" role="region" aria-labelledby="t-correos" tabindex="0">
+  <table class="tabla">
+    <caption id="t-correos">Correos transaccionales (ADR-021)</caption>
+    <thead><tr><th scope="col">Correo</th><th scope="col">Categoría</th><th scope="col">Ver</th></tr></thead>
+    <tbody>
+      {% for tipo, categoria in tipos %}
+      <tr>
+        <th scope="row">{{ tipo }}</th>
+        <td><span class="chip {% if categoria == 'seguridad' %}chip-alerta{% else %}chip-positivo{% endif %}">{% if categoria == "seguridad" %}Seguridad (obligatorio){% else %}Informativo{% endif %}</span></td>
+        <td><div class="acciones-fila">
+          <a class="btn btn-sec btn-pequeno" href="{% url 'correos:vista_previa' tipo %}">HTML<span class="sr-only"> de {{ tipo }}</span></a>
+          <a class="btn btn-sec btn-pequeno" href="{% url 'correos:vista_previa' tipo %}?formato=texto">Texto<span class="sr-only"> de {{ tipo }}</span></a>
+        </div></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,4 +1,4 @@
-"""Adaptador de reconocimiento de productos por foto con la API de Anthropic (ADR-019).
+"""Adaptador de reconocimiento de productos por foto con la API de Anthropic (ADR-022).
 
 Patrón puerto/adaptador, como SIPSA: el resto del sistema depende de `ReconocedorDeProductos`.
 Garantías de diseño:

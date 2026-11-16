@@ -1,5 +1,9 @@
 {% for p in productos %}
   <li><a href="{% url 'comparacion:comparar' p.pk %}">{{ p }}</a></li>
 {% empty %}
-  {% if consulta_larga %}<li class="vacio">No hay coincidencias. Prueba con otra palabra.</li>{% endif %}
+  {% if muy_corto %}
+  <li class="vacio">Escribe al menos dos letras.</li>
+  {% else %}
+  <li class="vacio">No encontramos «{{ texto }}». Prueba con otro nombre.</li>
+  {% endif %}
 {% endfor %}

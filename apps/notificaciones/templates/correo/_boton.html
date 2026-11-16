@@ -1,0 +1,9 @@
+{% comment %}Botón tipo píldora y, debajo, el mismo enlace en texto por si el botón no carga.{% endcomment %}
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 16px 0;">
+  <tr>
+    <td align="center" bgcolor="#0071e3" style="border-radius:999px;background-color:#0071e3;">
+      <a href="{{ url }}" style="display:inline-block;padding:14px 28px;font-family:-apple-system,'Segoe UI',Inter,Arial,sans-serif;font-size:16px;line-height:1.2;font-weight:600;color:#ffffff;text-decoration:none;border-radius:999px;">{{ texto }}</a>
+    </td>
+  </tr>
+</table>
+<p style="margin:0 0 16px 0;font-size:13px;line-height:1.5;color:#6e6e73;">Si el botón no funciona, copia este enlace en tu navegador:<br><a href="{{ url }}" style="color:#0066cc;word-break:break-all;">{{ url }}</a></p>

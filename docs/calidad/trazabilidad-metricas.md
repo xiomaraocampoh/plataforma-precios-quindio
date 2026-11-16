@@ -18,7 +18,7 @@ Fuente de métricas y umbrales: documento *Modelo Proyecto nuclear* (pasos 4 y 5
 | M-18 | Modularidad | Contratos de capas y módulos en CI + diff del Corte III limitado a `apps/comercios` | `.importlinter` (`lint-imports`), `git diff --stat` del PR del módulo comercial |
 | M-19 | Testabilidad | `pytest --cov` (CI falla < 70 %) | `.github/workflows/ci.yml` |
 | M-21 | Disponibilidad | `/healthz/` comprueba PostgreSQL y caché (503 si falla) | `core/views.py`, `tests/integration/test_healthz.py` |
-| M-22 | Tolerancia a fallos | Idempotencia por `id_cliente` | `test_reenvio_offline_con_mismo_id_cliente_no_duplica` |
+| M-22 | Tolerancia a fallos | Idempotencia por `id_cliente` y cola sin conexión en el navegador | `test_reenvio_offline_con_mismo_id_cliente_no_duplica` (API), `test_reenvio_del_formulario_con_mismo_id_cliente_no_duplica` (formulario), `tests/integration/e2e/test_navegador_sin_conexion.py` (Playwright, pérdida de red simulada) |
 | D-01 | Actualidad | Invalidación de caché al registrar | `test_nuevo_reporte_invalida_la_cache` |
 | D-02 | Actualidad (ventana) | Reglas de vigencia; RN-08 rechaza fechas futuras o fuera de ventana | `tests/unit/precios/test_vigencia.py`, `tests/unit/precios/test_validaciones.py` |
 | D-03 | Credibilidad | Nivel de confianza en cada resultado | `apps/precios/domain/confianza.py` |

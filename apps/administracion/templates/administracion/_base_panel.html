@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block titulo %}{% block titulo_panel %}Panel{% endblock %} · Panel de administración · AhorraPues{% endblock %}
+{% block contenido %}
+<nav class="migas" aria-label="Ruta de navegación">
+  <a href="{% url 'panel:inicio' %}">Panel</a>{% block migas %}{% endblock %}
+</nav>
+<div class="panel">
+  <nav class="panel-nav" aria-label="Secciones del panel">
+    <ul>
+      {% for a in accesos %}
+      <li><a href="{{ a.url }}"{% if a.slug == seccion.slug or a.slug == activo %} aria-current="page"{% endif %}>{{ a.titulo }}</a></li>
+      {% endfor %}
+      {% if user.is_superuser %}<li><a href="{% url 'admin:index' %}">Admin de Django</a></li>{% endif %}
+    </ul>
+  </nav>
+  <div class="panel-contenido">
+    {% block panel %}{% endblock %}
+  </div>
+</div>
+{% endblock %}

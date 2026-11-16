@@ -1,0 +1,61 @@
+# Perfil ampliado de Ruff después de las correcciones de estilo
+# 2026-11-16 10:41:44 -0500 · 023eb9c + cambios
+$ ruff check . --extend-select PL,RUF,ARG,ERA,SIM,PIE,RET --statistics
+18	PLR2004	magic-value-comparison
+10	RUF012 	mutable-class-default
+ 4	ARG001 	unused-function-argument
+ 4	ARG002 	unused-method-argument
+ 1	PLC0415	import-outside-top-level
+ 1	PLR0913	too-many-arguments
+Found 38 errors.
+
+# PLR2004 fuera de tests/ (debe quedar vacío):
+(ninguno)
+
+# Detalle (todos aceptados)
+apps\catalogo\admin.py:16:15: RUF012 Mutable default value for class attribute
+apps\catalogo\models.py:25:23: RUF012 Mutable default value for class attribute
+apps\catalogo\models.py:42:23: RUF012 Mutable default value for class attribute
+apps\comparacion\api\views.py:15:26: RUF012 Mutable default value for class attribute
+apps\comparacion\api\views.py:21:19: ARG002 Unused method argument: `request`
+apps\establecimientos\models.py:22:19: RUF012 Mutable default value for class attribute
+apps\integraciones\clients\sipsa.py:38:31: ARG002 Unused method argument: `fecha`
+apps\moderacion\models.py:39:23: RUF012 Mutable default value for class attribute
+apps\precios\api\serializers.py:19:18: RUF012 Mutable default value for class attribute
+apps\precios\api\views.py:17:26: RUF012 Mutable default value for class attribute
+apps\precios\management\commands\cargar_demo.py:104:23: ARG002 Unused method argument: `args`
+apps\precios\management\commands\cargar_demo.py:104:31: ARG002 Unused method argument: `opciones`
+apps\precios\models.py:35:23: RUF012 Mutable default value for class attribute
+apps\precios\models.py:38:19: RUF012 Mutable default value for class attribute
+apps\precios\services.py:57:5: PLR0913 Too many arguments in function definition (6 > 5)
+core\views.py:25:13: ARG001 Unused function argument: `request`
+manage.py:10:5: PLC0415 `import` should be at the top-level of a file
+tests\integration\test_api_comparacion.py:31:37: PLR2004 Magic value used in comparison, consider replacing `200` with a constant variable
+tests\integration\test_api_comparacion.py:81:37: PLR2004 Magic value used in comparison, consider replacing `200` with a constant variable
+tests\integration\test_api_reportes.py:33:37: PLR2004 Magic value used in comparison, consider replacing `201` with a constant variable
+tests\integration\test_api_reportes.py:50:65: PLR2004 Magic value used in comparison, consider replacing `400` with a constant variable
+tests\integration\test_api_reportes.py:57:37: PLR2004 Magic value used in comparison, consider replacing `400` with a constant variable
+tests\integration\test_cuentas.py:19:29: PLR2004 Magic value used in comparison, consider replacing `302` with a constant variable
+tests\integration\test_cuentas.py:30:29: PLR2004 Magic value used in comparison, consider replacing `200` with a constant variable
+tests\integration\test_cuentas.py:36:29: PLR2004 Magic value used in comparison, consider replacing `200` with a constant variable
+tests\integration\test_cuentas.py:42:29: PLR2004 Magic value used in comparison, consider replacing `200` with a constant variable
+tests\integration\test_cuentas.py:46:35: ARG001 Unused function argument: `reportante`
+tests\integration\test_cuentas.py:50:29: PLR2004 Magic value used in comparison, consider replacing `302` with a constant variable
+tests\integration\test_cuentas.py:52:65: PLR2004 Magic value used in comparison, consider replacing `302` with a constant variable
+tests\integration\test_cuentas.py:58:29: PLR2004 Magic value used in comparison, consider replacing `302` with a constant variable
+tests\integration\test_healthz.py:14:37: PLR2004 Magic value used in comparison, consider replacing `200` with a constant variable
+tests\integration\test_healthz.py:19:16: ARG001 Unused function argument: `args`
+tests\integration\test_healthz.py:19:24: ARG001 Unused function argument: `kwargs`
+tests\integration\test_healthz.py:24:37: PLR2004 Magic value used in comparison, consider replacing `503` with a constant variable
+tests\integration\test_limite_registros.py:60:37: PLR2004 Magic value used in comparison, consider replacing `429` with a constant variable
+tests\integration\test_limite_registros.py:70:37: PLR2004 Magic value used in comparison, consider replacing `200` with a constant variable
+tests\unit\comparacion\test_resumen.py:45:32: PLR2004 Magic value used in comparison, consider replacing `8` with a constant variable
+tests\unit\comparacion\test_resumen.py:54:26: PLR2004 Magic value used in comparison, consider replacing `2` with a constant variable
+
+# Perfil del proyecto
+All checks passed!
+109 files already formatted
+
+# Pruebas tras el cambio de estilo
+....                                                                     [100%]
+76 passed in 0.97s

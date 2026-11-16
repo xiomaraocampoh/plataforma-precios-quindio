@@ -1,0 +1,27 @@
+<p class="suave" role="status">{{ pagina.paginator.count }} cuenta{{ pagina.paginator.count|pluralize }}{% if hay_filtros %} con los filtros aplicados{% endif %}.</p>
+{% if pagina.object_list %}
+<div class="tabla-envoltura" role="region" aria-labelledby="t-usuarios" tabindex="0">
+  <table class="tabla">
+    <caption id="t-usuarios">Cuentas (página {{ pagina.number }} de {{ pagina.paginator.num_pages }}). Datos personales de uso interno: no se publican.</caption>
+    <thead><tr><th scope="col">Usuario</th><th scope="col">Rol</th><th scope="col">Estado</th><th scope="col">Acciones</th></tr></thead>
+    <tbody>
+      {% for u in pagina.object_list %}
+      <tr class="fila-panel">
+        <th scope="row">{{ u.username }}{% if u.is_superuser %} <span class="chip">Superusuario</span>{% endif %}{% if u.email %}<br><span class="suave">{{ u.email }}</span>{% endif %}</th>
+        <td>{{ u.get_rol_display }}</td>
+        <td>{% if u.suprimido_en %}<span class="chip chip-alerta">Suprimida por su titular</span>{% else %}{% include "administracion/partials/_estado.html" with activo=u.is_active si="Activa" no="Suspendida" %}{% endif %}</td>
+        <td><div class="acciones-fila">
+          <a class="btn btn-sec btn-pequeno" href="{% url 'panel:usuario' u.pk %}">{% if puede_gestionar and u.pk != user.pk and not u.is_superuser or puede_gestionar and u.pk != user.pk and user.is_superuser %}Cambiar rol{% else %}Ver{% endif %}<span class="sr-only"> {{ u.username }}</span></a>
+          {% if puede_gestionar and u.pk != user.pk and not u.suprimido_en %}{% if not u.is_superuser or user.is_superuser %}
+          <a class="btn btn-sec btn-pequeno" href="{% url 'panel:usuario_estado' u.pk %}">{% if u.is_active %}Suspender{% else %}Reactivar{% endif %}<span class="sr-only"> {{ u.username }}</span></a>
+          {% endif %}{% endif %}
+        </div></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "administracion/partials/_paginacion.html" %}
+{% else %}
+<section class="tile tile-marca vacio-estado"><h2>Sin resultados</h2><p class="suave">Prueba con otra búsqueda o quita algún filtro.</p></section>
+{% endif %}

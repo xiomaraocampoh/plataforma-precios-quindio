@@ -3,7 +3,7 @@ from django.contrib import admin
 from apps.moderacion import services as moderacion
 from core.admin_acciones import accion_de_moderacion
 
-from .models import Categoria, Presentacion, Producto, SolicitudCatalogo
+from .models import Categoria, Marca, Presentacion, Producto, SolicitudCatalogo
 
 
 class PresentacionInline(admin.TabularInline):
@@ -13,10 +13,16 @@ class PresentacionInline(admin.TabularInline):
 
 @admin.register(Producto)
 class ProductoAdmin(admin.ModelAdmin):
-    list_display = ("nombre", "marca", "categoria")
-    search_fields = ("nombre", "marca", "nombre_normalizado", "presentaciones__codigo_barras")
-    list_filter = ("categoria", "marca")
-    list_select_related = ("categoria",)
+    list_display = ("nombre", "marca", "categoria", "activo")
+    search_fields = (
+        "nombre",
+        "marca__nombre",
+        "nombre_normalizado",
+        "presentaciones__codigo_barras",
+    )
+    list_filter = ("categoria", "marca", "activo")
+    list_select_related = ("categoria", "marca")
+    autocomplete_fields = ("marca",)
     inlines = [PresentacionInline]
 
 
@@ -24,8 +30,8 @@ class ProductoAdmin(admin.ModelAdmin):
 class PresentacionAdmin(admin.ModelAdmin):
     list_display = ("__str__", "unidad", "codigo_barras")
     list_filter = ("unidad", "producto__categoria", "producto__marca")
-    search_fields = ("codigo_barras", "producto__nombre", "producto__marca")
-    list_select_related = ("producto",)
+    search_fields = ("codigo_barras", "producto__nombre", "producto__marca__nombre")
+    list_select_related = ("producto__marca",)
     autocomplete_fields = ("producto",)
 
 
@@ -49,4 +55,16 @@ class SolicitudCatalogoAdmin(admin.ModelAdmin):
     ]
 
 
-admin.site.register(Categoria)
+@admin.register(Marca)
+class MarcaAdmin(admin.ModelAdmin):
+    list_display = ("nombre", "activa")
+    list_filter = ("activa",)
+    search_fields = ("nombre", "nombre_normalizado")
+    readonly_fields = ("nombre_normalizado",)
+
+
+@admin.register(Categoria)
+class CategoriaAdmin(admin.ModelAdmin):
+    list_display = ("nombre", "perecedera", "activa")
+    list_filter = ("perecedera", "activa")
+    search_fields = ("nombre",)

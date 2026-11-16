@@ -1,0 +1,9 @@
+{% extends "administracion/_base_panel.html" %}
+{% block titulo_panel %}Auditoría{% endblock %}
+{% block migas %}<span aria-hidden="true">/</span><span aria-current="page">Auditoría</span>{% endblock %}
+{% block panel %}
+<div class="encabezado"><div><p class="etiqueta">Trazabilidad</p><h1>Auditoría</h1></div></div>
+<p class="suave">Cada acción del panel: quién, qué y cuándo. La bitácora no se puede editar ni borrar.</p>
+{% include "administracion/partials/_filtros.html" with ayuda_busqueda="Objeto o usuario" etiqueta_busqueda="la auditoría" %}
+<div id="resultados-panel" aria-live="polite">{% include "administracion/partials/_auditoria.html" %}</div>
+{% endblock %}

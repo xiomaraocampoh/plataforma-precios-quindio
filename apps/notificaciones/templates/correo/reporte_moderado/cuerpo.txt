@@ -1,0 +1,11 @@
+{% extends "correo/base.txt" %}
+{% block titulo %}{% if aprobado %}[Publicado]{% else %}[No publicado]{% endif %} {% if aprobado %}Tu precio ya está publicado{% else %}Tu precio no se publicó{% endif %}{% endblock %}
+{% block cuerpo %}{{ presentacion }} a ${{ precio }} en {{ establecimiento }}.
+
+{% if aprobado %}Quedó en revisión porque era muy distinto a los demás precios. Moderación lo revisó y ya aparece en la comparación.{% else %}Quedó en revisión porque era muy distinto a los demás precios y moderación no pudo confirmarlo. Si el precio es correcto, puedes reportarlo de nuevo.{% endif %}
+
+{% endblock %}
+{% block accion %}Ver mis aportes: {{ enlace_aportes }}
+
+{% endblock %}
+{% block motivo %}reportaste un precio en AhorraPues{% endblock %}

@@ -1,4 +1,6 @@
-<div role="status" style="display:grid;gap:.75rem;justify-items:start">
+{# accesibilidad.js enfoca el h2 y lo anuncia en #avisos (2.4.3, 4.1.3) #}
+{# data-registro-guardado: cola-registros.js lo usa para saber que el reenvío quedó guardado (M-22) #}
+<div data-registro-guardado style="display:grid;gap:.75rem;justify-items:start">
   <span class="icono-caja" aria-hidden="true"><svg class="ico"><use href="#{% if reporte.estado == 'en_revision' %}i-clock{% else %}i-check{% endif %}"/></svg></span>
   {% if reporte.estado == "en_revision" %}
     <h2>Gracias, quedó en revisión</h2>

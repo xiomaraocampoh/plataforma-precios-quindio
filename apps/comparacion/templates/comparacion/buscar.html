@@ -2,7 +2,7 @@
 {% load static %}
 {% block titulo %}AhorraPues · Compara precios en Armenia y el Quindío{% endblock %}
 {% block head %}<link rel="preload" as="image" href="{% static 'img/hero-supermercado.webp' %}" media="(min-width: 900px)" fetchpriority="high">
-<script src="{% static 'js/hero.js' %}?v=3" defer></script>
+<script src="{% static 'js/hero.js' %}?v=5" defer></script>
 <script src="{% static 'js/escanear.js' %}?v=15" defer></script>{% endblock %}
 {% block hero %}
 <div class="hero-fondo">
@@ -94,7 +94,7 @@
   </dialog>
 
   {% if destacados %}
-  <div class="chips hero-chips" aria-label="Productos frecuentes">
+  <div class="chips hero-chips" role="group" aria-label="Productos frecuentes">
     {% for p in destacados|slice:":6" %}<a class="chip" href="{% url 'comparacion:comparar' p.pk %}">{{ p }}</a>{% endfor %}
   </div>
   {% endif %}
@@ -106,6 +106,8 @@
       <a class="btn btn-grande" href="{% url 'cuentas:registro' %}">Crear cuenta gratis</a>
     {% endif %}
     <a class="enlace-flecha" href="#como-funciona">Cómo funciona</a>
+    {# WCAG 2.2.2: la rotación del titular se puede detener; hero.js lo muestra solo si anima #}
+    <button type="button" class="btn-texto" id="pausar-rotacion" hidden>Pausar animación</button>
   </div>
 </section>
 

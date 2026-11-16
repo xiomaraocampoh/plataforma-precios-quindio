@@ -3,7 +3,7 @@
  * Privacidad:
  *  - Código de barras: la imagen se decodifica en el navegador; al servidor solo viajan los
  *    dígitos (GET /escanear/?codigo=…).
- *  - Foto del producto (ADR-019): se reduce a 1024 px y se recodifica aquí (se pierde el EXIF,
+ *  - Foto del producto (ADR-022): se reduce a 1024 px y se recodifica aquí (se pierde el EXIF,
  *    incluida la ubicación) antes de enviarla; el servidor no la guarda.
  * La cámara en vivo exige contexto seguro (HTTPS o localhost). Sin ella queda la foto/galería. */
 (function () {

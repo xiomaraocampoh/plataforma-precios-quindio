@@ -1,0 +1,15 @@
+{% extends "administracion/_base_panel.html" %}
+{% block titulo_panel %}{{ seccion.titulo }}{% endblock %}
+{% block migas %}<span aria-hidden="true">/</span><span aria-current="page">{{ seccion.titulo }}</span>{% endblock %}
+{% block panel %}
+<div class="encabezado">
+  <div>
+    <p class="etiqueta">Catálogo y directorio</p>
+    <h1>{{ seccion.titulo }}</h1>
+  </div>
+  {% if puede.add %}<a class="btn" href="{% url 'panel:nuevo' seccion.slug %}"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>{{ seccion.nuevo|capfirst }}</a>{% endif %}
+</div>
+<p class="suave">{{ seccion.descripcion }}</p>
+{% include "administracion/partials/_filtros.html" with ayuda_busqueda=seccion.busqueda etiqueta_busqueda=seccion.titulo|lower %}
+<div id="resultados-panel" aria-live="polite">{% include "administracion/partials/_resultados.html" %}</div>
+{% endblock %}

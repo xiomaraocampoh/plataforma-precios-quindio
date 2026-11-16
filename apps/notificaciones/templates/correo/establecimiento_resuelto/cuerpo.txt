@@ -1,0 +1,9 @@
+{% extends "correo/base.txt" %}
+{% block titulo %}{% if aprobado %}[Sugerencia aprobada]{% else %}[Sugerencia no aprobada]{% endif %} {% if aprobado %}{{ establecimiento }} ya está en el directorio{% else %}No agregamos {{ establecimiento }}{% endif %}{% endblock %}
+{% block cuerpo %}{% if aprobado %}Ya se pueden registrar y comparar sus precios.{% else %}Moderación revisó la sugerencia y no la aprobó, por ejemplo porque ya existía o la dirección no era clara.{% endif %}
+
+{% endblock %}
+{% block accion %}Ver establecimientos: {{ enlace_directorio }}
+
+{% endblock %}
+{% block motivo %}sugeriste un establecimiento en AhorraPues{% endblock %}

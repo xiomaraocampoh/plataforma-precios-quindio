@@ -1,20 +1,16 @@
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_http_methods
 
 from apps.precios.selectors import contar_aportes
+from core.limites import ip_de
 
-from . import services
-from .forms import DatosForm, RegistroForm, SuprimirCuentaForm
-
-
-class IngresarView(LoginView):
-    template_name = "cuentas/ingresar.html"
-    redirect_authenticated_user = True
+from .. import services
+from ..forms import DatosForm, PreferenciasForm, RegistroForm, SuprimirCuentaForm
+from .ingreso import FLAG
 
 
 @require_http_methods(["GET", "POST"])
@@ -29,6 +25,10 @@ def registro(request):
             username=d["username"], email=d["email"], password=d["password1"]
         )
         login(request, usuario)
+        request.session[FLAG] = "no_requerido"  # un reportante nuevo no tiene 2FA obligatoria
+        services.correo.registrar_dispositivo(
+            usuario, user_agent=request.META.get("HTTP_USER_AGENT", "")[:400], ip=ip_de(request)
+        )
         messages.success(request, "Tu cuenta quedó creada. Ya puedes registrar precios.")
         seguro = url_has_allowed_host_and_scheme(siguiente, allowed_hosts={request.get_host()})
         return redirect(siguiente if seguro and siguiente else "precios:registrar")
@@ -53,7 +53,13 @@ def mis_datos(request):
         )
         messages.success(request, "Tus datos quedaron actualizados.")
         return redirect("cuentas:mis_datos")
-    contexto = {"form": form, "aportes": contar_aportes(usuario)}
+    contexto = {
+        "form": form,
+        "aportes": contar_aportes(usuario),
+        "preferencias": PreferenciasForm(
+            initial={"correos_informativos": usuario.correos_informativos}
+        ),
+    }
     return render(request, "cuentas/mis_datos.html", contexto)
 
 

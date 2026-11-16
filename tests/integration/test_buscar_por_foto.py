@@ -1,4 +1,4 @@
-"""Búsqueda de un producto por foto con IA (ADR-019): servicio, límites, privacidad y vista."""
+"""Búsqueda de un producto por foto con IA (ADR-022): servicio, límites, privacidad y vista."""
 
 from decimal import Decimal
 

@@ -1,0 +1,7 @@
+{% extends "correo/base.html" %}
+{% block preheader %}Moderación revisó tu sugerencia de {{ establecimiento }}.{% endblock %}
+{% block chip %}{% if aprobado %}{% include 'correo/_chip.html' with tono='aprobado' texto='Sugerencia aprobada' %}{% else %}{% include 'correo/_chip.html' with tono='rechazado' texto='Sugerencia no aprobada' %}{% endif %}{% endblock %}
+{% block titulo %}{% if aprobado %}{{ establecimiento }} ya está en el directorio{% else %}No agregamos {{ establecimiento }}{% endif %}{% endblock %}
+{% block cuerpo %}<p style="margin:0 0 16px 0;font-size:16px;line-height:1.5;color:#5f5f64;">{% if aprobado %}Ya se pueden registrar y comparar sus precios.{% else %}Moderación revisó la sugerencia y no la aprobó, por ejemplo porque ya existía o la dirección no era clara.{% endif %}</p>{% endblock %}
+{% block accion %}{% include 'correo/_boton.html' with url=enlace_directorio texto='Ver establecimientos' %}{% endblock %}
+{% block motivo %}sugeriste un establecimiento en AhorraPues{% endblock %}

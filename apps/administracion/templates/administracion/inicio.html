@@ -1,0 +1,23 @@
+{% extends "administracion/_base_panel.html" %}
+{% block titulo_panel %}Inicio{% endblock %}
+{% block panel %}
+<div class="encabezado">
+  <div>
+    <p class="etiqueta">Administración</p>
+    <h1>Panel</h1>
+  </div>
+</div>
+<p class="suave">Ves solo las secciones que tu rol permite. Cada cambio queda registrado con tu usuario y la fecha.</p>
+<ul class="tarjetas panel-tarjetas">
+  {% for a in accesos %}
+  <li>
+    <a class="tarjeta" href="{{ a.url }}">
+      <span class="nombre">{{ a.titulo }}</span>
+      {% if a.total is not None %}<span class="meta">{{ a.total }} registro{{ a.total|pluralize }}</span>{% endif %}
+      <span class="meta">{{ a.descripcion }}</span>
+      <span class="ir">Abrir</span>
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% endblock %}

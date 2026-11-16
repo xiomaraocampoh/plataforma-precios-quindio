@@ -1,0 +1,4 @@
+<th scope="row">{{ o.nombre }}{% if o.marca %} <span class="suave">· {{ o.marca }}</span>{% endif %}</th>
+<td>{{ o.categoria }}</td>
+<td class="num">{{ o.n_presentaciones }}</td>
+<td>{% include "administracion/partials/_estado.html" with activo=o.activo %}</td>

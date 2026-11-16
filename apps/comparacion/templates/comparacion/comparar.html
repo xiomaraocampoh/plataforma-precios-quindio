@@ -50,12 +50,18 @@
 </aside>
 {% endif %}
 {% if user.is_authenticated %}<p class="sr-only" id="ayuda-sigue-igual">Confirma que el precio no ha cambiado desde que se reportó. Renueva su vigencia.</p>{% endif %}
+{% comment %}WCAG 2.2.2: la actualización automática se puede pausar; accesibilidad.js muestra el control.
+   Sin aria-live aquí: releer toda la lista cada minuto interrumpe al lector de pantalla;
+   los cambios reales se anuncian en #avisos (4.1.3).{% endcomment %}
+<p class="actualizacion suave" id="control-actualizacion" hidden>
+  Los precios se actualizan cada minuto.
+  <button type="button" class="btn-texto" id="pausar-actualizacion">Pausar actualización</button>
+</p>
 <div id="resultados"
      hx-get="{% url 'comparacion:comparar' producto.pk %}"
-     hx-trigger="every 60s"
+     hx-trigger="every 60s [!window.actualizacionPausada]"
      hx-include="#filtros-comparacion"
-     hx-swap="innerHTML"
-     aria-live="polite">
+     hx-swap="innerHTML">
   {% include "comparacion/partials/_resultados.html" %}
 </div>
 {% endblock %}

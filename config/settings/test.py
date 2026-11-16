@@ -10,3 +10,14 @@ if not os.environ.get("DATABASE_URL"):
     DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": ":memory:"}}
 
 CACHES = {"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}}
+
+# Las pruebas y el CI nunca salen a la red: el correo queda en django.core.mail.outbox
+EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+EMAIL_HOST = ""
+EMAIL_HOST_PASSWORD = ""
+SITIO_URL = "http://testserver"
+EMAIL_REPLY_TO = "respuestas@ahorrapues.test"
+DEFAULT_FROM_EMAIL = "AhorraPues <no-responder@ahorrapues.test>"
+# La transacción de cada prueba nunca se confirma: aquí el envío ocurre al encolar. El camino con
+# transaction.on_commit se prueba aparte (tests/integration/notificaciones/test_outbox.py).
+NOTIFICACIONES = {"ENVIAR_AL_CONFIRMAR": False}

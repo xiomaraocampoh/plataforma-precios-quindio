@@ -3,13 +3,13 @@
 from urllib.parse import urlencode
 
 from django.core.paginator import Paginator
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_GET, require_POST
 
 from apps.catalogo import selectors as catalogo
 from apps.catalogo.domain.codigo_barras import es_gtin_valido, normalizar_codigo
-from apps.catalogo.models import Producto
 from apps.integraciones import services as integraciones
 from apps.integraciones.clients.vision import ReconocimientoNoDisponibleError
 from apps.integraciones.domain.reconocimiento import (
@@ -21,6 +21,7 @@ from apps.integraciones.selectors import referencia_sipsa
 from .domain.filtros import FiltroPrecio, FiltroUbicacion, interpretar_monto
 from .domain.ranking import CRITERIO_DECLARADO
 from .selectors import (
+    MIN_CARACTERES_BUSQUEDA,
     buscar_productos,
     comparar_con_resumen,
     comparar_filas,
@@ -98,11 +99,14 @@ def buscar_por_foto(request):
 
 @require_GET
 def sugerencias(request):
-    """hx-get con hx-trigger='keyup changed delay:300ms' → solo el fragmento de sugerencias."""
-    texto = request.GET.get("q", "")
+    """Fragmento de sugerencias (hx-trigger: input changed delay:300ms, search)."""
+    texto = request.GET.get("q", "").strip()
+    if not texto:
+        return HttpResponse("")  # Esc o campo vacío: la lista queda vacía y se oculta
     contexto = {
         "productos": buscar_productos(texto),
-        "consulta_larga": len(texto.strip()) >= 2,  # con menos letras no se muestra nada
+        "texto": texto,
+        "muy_corto": len(texto) < MIN_CARACTERES_BUSQUEDA,
     }
     return render(request, "comparacion/partials/_sugerencias.html", contexto)
 
@@ -119,7 +123,7 @@ def _leer_filtro_precio(parametros) -> tuple[FiltroPrecio, str]:
 
 @require_GET
 def comparar(request, producto_id: int):
-    producto = get_object_or_404(Producto.objects.select_related("categoria"), pk=producto_id)
+    producto = get_object_or_404(catalogo.productos_publicos(), pk=producto_id)
     filtro = FiltroUbicacion(
         municipio=request.GET.get("municipio", ""), barrio=request.GET.get("barrio", "")
     )

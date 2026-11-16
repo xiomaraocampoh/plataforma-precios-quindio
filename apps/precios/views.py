@@ -21,6 +21,7 @@ def registrar(request):
                 presentacion_id=d["presentacion"].pk,
                 establecimiento_id=d["establecimiento"].pk,
                 precio=d["precio"],
+                fecha_observacion=d.get("fecha_observacion"),
                 id_cliente=d.get("id_cliente"),
             )
         except ValidationError as exc:

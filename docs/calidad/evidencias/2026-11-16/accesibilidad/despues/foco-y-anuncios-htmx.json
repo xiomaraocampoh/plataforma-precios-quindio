@@ -1,0 +1,28 @@
+{
+  "registro_con_errores": {
+    "elemento": "SELECT#id_establecimiento",
+    "texto": "---------\n\n  Tienda Doña Rosa (Tienda de barrio)\n\n  Tienda E",
+    "avisos": ""
+  },
+  "registro_confirmado": {
+    "elemento": "H2",
+    "texto": "Listo, tu precio ya está publicado",
+    "avisos": "Listo, tu precio ya está publicado",
+    "contenido": "Listo, tu precio ya está publicado\n\nAyuda a otras personas a comparar. ¡Gracias por aportar!\n\nRegistrar otro precio"
+  },
+  "registrar_otro": {
+    "elemento": "SELECT#id_establecimiento",
+    "texto": "---------\n\n  Tienda Doña Rosa (Tienda de barrio)\n\n  Tienda E",
+    "avisos": "Listo, tu precio ya está publicado"
+  },
+  "pausa_actualizacion": {
+    "boton": "Reanudar actualización",
+    "pausada": true,
+    "avisos": "Actualización automática en pausa."
+  },
+  "pausa_rotacion": {
+    "boton": "Reanudar animación",
+    "palabra_antes": "compra",
+    "palabra_tras_3_2_s": "compra"
+  }
+}

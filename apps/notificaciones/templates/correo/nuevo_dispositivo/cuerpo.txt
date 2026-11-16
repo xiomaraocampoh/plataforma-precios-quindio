@@ -1,0 +1,11 @@
+{% extends "correo/base.txt" %}
+{% block titulo %}[Nuevo ingreso] Ingresaste desde un dispositivo nuevo{% endblock %}
+{% block cuerpo %}Hola {{ nombre }}, alguien ingresó a tu cuenta desde {{ navegador }} el {{ cuando }}.
+
+Si fuiste tú, no tienes que hacer nada. Si no lo reconoces, cambia tu contraseña ya.
+
+{% endblock %}
+{% block accion %}Cambiar mi contraseña: {{ enlace_recuperar }}
+
+{% endblock %}
+{% block motivo %}hubo un ingreso a tu cuenta desde un dispositivo que no conocíamos{% endblock %}

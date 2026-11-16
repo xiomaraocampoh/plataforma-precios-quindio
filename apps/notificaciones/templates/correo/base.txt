@@ -1,0 +1,12 @@
+{% autoescape off %}AhorraPues
+==========
+
+{% block titulo %}{% endblock %}
+
+{% block cuerpo %}{% endblock %}{% block accion %}{% endblock %}{% block despues %}{% endblock %}
+--
+Recibes este correo porque {% block motivo %}tienes una cuenta en AhorraPues{% endblock %}.
+{% if informativo %}Elegir qué correos recibo: {{ enlace_preferencias }}
+{% if enlace_baja %}Dejar de recibir estos correos: {{ enlace_baja }}
+{% endif %}{% endif %}AhorraPues · Armenia, Quindío
+{% endautoescape %}

@@ -1,0 +1,1 @@
+{% if aprobado %}Retiramos el precio que denunciaste{% else %}Revisamos el precio que denunciaste{% endif %}

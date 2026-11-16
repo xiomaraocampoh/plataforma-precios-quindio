@@ -1,0 +1,23 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0 -- C:\Users\Windows\Desktop\plataforma-precios-quindio\.venv\Scripts\python.exe
+django: version: 5.2.18, settings: config.settings.test (from ini)
+rootdir: c:\Users\Windows\Desktop\plataforma-precios-quindio
+configfile: pyproject.toml
+plugins: Faker-40.44.0, platformdirs-4.14.3, cov-7.1.0, django-4.14.0, playwright-0.10.0
+collecting ... collected 3 items
+
+tests/integration/e2e/test_navegador_sin_conexion.py::test_sin_senal_guarda_el_registro_y_lo_envia_al_volver_la_red[chromium] PASSED [ 33%]
+tests/integration/e2e/test_navegador_sin_conexion.py::test_respuesta_perdida_se_reenvia_al_cargar_la_pagina_sin_duplicar[chromium] PASSED [ 66%]
+tests/integration/e2e/test_navegador_sin_conexion.py::test_m22_diez_registros_sin_conexion_se_sincronizan_sin_perdida_ni_duplicados[chromium] PASSED [100%]
+
+============================== warnings summary ===============================
+tests/integration/e2e/test_navegador_sin_conexion.py::test_sin_senal_guarda_el_registro_y_lo_envia_al_volver_la_red[chromium]
+  C:\Users\Windows\Desktop\plataforma-precios-quindio\.venv\Lib\site-packages\_pytest\fixtures.py:1392: PytestRemovedIn10Warning: Session-scoped fixtures defined as instance methods are deprecated.
+  Instance attributes set in the 'base_url' fixture will NOT be visible to test methods,
+  as each test gets a new instance while the fixture runs only once per class.
+  Use a @classmethod decorator below @pytest.fixture and set attributes on cls instead.
+  See https://docs.pytest.org/en/stable/deprecations.html#class-scoped-fixture-as-instance-method
+    fixturefunc = resolve_fixture_function(fixturedef, request)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 3 passed, 1 warning in 6.86s =========================

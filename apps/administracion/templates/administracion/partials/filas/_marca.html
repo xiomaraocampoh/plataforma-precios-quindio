@@ -1,0 +1,3 @@
+<th scope="row">{{ o.nombre }}</th>
+<td class="num">{{ o.n_productos }}</td>
+<td>{% include "administracion/partials/_estado.html" with activo=o.activa si="Activa" no="Inactiva" %}</td>

@@ -1,5 +1,6 @@
 from django import forms
 
+from apps.catalogo import selectors as catalogo
 from apps.catalogo.models import Presentacion
 from apps.establecimientos.models import Establecimiento
 
@@ -11,7 +12,7 @@ class RegistroPrecioForm(forms.Form):
         queryset=Establecimiento.objects.filter(activo=True), label="¿Dónde estás?"
     )
     presentacion = forms.ModelChoiceField(
-        queryset=Presentacion.objects.select_related("producto"), label="Producto y presentación"
+        queryset=Presentacion.objects.none(), label="Producto y presentación"
     )
     precio = forms.DecimalField(
         min_value=1,
@@ -20,4 +21,14 @@ class RegistroPrecioForm(forms.Form):
         label="Precio en góndola ($)",
         widget=forms.NumberInput(attrs={"inputmode": "numeric", "autocomplete": "off"}),
     )
+    # Registro sin conexión (ADR-009): la cola del navegador reenvía con el mismo id y la hora
+    # en que se vio el precio; el servicio aplica RN-08 a esa fecha.
     id_cliente = forms.UUIDField(required=False, widget=forms.HiddenInput)
+    fecha_observacion = forms.DateTimeField(required=False, widget=forms.HiddenInput)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Solo lo que sigue en el catálogo: presentación, producto y categoría activos
+        self.fields["presentacion"].queryset = catalogo.presentaciones_publicas().select_related(
+            "producto__marca"
+        )

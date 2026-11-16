@@ -40,12 +40,14 @@ addopts = "-ra --strict-markers"
 markers = [
   "unit: reglas de dominio puras, sin base de datos",
   "integration: requiere base de datos / API",
+  "e2e: navegador real con Playwright (python -m playwright install chromium)",
 ]
 
 # ── Cobertura (M-19) ──────────────────────────────────
 [tool.coverage.run]
 source = ["apps", "core"]
 branch = true
+relative_files = true  # rutas relativas en coverage.xml: SonarQube en Docker y CI las resuelven
 omit = ["*/migrations/*", "*/admin.py", "*/apps.py"]
 
 [tool.coverage.report]

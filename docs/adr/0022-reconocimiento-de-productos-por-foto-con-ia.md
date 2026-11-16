@@ -1,4 +1,4 @@
-# ADR-019: Reconocimiento de productos por foto con la API de Anthropic
+# ADR-022: Reconocimiento de productos por foto con la API de Anthropic
 
 - **Estado:** Propuesto (requiere la aprobación del equipo y de la propietaria antes de activarse)
 - **Fecha:** 2026-11-16
