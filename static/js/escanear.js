@@ -76,7 +76,7 @@
 
   function iniciarCamara() {
     var hayCamara = window.isSecureContext && navigator.mediaDevices && navigator.mediaDevices.getUserMedia;
-    video.hidden = !hayCamara;
+    video.hidden = true; // se muestra cuando la cámara ya entrega imagen
     if (!hayCamara) {
       decir("La cámara en vivo no está disponible aquí. Toma una foto del código o escríbelo abajo.");
       return;
@@ -87,6 +87,7 @@
         if (!dialogo.open) { s.getTracks().forEach(function (t) { t.stop(); }); return; }
         flujo = s; activo = true;
         video.srcObject = s;
+        video.hidden = false;
         video.play();
         decir("Apunta al código de barras y mantén el celular quieto.");
         if ("BarcodeDetector" in window) {
