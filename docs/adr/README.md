@@ -14,6 +14,7 @@ Cada ADR sigue la plantilla [`0000-plantilla.md`](0000-plantilla.md) (formato de
 | [0016](0016-alertas-de-bajada-de-precio-diferidas.md) | Alertas de bajada de precio diferidas | Propuesto |
 | [0017](0017-despliegue-en-paas-de-contenedores.md) | Despliegue en PaaS de contenedores | Propuesto (proveedor pendiente) |
 | [0018](0018-precio-oficial-verificado-como-principal.md) | Precio oficial verificado como principal | Propuesto |
+| [0019](0019-panel-de-administracion-y-roles.md) | Panel propio, roles con Groups y Marca como entidad | Propuesto |
 
 ## Sobre la numeración (decisión D-1 pendiente)
 
