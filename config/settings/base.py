@@ -149,4 +149,9 @@ PRECIOS = {
 INTEGRACIONES = {
     "SIPSA_BASE_URL": env.str("SIPSA_BASE_URL", default=""),
     "SIPSA_TIMEOUT_S": env.int("SIPSA_TIMEOUT_S", default=5),
+    # Reconocimiento de productos por foto (ADR-019). Sin clave, la función queda apagada.
+    "ANTHROPIC_API_KEY": env.str("ANTHROPIC_API_KEY", default=""),
+    "RECONOCIMIENTO_MODELO": env.str("RECONOCIMIENTO_MODELO", default="claude-opus-5-5"),
+    "RECONOCIMIENTO_TIMEOUT_S": env.int("RECONOCIMIENTO_TIMEOUT_S", default=20),
+    "RECONOCIMIENTOS_POR_HORA": env.int("RECONOCIMIENTOS_POR_HORA", default=20),
 }
