@@ -59,7 +59,7 @@ formularios primero fallaron (`pruebas-formularios-rojo.txt`) y luego pasaron
 | Buscador | Tab baja a la sugerencia, Enter abre la comparación y Esc vacía y oculta la lista |
 | Etiquetas de formularios | Todos los campos con `<label>`; errores y ayudas asociados por `aria-describedby` |
 | Foco y anuncios tras HTMX | Con errores, el foco va al primer campo inválido; al confirmar, al título, que se anuncia en `#avisos`; «Registrar otro», al primer campo (`despues/foco-y-anuncios-htmx.json`) |
-| Pausas (2.2.2) | «Pausar animación» detiene la rotación; «Pausar actualización» detiene la recarga y lo anuncia |
+| Pausas (2.2.2) | La rotación del titular dura < 5 s y se detiene sola (ya no hay botón «Pausar animación»; antes duraba para siempre y lo exigía); «Pausar actualización» detiene la recarga y lo anuncia |
 | Objetivos ≥ 24 px | Todos; «Crear cuenta» (85×20) está dentro de una frase (excepción *inline* de 2.5.8) |
 | Reflujo a 320 px | Sin scroll horizontal en las 5 pantallas |
 | Espaciado de texto (1.4.12) | Ningún texto recortado |

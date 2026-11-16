@@ -2,14 +2,14 @@
 {% load static %}
 {% block titulo %}AhorraPues · Compara precios en Armenia y el Quindío{% endblock %}
 {% block head %}<link rel="preload" as="image" href="{% static 'img/hero-supermercado.webp' %}" media="(min-width: 900px)" fetchpriority="high">
-<script src="{% static 'js/hero.js' %}?v=5" defer></script>
+<script src="{% static 'js/hero.js' %}?v=6" defer></script>
 <script src="{% static 'js/escanear.js' %}?v=15" defer></script>{% endblock %}
 {% block hero %}
 <div class="hero-fondo">
 <div class="hero-contenedor">
 <section class="hero" aria-labelledby="titulo-buscar">
   <p class="etiqueta">AhorraPues · Armenia y el Quindío</p>
-  <h1 id="titulo-buscar" aria-label="Ahorra en cada compra."><span class="l1">Ahorra en</span> <span class="unidad">cada <span class="rota" data-palabras="compra,semana,quincena,tienda,visita,comida,mercado" aria-hidden="true"><span class="rota-palabra">compra</span></span>.</span></h1>
+  <h1 id="titulo-buscar" aria-label="Ahorra en cada compra."><span class="l1">Ahorra en</span> <span class="unidad">cada <span class="rota" data-palabras="compra,semana,quincena,compra" aria-hidden="true"><span class="rota-palabra">compra</span></span>.</span></h1>
   <p class="bajada">Compara los precios de tu mercado entre tiendas, minimercados y supermercados, en segundos.</p>
 
   <div class="hero-buscador">
@@ -106,8 +106,7 @@
       <a class="btn btn-grande" href="{% url 'cuentas:registro' %}">Crear cuenta gratis</a>
     {% endif %}
     <a class="enlace-flecha" href="#como-funciona">Cómo funciona</a>
-    {# WCAG 2.2.2: la rotación del titular se puede detener; hero.js lo muestra solo si anima #}
-    <button type="button" class="btn-texto" id="pausar-rotacion" hidden>Pausar animación</button>
+    {# WCAG 2.2.2: la rotación dura < 5 s y se detiene sola (hero.js), no necesita botón de pausa #}
   </div>
 </section>
 
