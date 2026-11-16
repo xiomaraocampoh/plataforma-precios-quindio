@@ -13,14 +13,15 @@
         {% if campo.name == "acepto_tratamiento_datos" %}
         <div class="campo">
           <div class="check">{{ campo }}<label for="{{ campo.id_for_label }}">{{ campo.label }}</label></div>
-          {% if campo.errors %}<span class="error" role="alert">{{ campo.errors|join:", " }}</span>{% endif %}
+          {% if campo.errors %}<span class="error" id="{{ campo.auto_id }}_error" role="alert">{{ campo.errors|join:", " }}</span>{% endif %}
         </div>
         {% else %}
         <div class="campo">
           {{ campo.label_tag }}
           {{ campo }}
-          {% if campo.help_text and not campo.errors %}<p class="ayuda">{{ campo.help_text }}</p>{% endif %}
-          {% if campo.errors %}<span class="error" role="alert">{{ campo.errors|join:" " }}</span>{% endif %}
+          {# los id coinciden con el aria-describedby que genera Django (1.3.1) #}
+          {% if campo.help_text %}<p class="ayuda" id="{{ campo.auto_id }}_helptext">{{ campo.help_text }}</p>{% endif %}
+          {% if campo.errors %}<span class="error" id="{{ campo.auto_id }}_error" role="alert">{{ campo.errors|join:" " }}</span>{% endif %}
         </div>
         {% endif %}
       {% endfor %}

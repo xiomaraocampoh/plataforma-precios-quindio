@@ -1,0 +1,28 @@
+# lint-imports
+# Fecha: 2026-11-16 10:43:35 -0500 · rama feat/cierre-corte-2 @ 34e482b
+# BD de pruebas: SQLite en memoria (sin Docker/PostgreSQL en este equipo)
+
+=============
+Import Linter
+=============
+
+
+---------
+Contracts
+---------
+
+Analyzed 105 files, 149 dependencies.
+-------------------------------------
+
+El dominio es Python puro: no importa Django ni DRF KEPT
+El dominio no depende de modelos, servicios, selectores ni interfaces KEPT
+Capas de cada módulo: interfaces > aplicación > persistencia > dominio KEPT
+Ningún otro módulo importa las interfaces de precios (views, api, forms, 
+urls) KEPT
+Ningún otro módulo importa las interfaces de comparacion (views, api, forms, 
+urls) KEPT
+El núcleo no depende del módulo comercial (se integra en el Corte III; EC-05)KEPT
+
+Contracts: 6 kept, 0 broken.
+
+# código de salida: 0

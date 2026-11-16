@@ -1,0 +1,7 @@
+# ruff format --check .
+# Fecha: 2026-11-16 10:43:35 -0500 · rama feat/cierre-corte-2 @ 34e482b
+# BD de pruebas: SQLite en memoria (sin Docker/PostgreSQL en este equipo)
+
+111 files already formatted
+
+# código de salida: 0

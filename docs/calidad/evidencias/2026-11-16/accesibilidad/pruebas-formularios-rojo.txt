@@ -1,0 +1,19 @@
+# fix(a11y) formularios · ROJO: pruebas antes de corregir las plantillas
+# 2026-11-16 11:07:00 -0500 · bb98a7d
+tests/integration/test_accesibilidad.py::test_registro_de_precio_por_htmx_asocia_errores_a_sus_campos FAILED [ 33%]
+tests/integration/test_accesibilidad.py::test_registro_de_cuenta_asocia_ayudas_y_errores_a_sus_campos FAILED [ 66%]
+tests/integration/test_accesibilidad.py::test_ingreso_con_campos_vacios_muestra_un_error_por_campo FAILED [100%]
+        assert html.count('aria-invalid="true"') == 3
+>       assert _referencias_rotas(html) == []
+E       AssertionError: assert ['id_establec...tacion_error'] == []
+tests\integration\test_accesibilidad.py:39: AssertionError
+>       assert _referencias_rotas(vacio) == []
+E       AssertionError: assert ['id_password...ame_helptext'] == []
+tests\integration\test_accesibilidad.py:26: AssertionError
+>       assert html.count('aria-invalid="true"') == 2
+E       assert 0 == 2
+tests\integration\test_accesibilidad.py:45: AssertionError
+FAILED tests/integration/test_accesibilidad.py::test_registro_de_precio_por_htmx_asocia_errores_a_sus_campos
+FAILED tests/integration/test_accesibilidad.py::test_registro_de_cuenta_asocia_ayudas_y_errores_a_sus_campos
+FAILED tests/integration/test_accesibilidad.py::test_ingreso_con_campos_vacios_muestra_un_error_por_campo
+============================== 3 failed in 0.74s ==============================

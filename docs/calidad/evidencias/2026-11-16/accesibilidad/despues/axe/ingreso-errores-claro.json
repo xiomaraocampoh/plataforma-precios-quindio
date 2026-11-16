@@ -1,0 +1,10 @@
+{
+  "violaciones": [],
+  "revisar": [
+    {
+      "id": "color-contrast",
+      "nodos": 2
+    }
+  ],
+  "url_auditada": "/cuentas/ingresar/"
+}

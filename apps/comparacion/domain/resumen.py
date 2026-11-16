@@ -15,7 +15,7 @@ class ResumenComparacion:
     unidad_base: str | None  # None si las unidades base difieren (no son comparables)
     minimo_unitario: Decimal | None
     maximo_unitario: Decimal | None
-    diferencia_pct: int | None  # (máx − mín) / máx, redondeado; None si no aplica
+    diferencia_pct: int | None  # (máx - mín) / máx, redondeado; None si no aplica
 
 
 def resumir_precios(resultados: list[ResultadoComparacion]) -> ResumenComparacion:

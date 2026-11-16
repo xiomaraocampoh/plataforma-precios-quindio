@@ -6,7 +6,7 @@
   --superficie: #ffffff;
   --superficie-2: #f5f5f7;
   --borde: #e5e5ea;
-  --borde-fuerte: #c7c7cc;
+  --borde-fuerte: #86868b;    /* borde de campos: ≥ 3:1 sobre blanco y #f5f5f7 (1.4.11) */
   --texto: #1d1d1f;
   --texto-suave: #5f5f64;
   --marca: #0071e3;            /* acento */
@@ -35,7 +35,7 @@
     --superficie: #1d1d1f;
     --superficie-2: #2a2a2d;
     --borde: #2f2f33;
-    --borde-fuerte: #48484d;
+    --borde-fuerte: #7c7c80;  /* ≥ 3:1 sobre #1d1d1f y #000 (1.4.11) */
     --texto: #f5f5f7;
     --texto-suave: #a1a1a6;
     --marca: #2997ff;
@@ -72,8 +72,11 @@ h1 { font-size: clamp(2rem, 5.4vw, 3rem); }
 h2 { font-size: 1.25rem; letter-spacing: -.018em; }
 a { color: var(--marca-enlace); text-decoration: none; }
 a:hover { text-decoration: underline; text-underline-offset: 3px; }
+/* Enlaces dentro de un texto: subrayados, no solo por color (1.4.1) */
+p a:not(.btn), .enlace-pie a { text-decoration: underline; text-underline-offset: 3px; }
 :focus-visible { outline: 3px solid var(--marca); outline-offset: 3px; border-radius: 8px; }
 
+[hidden] { display: none !important; }  /* que .btn (inline-flex) no muestre controles ocultos */
 .saltar { position: absolute; left: -9999px; }
 .saltar:focus { left: 1rem; top: 1rem; z-index: 50; background: var(--superficie); padding: .6rem 1rem; border-radius: var(--radio-sm); }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
@@ -119,7 +122,7 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 }
 .tile-oscuro { background: var(--marca-oscura); color: #f5f5f7; background-image: radial-gradient(120% 100% at 100% 0%, rgb(41 151 255 / .22), transparent 55%); }
 .tile-oscuro .suave { color: var(--sobre-oscura-suave); }
-.tile-oscuro a { color: #6cb6ff; }
+.tile-oscuro a:not(.btn) { color: #6cb6ff; }  /* los botones conservan su color (1.4.3) */
 .tile-tenue { background: transparent; border: 1px solid var(--borde); }
 .tile-marca { background: var(--marca-suave); }
 
@@ -149,7 +152,7 @@ input[type=checkbox] { width: 24px; height: 24px; accent-color: var(--marca); fl
 
 .buscador { position: relative; }
 .buscador .ico { position: absolute; left: 1.15rem; top: 50%; transform: translateY(-50%); color: var(--texto-suave); pointer-events: none; width: 1.3em; height: 1.3em; }
-.buscador input { min-height: 60px; padding-left: 3.1rem; font-size: 1.15rem; border-radius: 999px; border: 1px solid var(--borde); background: var(--superficie); box-shadow: 0 4px 24px -8px rgb(0 0 0 / .12); }
+.buscador input { min-height: 60px; padding-left: 3.1rem; font-size: 1.15rem; border-radius: 999px; border: 1px solid var(--borde-fuerte); background: var(--superficie); box-shadow: 0 4px 24px -8px rgb(0 0 0 / .12); }
 .buscador input:focus-visible { border-color: var(--marca); }
 
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 44px; padding: 0 1.4rem; border-radius: 999px; border: 1px solid var(--marca); background: var(--marca); color: var(--sobre-marca); font-weight: 500; font-size: 1rem; text-decoration: none; cursor: pointer; line-height: 1; }
@@ -161,6 +164,8 @@ input[type=checkbox] { width: 24px; height: 24px; accent-color: var(--marca); fl
 .btn-claro:hover { background: #e8e8ed; color: #1d1d1f; border-color: #e8e8ed; }
 .btn-grande { min-height: 52px; padding: 0 1.9rem; font-size: 1.0625rem; }
 .btn-bloque { width: 100%; min-height: 50px; }
+.btn-texto { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; border: 0; background: none; color: var(--texto-suave); font-size: .9rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.btn-texto:hover { color: var(--texto); }
 .enlace-flecha { font-weight: 500; }
 .enlace-flecha::after { content: " ›"; }
 
@@ -205,7 +210,7 @@ a.chip:hover { text-decoration: none; background: var(--borde); }
 .hero-fondo {
   color-scheme: light;
   --texto: #1d1d1f; --texto-suave: #55555a; --superficie: #ffffff; --superficie-2: #f5f5f7;
-  --borde: #e5e5ea; --borde-fuerte: #c7c7cc; --marca: #0071e3; --marca-hover: #0062c4;
+  --borde: #e5e5ea; --borde-fuerte: #86868b; --marca: #0071e3; --marca-hover: #0062c4;
   --marca-enlace: #0066cc; --marca-suave: #eaf3fd; --sobre-marca: #ffffff;
   color: var(--texto);
   background: #f3f7fd url("../img/hero-supermercado-960.webp") center top / cover no-repeat;
@@ -272,6 +277,7 @@ a.chip:hover { text-decoration: none; background: var(--borde); }
 .cta-final p { max-width: 38ch; font-size: 1.15rem; }
 
 /* ---------- Resultados ---------- */
+.actualizacion { display: flex; flex-wrap: wrap; align-items: center; gap: 0 .5rem; margin: -.5rem 0 1rem; font-size: .9rem; }
 .encabezado { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: .75rem 1.5rem; margin-bottom: 1.25rem; }
 .encabezado h1 { font-size: clamp(2.2rem, 6vw, 3.6rem); font-weight: 700; letter-spacing: -.04em; }
 .puesto { font-size: .8rem; font-weight: 600; color: var(--texto-suave); font-variant-numeric: tabular-nums; }

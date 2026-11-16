@@ -10,7 +10,7 @@ def _bd_ok() -> bool:
         with connection.cursor() as cursor:
             cursor.execute("SELECT 1")
         return True
-    except Exception:  # noqa: BLE001 — el health check nunca debe propagar
+    except Exception:  # el health check nunca debe propagar
         return False
 
 
@@ -18,7 +18,7 @@ def _cache_ok() -> bool:
     try:
         cache.set(CLAVE_SALUD, "ok", timeout=5)
         return cache.get(CLAVE_SALUD) == "ok"
-    except Exception:  # noqa: BLE001
+    except Exception:  # idem: un fallo de caché se informa como 503, no como 500
         return False
 
 

@@ -1,0 +1,25 @@
+# TDD 1 · prueba de caracterización: mediana 0 (confianza.py:28)
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0 -- C:\Users\Windows\Desktop\plataforma-precios-quindio\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.18, settings: config.settings.test (from ini)
+rootdir: C:\Users\Windows\Desktop\plataforma-precios-quindio
+configfile: pyproject.toml
+plugins: Faker-40.44.0, platformdirs-4.14.3, cov-7.1.0, django-4.14.0
+collecting ... collected 8 items
+
+tests/unit/precios/test_confianza.py::test_precio_cercano_a_la_mediana_no_es_anomalo PASSED [ 12%]
+tests/unit/precios/test_confianza.py::test_precio_muy_alejado_es_anomalo[precio0] PASSED [ 25%]
+tests/unit/precios/test_confianza.py::test_precio_muy_alejado_es_anomalo[precio1] PASSED [ 37%]
+tests/unit/precios/test_confianza.py::test_sin_muestras_suficientes_no_se_marca_anomalo PASSED [ 50%]
+tests/unit/precios/test_confianza.py::test_anomalo_siempre_es_confianza_baja PASSED [ 62%]
+tests/unit/precios/test_confianza.py::test_reporte_confirmado_por_dos_usuarios_es_confianza_alta PASSED [ 75%]
+tests/unit/precios/test_confianza.py::test_reporte_aislado_es_confianza_media PASSED [ 87%]
+tests/unit/precios/test_confianza.py::test_mediana_cero_no_marca_anomalia PASSED [100%]
+
+============================== 8 passed in 0.17s ==============================
+# código de salida: 0
+
+# Cobertura de la línea 28
+TOTAL      22      0      8      0   100%
+8 passed in 0.26s

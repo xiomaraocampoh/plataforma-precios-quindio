@@ -1,0 +1,45 @@
+{
+  "inicio": {
+    "url": "http://127.0.0.1:8000/",
+    "puntaje": 96,
+    "fallos": [
+      {
+        "id": "color-contrast",
+        "titulo": "Background and foreground colors do not have a sufficient contrast ratio.",
+        "elementos": 1
+      }
+    ]
+  },
+  "comparacion": {
+    "url": "http://127.0.0.1:8000/productos/1/",
+    "puntaje": 100,
+    "fallos": []
+  },
+  "registro-precio": {
+    "url": "http://127.0.0.1:8000/precios/registrar/",
+    "puntaje": 100,
+    "fallos": []
+  },
+  "registro-cuenta": {
+    "url": "http://127.0.0.1:8000/cuentas/registro/",
+    "puntaje": 96,
+    "fallos": [
+      {
+        "id": "link-in-text-block",
+        "titulo": "Links rely on color to be distinguishable.",
+        "elementos": 1
+      }
+    ]
+  },
+  "ingreso": {
+    "url": "http://127.0.0.1:8000/cuentas/ingresar/",
+    "puntaje": 96,
+    "fallos": [
+      {
+        "id": "link-in-text-block",
+        "titulo": "Links rely on color to be distinguishable.",
+        "elementos": 1
+      }
+    ]
+  }
+}

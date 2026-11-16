@@ -11,6 +11,7 @@ from statistics import median
 from .vigencia import Fuente
 
 MIN_MUESTRAS_PARA_ANOMALIA = 3
+CONFIRMACIONES_PARA_CONFIANZA_ALTA = 2
 
 
 class NivelConfianza(StrEnum):
@@ -32,6 +33,6 @@ def es_anomalo(precio: Decimal, referencia: list[Decimal], tolerancia: Decimal) 
 def nivel_confianza(fuente: Fuente, confirmaciones: int, anomalo: bool) -> NivelConfianza:
     if anomalo:
         return NivelConfianza.BAJA
-    if fuente == Fuente.COMERCIO or confirmaciones >= 2:
+    if fuente == Fuente.COMERCIO or confirmaciones >= CONFIRMACIONES_PARA_CONFIANZA_ALTA:
         return NivelConfianza.ALTA
     return NivelConfianza.MEDIA
