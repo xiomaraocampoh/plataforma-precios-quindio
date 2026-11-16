@@ -1,0 +1,28 @@
+# Lo que NO entra a la imagen: secretos, entornos locales, caché y material que no corre en producción.
+.git
+.github
+.venv
+venv
+env
+__pycache__
+*.pyc
+.pytest_cache
+.ruff_cache
+.import_linter_cache
+.coverage
+coverage.xml
+htmlcov
+
+# Nunca copiar secretos (la plantilla .env.prod.example tampoco hace falta dentro de la imagen)
+.env
+.env.*
+
+# Salida generada y documentación
+staticfiles
+docs
+tests
+
+# Archivos de orquestación
+docker-compose*.yml
+Dockerfile
+.dockerignore
