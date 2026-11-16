@@ -2,6 +2,7 @@
 
 import re
 import time
+from datetime import timedelta
 from decimal import Decimal
 
 import pytest
@@ -86,12 +87,27 @@ def test_un_enlace_alterado_no_sirve(client, db):
     assert r.status_code == 400 and "no es válido" in r.content.decode()
 
 
+def _como_si_hubiera_pasado_un_minuto():
+    hace = timezone.now() - timedelta(minutes=2)
+    CorreoPendiente.objects.filter(tipo="verificar_correo").update(creado_en=hace)
+
+
 def test_el_reenvio_de_la_verificacion_tiene_limite(client, db):
     client.post(reverse("cuentas:registro"), REGISTRO)
     for _ in range(5):
+        _como_si_hubiera_pasado_un_minuto()
         r = client.post(reverse("cuentas:reenviar_verificacion"), follow=True)
         assert "Si tu correo aún no está confirmado" in r.content.decode()
     assert len(mail.outbox) == 1 + 3  # registro + 3 reenvíos por hora
+
+
+def test_dos_clics_seguidos_en_reenviar_envian_un_solo_correo(client, db):
+    # Defecto visto en la prueba real con Brevo: dos clics a 2 s llegaron como dos correos
+    client.post(reverse("cuentas:registro"), REGISTRO)
+    _como_si_hubiera_pasado_un_minuto()
+    client.post(reverse("cuentas:reenviar_verificacion"))
+    client.post(reverse("cuentas:reenviar_verificacion"))
+    assert len(mail.outbox) == 1 + 1
 
 
 def test_cambiar_el_correo_pide_confirmarlo_otra_vez(client, verificada):
