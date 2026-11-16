@@ -72,6 +72,8 @@ h1 { font-size: clamp(2rem, 5.4vw, 3rem); }
 h2 { font-size: 1.25rem; letter-spacing: -.018em; }
 a { color: var(--marca-enlace); text-decoration: none; }
 a:hover { text-decoration: underline; text-underline-offset: 3px; }
+/* Enlaces dentro de un texto: subrayados, no solo por color (1.4.1) */
+p a:not(.btn), .enlace-pie a { text-decoration: underline; text-underline-offset: 3px; }
 :focus-visible { outline: 3px solid var(--marca); outline-offset: 3px; border-radius: 8px; }
 
 .saltar { position: absolute; left: -9999px; }
