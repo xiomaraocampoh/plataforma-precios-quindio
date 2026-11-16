@@ -50,7 +50,7 @@ def test_ingreso_con_campos_vacios_muestra_un_error_por_campo(client):
     assert _referencias_rotas(html) == []
 
 
-def test_inicio_ofrece_control_para_pausar_la_rotacion_del_titular(client):
+def test_inicio_ofrece_control_para_pausar_la_rotacion_del_titular(client, db):
     # M-03 · 2.2.2: el contenido en movimiento de más de 5 s debe poder detenerse
     html = client.get(reverse("comparacion:inicio")).content.decode()
     assert re.search(r'<button type="button"[^>]*id="pausar-rotacion"', html)
