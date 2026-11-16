@@ -11,7 +11,6 @@ from django.views.decorators.http import require_GET, require_POST
 from apps.catalogo import selectors as catalogo
 from apps.catalogo.domain.codigo_barras import es_gtin_valido, normalizar_codigo
 from apps.integraciones import services as integraciones
-from apps.integraciones.clients.vision import ReconocimientoNoDisponibleError
 from apps.integraciones.domain.reconocimiento import (
     ImagenInvalidaError,
     consulta_de_busqueda,
@@ -82,7 +81,7 @@ def buscar_por_foto(request):
         return _fragmento_foto(request, 400, error=str(exc))
     except integraciones.LimiteDeReconocimientosExcedidoError as exc:
         return _fragmento_foto(request, 429, error=str(exc))
-    except ReconocimientoNoDisponibleError:
+    except integraciones.ReconocimientoNoDisponibleError:
         return _fragmento_foto(
             request,
             503,
