@@ -118,3 +118,31 @@ def registrar_reporte(
     producto_id = presentacion.producto_id
     transaction.on_commit(lambda: invalidar_comparacion(producto_id))
     return reporte
+
+
+@transaction.atomic
+def cargar_reporte_historico(
+    *,
+    autor,
+    presentacion_id: int,
+    establecimiento_id: int,
+    precio: Decimal,
+    fecha_observacion: datetime,
+    fuente: Fuente = Fuente.REPORTANTE,
+) -> ReportePrecio:
+    """Crea un reporte con una fecha pasada arbitraria, sin RN-08 ni RN-10.
+
+    Solo para datos de demostración (`cargar_demo --con-vencidos`) y pruebas de vigencia: los
+    registros de usuarios pasan siempre por `registrar_reporte`.
+    """
+    reporte = ReportePrecio.objects.create(
+        autor=autor,
+        presentacion_id=presentacion_id,
+        establecimiento_id=establecimiento_id,
+        precio=precio,
+        fecha_observacion=fecha_observacion,
+        fuente=fuente.value,
+    )
+    producto_id = reporte.presentacion.producto_id
+    transaction.on_commit(lambda: invalidar_comparacion(producto_id))
+    return reporte

@@ -1,11 +1,19 @@
 """Carga datos de demostración (catálogo, establecimientos, usuarios y precios).
 
-Uso: python manage.py cargar_demo
-Los precios se registran mediante `services.registrar_reporte` para respetar las reglas de negocio
-(vigencia, anomalías, caché). Es idempotente: si ya hay datos demo, no hace nada.
+Uso: python manage.py cargar_demo [--con-vencidos]
+
+- Los precios se registran mediante `services.registrar_reporte` para respetar las reglas de
+  negocio (vigencia, anomalías, caché). Cada parte es idempotente.
+- Accesos: superusuario «admin» y moderador «moderador_demo» (rol moderador, is_staff). Su
+  contraseña sale de DEMO_ADMIN_PASSWORD; la de los usuarios demo, de DEMO_PASSWORD. Si la variable
+  no existe se genera una aleatoria y se muestra UNA vez en consola. Nunca hay contraseñas en el
+  código ni en el README.
+- --con-vencidos: precios justo fuera de la ventana de vigencia (8 días reportado, 4 días
+  perecedero, 31 días oficial) y justo dentro (6, 2 y 29 días), para comprobar EC-02.
 """
 
-import unicodedata
+import os
+import secrets
 from datetime import timedelta
 from decimal import Decimal
 
@@ -13,14 +21,18 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils import timezone
 
+from apps.catalogo.domain.duplicados import normalizar_nombre
 from apps.catalogo.models import Categoria, Presentacion, Producto
 from apps.cuentas import services as cuentas
 from apps.cuentas.models import Usuario
 from apps.establecimientos.models import Establecimiento
 from apps.precios import services
+from apps.precios.domain.vigencia import Fuente
 from apps.precios.models import ReportePrecio
 
-CLAVE_DEMO = "Demo-2026-precios"  # solo desarrollo
+USUARIOS_DEMO = ["demo", "demo_ana", "demo_luis", "demo_sofia"]
+ADMIN = "admin"
+MODERADOR = "moderador_demo"
 
 CATEGORIAS = {"Granos": False, "Abarrotes": False, "Lácteos y huevos": True, "Frescos": True}
 
@@ -88,9 +100,37 @@ ESTABLECIMIENTOS = [
 ]
 
 
-def _normalizar(texto: str) -> str:
-    sin_tildes = unicodedata.normalize("NFKD", texto).encode("ascii", "ignore").decode()
-    return sin_tildes.lower().strip()
+# --con-vencidos: (producto, categoría, cantidad, unidad, [(establecimiento, días, fuente, precio)])
+VENCIDOS = [
+    (
+        "Frijol cargamanto",
+        "Granos",
+        "500",
+        "g",
+        [
+            ("Tienda Doña Rosa", 8, Fuente.REPORTANTE, 5200),  # vencido: ventana de 7 días
+            ("Tienda El Vecino", 6, Fuente.REPORTANTE, 5300),  # vigente
+            ("Supermercado Central", 31, Fuente.COMERCIO, 4900),  # vencido: oficial, 30 días
+            ("Supermercado del Parque", 29, Fuente.COMERCIO, 5000),  # vigente
+        ],
+    ),
+    (
+        "Queso campesino",
+        "Lácteos y huevos",
+        "500",
+        "g",
+        [
+            ("Minimercado La Esquina", 4, Fuente.REPORTANTE, 9800),  # vencido: perecedero, 3 días
+            ("Minimercado Nuevo Centro", 2, Fuente.REPORTANTE, 9600),  # vigente
+        ],
+    ),
+]
+
+
+def _clave(variable: str) -> tuple[str, bool]:
+    """(contraseña, generada): de la variable de entorno o aleatoria si no existe."""
+    valor = os.environ.get(variable, "")
+    return (valor, False) if valor else (secrets.token_urlsafe(12), True)
 
 
 def _redondear(valor: float) -> Decimal:
@@ -100,25 +140,82 @@ def _redondear(valor: float) -> Decimal:
 class Command(BaseCommand):
     help = "Carga datos de demostración con precios de ejemplo."
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--con-vencidos",
+            action="store_true",
+            help="Agrega precios justo fuera y justo dentro de la ventana de vigencia (EC-02).",
+        )
+
     @transaction.atomic
     def handle(self, *args, **opciones):
-        if ReportePrecio.objects.filter(autor__username__startswith="demo").exists():
-            self.stdout.write("Ya hay datos de demostración; no se cargó nada.")
-            return
+        if ReportePrecio.objects.filter(autor__username__in=USUARIOS_DEMO).exists():
+            self.stdout.write("Ya hay datos de demostración; no se cargaron precios base.")
+        else:
+            usuarios = self._usuarios()
+            n = self._precios(usuarios, self._establecimientos(), self._catalogo())
+            self.stdout.write(self.style.SUCCESS(f"Listo: {n} precios de ejemplo cargados."))
+        self._accesos()
+        if opciones["con_vencidos"]:
+            self._vencidos()
 
-        usuarios = self._usuarios()
-        locales = self._establecimientos()
-        presentaciones = self._catalogo()
-        n = self._precios(usuarios, locales, presentaciones)
-
-        self.stdout.write(self.style.SUCCESS(f"Listo: {n} precios de ejemplo cargados."))
-        self.stdout.write(f"Usuario de prueba: demo  ·  contraseña: {CLAVE_DEMO}")
+    def _avisar_clave(self, usuarios: str, variable: str, clave: str, generada: bool) -> None:
+        if generada:
+            self.stdout.write(
+                self.style.WARNING(
+                    f"Contraseña generada para {usuarios} (defina {variable} para fijarla; "
+                    f"no se volverá a mostrar): {clave}"
+                )
+            )
+        else:
+            self.stdout.write(f"{usuarios}: contraseña tomada de {variable}.")
 
     def _usuarios(self) -> list[Usuario]:
-        nombres = ["demo", "demo_ana", "demo_luis", "demo_sofia"]
-        return [
-            cuentas.registrar_usuario(username=u, email="", password=CLAVE_DEMO) for u in nombres
+        clave, generada = _clave("DEMO_PASSWORD")
+        usuarios = [
+            cuentas.registrar_usuario(username=u, email="", password=clave) for u in USUARIOS_DEMO
         ]
+        self._avisar_clave(", ".join(USUARIOS_DEMO), "DEMO_PASSWORD", clave, generada)
+        return usuarios
+
+    def _accesos(self) -> None:
+        clave, generada = _clave("DEMO_ADMIN_PASSWORD")
+        _, admin_nuevo = cuentas.asegurar_administrador(username=ADMIN, password=clave)
+        _, mod_nuevo = cuentas.asegurar_moderador(username=MODERADOR, password=clave)
+        nuevos = [u for u, nuevo in ((ADMIN, admin_nuevo), (MODERADOR, mod_nuevo)) if nuevo]
+        if nuevos:
+            self._avisar_clave(" y ".join(nuevos), "DEMO_ADMIN_PASSWORD", clave, generada)
+        else:
+            self.stdout.write(f"{ADMIN} y {MODERADOR} ya existen; no se cambió su contraseña.")
+
+    def _vencidos(self) -> None:
+        autor = Usuario.objects.get(username=USUARIOS_DEMO[0])
+        cats = {c.nombre: c for c in Categoria.objects.all()}
+        locales = {e.nombre: e for e in Establecimiento.objects.all()}
+        ahora = timezone.now()
+        creados = 0
+        for nombre, cat, cantidad, unidad, filas in VENCIDOS:
+            producto, _ = Producto.objects.get_or_create(
+                nombre_normalizado=normalizar_nombre(nombre),
+                marca="",
+                defaults={"nombre": nombre, "categoria": cats[cat]},
+            )
+            pres, _ = Presentacion.objects.get_or_create(
+                producto=producto, cantidad=Decimal(cantidad), unidad=unidad
+            )
+            if ReportePrecio.objects.filter(presentacion=pres).exists():
+                continue
+            for local, dias, fuente, precio in filas:
+                services.cargar_reporte_historico(
+                    autor=autor,
+                    presentacion_id=pres.pk,
+                    establecimiento_id=locales[local].pk,
+                    precio=Decimal(precio),
+                    fecha_observacion=ahora - timedelta(days=dias),
+                    fuente=fuente,
+                )
+                creados += 1
+        self.stdout.write(f"Precios vencidos y en el límite de vigencia: {creados} nuevos.")
 
     def _establecimientos(self) -> list[tuple[Establecimiento, float]]:
         return [
@@ -146,7 +243,7 @@ class Command(BaseCommand):
         resultado = []
         for nombre, cat, presentaciones in PRODUCTOS:
             producto, _ = Producto.objects.get_or_create(
-                nombre_normalizado=_normalizar(nombre),
+                nombre_normalizado=normalizar_nombre(nombre),
                 marca="",
                 defaults={"nombre": nombre, "categoria": cats[cat]},
             )
