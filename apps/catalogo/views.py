@@ -1,0 +1,45 @@
+"""Vistas HTMX del catálogo: solicitud de productos con aviso de duplicados (RF-06, D-05)."""
+
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect, render
+from django.views.decorators.http import require_GET, require_http_methods
+
+from . import selectors, services
+from .forms import SolicitudForm
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def solicitar(request):
+    form = SolicitudForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        d = form.cleaned_data
+        services.solicitar_producto(
+            solicitante=request.user,
+            nombre=d["nombre"],
+            marca=d["marca"],
+            categoria_id=d["categoria"].pk,
+            cantidad=d["cantidad"],
+            unidad=d["unidad"],
+            codigo_barras=d["codigo_barras"],
+            detalle=d["detalle"],
+        )
+        messages.success(
+            request, "Recibimos tu solicitud. Una persona moderadora la revisará pronto."
+        )
+        return redirect("comparacion:productos")
+    similares = selectors.productos_similares(
+        request.POST.get("nombre", ""), request.POST.get("marca", "")
+    )
+    return render(request, "catalogo/solicitar.html", {"form": form, "similares": similares})
+
+
+@require_GET
+def similares(request):
+    """Fragmento HTMX: productos parecidos al nombre escrito (similitud ≥ 0,85, D-05)."""
+    productos = selectors.productos_similares(
+        request.GET.get("nombre", ""), request.GET.get("marca", "")
+    )
+    contexto = {"similares": productos, "nombre": request.GET.get("nombre", "").strip()}
+    return render(request, "catalogo/partials/_similares.html", contexto)

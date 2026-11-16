@@ -1,0 +1,8 @@
+{% if similares %}
+<div class="tile tile-marca" style="padding:1rem 1.2rem;margin-bottom:1rem">
+  <p><strong>¿Es alguno de estos?</strong> <span class="suave">Si ya existe, no hace falta solicitarlo.</span></p>
+  <ul class="lista-simple" style="margin:.4rem 0 0">
+    {% for p in similares %}<li><a href="{% url 'comparacion:comparar' p.pk %}">{{ p }}</a> <span class="suave">· {{ p.categoria }}</span></li>{% endfor %}
+  </ul>
+</div>
+{% endif %}

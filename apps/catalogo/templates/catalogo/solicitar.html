@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block titulo %}Solicitar producto · AhorraPues{% endblock %}
+{% block contenido %}
+<div class="auth bento">
+  <section class="tile tile-4" aria-labelledby="t-solicitar">
+    <p class="etiqueta">Catálogo</p>
+    <h1 id="t-solicitar">Solicitar un producto o presentación</h1>
+    <p class="suave">Antes de enviar, revisa si ya existe: te mostramos los productos parecidos mientras escribes.</p>
+    <form method="post" novalidate hx-disabled-elt="find button"
+          hx-get="{% url 'catalogo:similares' %}" hx-trigger="input changed delay:400ms from:#id_nombre, input changed delay:400ms from:#id_marca"
+          hx-target="#similares" hx-include="#id_nombre, #id_marca">
+      {% csrf_token %}
+      {% include "partials/_errores_generales.html" %}
+      {% include "partials/_campo.html" with campo=form.nombre %}
+      {% include "partials/_campo.html" with campo=form.marca %}
+      <div id="similares" aria-live="polite">{% include "catalogo/partials/_similares.html" %}</div>
+      {% include "partials/_campo.html" with campo=form.categoria %}
+      <div class="bento" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+        <div style="grid-column:span 1">{% include "partials/_campo.html" with campo=form.cantidad %}</div>
+        <div style="grid-column:span 1">{% include "partials/_campo.html" with campo=form.unidad %}</div>
+      </div>
+      {% include "partials/_campo.html" with campo=form.codigo_barras %}
+      {% include "partials/_campo.html" with campo=form.detalle %}
+      <button class="btn btn-bloque" type="submit">Enviar solicitud</button>
+    </form>
+  </section>
+  <aside class="tile tile-2 tile-marca" aria-labelledby="t-por-que">
+    <span class="icono-caja" aria-hidden="true" style="background:var(--superficie)"><svg class="ico"><use href="#i-box"/></svg></span>
+    <h2 id="t-por-que">¿Por qué pasa por revisión?</h2>
+    <p class="suave">Un mismo producto con dos nombres divide la comparación. Una persona moderadora revisa que no exista antes de agregarlo.</p>
+  </aside>
+</div>
+{% endblock %}

@@ -18,5 +18,6 @@ urlpatterns = [
     path("healthz/", healthz, name="healthz"),
     path("cuentas/", include("apps.cuentas.urls")),
     path("precios/", include("apps.precios.urls")),
+    path("catalogo/", include("apps.catalogo.urls")),
     path("", include("apps.comparacion.urls")),
 ]

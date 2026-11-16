@@ -15,5 +15,6 @@
 <section class="tile tile-marca vacio-estado">
   <h2>No encontramos productos</h2>
   <p class="suave">Prueba con otro nombre o quita algún filtro.</p>
+  {% if user.is_authenticated %}<p><a class="btn" href="{% url 'catalogo:solicitar' %}">Solicitar el producto</a></p>{% endif %}
 </section>
 {% endif %}

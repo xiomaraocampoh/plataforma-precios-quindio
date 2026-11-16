@@ -6,6 +6,7 @@
     <p class="etiqueta">Catálogo</p>
     <h1>Productos</h1>
   </div>
+  {% if user.is_authenticated %}<a class="btn btn-sec" href="{% url 'catalogo:solicitar' %}"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>¿No está? Solicítalo</a>{% endif %}
 </div>
 <form class="filtros" method="get" action="{% url 'comparacion:productos' %}" role="search" aria-label="Filtrar productos"
       hx-get="{% url 'comparacion:productos' %}" hx-target="#lista-productos" hx-push-url="true"
