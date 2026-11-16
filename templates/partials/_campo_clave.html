@@ -1,0 +1,13 @@
+{% comment %}
+Campo de contraseña con botón «Mostrar» (WCAG 3.3.2). El botón nace oculto y lo activa
+static/js/cuentas.js: sin JavaScript es un campo normal. Uso: include con campo=form.x.
+{% endcomment %}
+<div class="campo">
+  <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+  <div class="clave">
+    {{ campo }}
+    <button class="ver" type="button" data-ver-clave aria-controls="{{ campo.id_for_label }}" aria-pressed="false" hidden>Mostrar</button>
+  </div>
+  {% if campo.help_text %}<p class="ayuda" id="{{ campo.auto_id }}_helptext">{{ campo.help_text }}</p>{% endif %}
+  {% if campo.errors %}<span class="error" id="{{ campo.auto_id }}_error"{% if not sin_alerta %} role="alert"{% endif %}>{{ campo.errors|join:" " }}</span>{% endif %}
+</div>

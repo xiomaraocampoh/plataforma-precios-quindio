@@ -1,5 +1,6 @@
 {% comment %}
-Campo de formulario accesible (WCAG 1.3.1, 3.3.1, 3.3.2). Uso: include de este parcial con campo=form.x.
+Campo de formulario accesible (WCAG 1.3.1, 3.3.1, 3.3.2). Uso: include de este parcial con campo=form.x (sin_alerta=True si la página ya trae un
+resumen de errores con role="alert", para no anunciar lo mismo dos veces).
 Los id de ayuda y error coinciden con el aria-describedby que genera Django 5.2.
 {% endcomment %}
 <div class="campo">
@@ -10,5 +11,5 @@ Los id de ayuda y error coinciden con el aria-describedby que genera Django 5.2.
   {{ campo }}
   {% endif %}
   {% if campo.help_text %}<p class="ayuda" id="{{ campo.auto_id }}_helptext">{{ campo.help_text }}</p>{% endif %}
-  {% if campo.errors %}<span class="error" id="{{ campo.auto_id }}_error" role="alert">{{ campo.errors|join:" " }}</span>{% endif %}
+  {% if campo.errors %}<span class="error" id="{{ campo.auto_id }}_error"{% if not sin_alerta %} role="alert"{% endif %}>{{ campo.errors|join:" " }}</span>{% endif %}
 </div>
