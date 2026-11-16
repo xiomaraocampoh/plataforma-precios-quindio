@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block titulo %}Productos · AhorraPues{% endblock %}
+{% block contenido %}
+<div class="encabezado">
+  <div>
+    <p class="etiqueta">Catálogo</p>
+    <h1>Productos</h1>
+  </div>
+</div>
+<form class="filtros" method="get" action="{% url 'comparacion:productos' %}" role="search" aria-label="Filtrar productos"
+      hx-get="{% url 'comparacion:productos' %}" hx-target="#lista-productos" hx-push-url="true"
+      hx-trigger="change, submit, input changed delay:400ms from:#f-q">
+  <div class="campo">
+    <label for="f-q">Nombre o código de barras</label>
+    <input id="f-q" name="q" type="search" value="{{ q }}" autocomplete="off" placeholder="Ej.: cafe, 7702001001234">
+  </div>
+  <div class="campo">
+    <label for="f-marca">Marca</label>
+    <select id="f-marca" name="marca">
+      <option value="">Todas</option>
+      {% for m in marcas %}<option value="{{ m }}"{% if m == marca %} selected{% endif %}>{{ m }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="campo">
+    <label for="f-categoria">Categoría</label>
+    <select id="f-categoria" name="categoria">
+      <option value="">Todas</option>
+      {% for c in categorias %}<option value="{{ c.pk }}"{% if c.pk == categoria_id %} selected{% endif %}>{{ c.nombre }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="acciones-filtro">
+    <button class="btn" type="submit">Filtrar</button>
+    <a class="btn btn-sec" href="{% url 'comparacion:productos' %}">Limpiar</a>
+  </div>
+</form>
+<div id="lista-productos" aria-live="polite">{% include "comparacion/partials/_productos.html" %}</div>
+{% endblock %}

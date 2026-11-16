@@ -7,6 +7,7 @@ from core.views import healthz
 api_v1 = [
     path("precios/", include("apps.precios.api.urls")),
     path("comparacion/", include("apps.comparacion.api.urls")),
+    path("catalogo/", include("apps.catalogo.api.urls")),
 ]
 
 urlpatterns = [

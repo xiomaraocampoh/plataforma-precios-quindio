@@ -28,7 +28,7 @@ def reportante(django_user_model):
 
 
 @pytest.fixture
-def arroz():
+def arroz(db):
     cat = Categoria.objects.create(nombre="Granos")
     prod = Producto.objects.create(
         nombre="Arroz blanco", nombre_normalizado="arroz blanco", categoria=cat
@@ -39,7 +39,7 @@ def arroz():
 
 
 @pytest.fixture
-def tiendas():
+def tiendas(db):
     def crear(nombre, tipo):
         return Establecimiento.objects.create(
             nombre=nombre,

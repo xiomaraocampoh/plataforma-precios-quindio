@@ -11,6 +11,7 @@ from django.core.cache import cache
 from django.db.models import Count, Q
 from django.utils import timezone
 
+from apps.catalogo import selectors as catalogo
 from apps.catalogo.domain.normalizacion import precio_por_unidad
 from apps.catalogo.models import Producto
 from apps.establecimientos.models import Establecimiento
@@ -25,10 +26,8 @@ from .domain.resumen import ResumenComparacion, resumir_precios
 
 
 def buscar_productos(texto: str, limite: int = 10):
-    texto = (texto or "").strip()
-    if len(texto) < 2:
-        return Producto.objects.none()
-    return Producto.objects.filter(nombre__icontains=texto).order_by("nombre")[:limite]
+    """RF-04: la búsqueda vive en el catálogo; aquí solo se reexpone para las vistas."""
+    return catalogo.buscar_productos(texto, limite)
 
 
 def _calcular_comparacion(producto_id: int) -> list[ResultadoComparacion]:

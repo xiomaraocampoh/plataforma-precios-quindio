@@ -1,8 +1,12 @@
 """Vistas HTMX del consumidor. Renderizan página completa o solo el fragmento (partial)."""
 
+from urllib.parse import urlencode
+
+from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_GET
 
+from apps.catalogo import selectors as catalogo
 from apps.catalogo.models import Producto
 
 from .domain.ranking import CRITERIO_DECLARADO
@@ -46,5 +50,28 @@ def comparar(request, producto_id: int):
     }
     plantilla = (
         "comparacion/partials/_resultados.html" if request.htmx else "comparacion/comparar.html"
+    )
+    return render(request, plantilla, contexto)
+
+
+@require_GET
+def productos(request):
+    """Listado de productos con filtros de marca y categoría (RF-04, RF-19 prioridad C)."""
+    texto = request.GET.get("q", "").strip()
+    marca = request.GET.get("marca", "").strip()
+    categoria = request.GET.get("categoria", "")
+    categoria_id = int(categoria) if categoria.isdigit() else None
+    lista = catalogo.listar_productos(texto=texto, marca=marca, categoria_id=categoria_id)
+    pagina = Paginator(lista, 24).get_page(request.GET.get("pagina"))
+    contexto = {
+        "pagina": pagina,
+        "q": texto,
+        "marca": marca,
+        "categoria_id": categoria_id,
+        "consulta": urlencode({k: v for k, v in request.GET.items() if k != "pagina" and v}),
+        **catalogo.opciones_de_filtro(),
+    }
+    plantilla = (
+        "comparacion/partials/_productos.html" if request.htmx else "comparacion/productos.html"
     )
     return render(request, plantilla, contexto)
