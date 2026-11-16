@@ -36,6 +36,7 @@
     try { return JSON.parse(document.body.getAttribute("hx-headers"))["X-CSRFToken"]; }
     catch (e) { return ""; }
   }
+  var CARGANDO = '<div class="foto-cargando"><span class="giro" aria-hidden="true"></span><span>Identificando el producto…</span></div>';
   function decir(t) { guia.textContent = t; }
   function textoGuia() {
     if (dlg.hasAttribute("data-sincamara")) { decir(""); return; }
@@ -145,7 +146,7 @@
     return new Promise(function (ok) { c.toBlob(ok, "image/jpeg", 0.85); });
   }
   function enviarIA(blobPromesa) {
-    mostrarHoja("Identificando el producto…");
+    mostrarHoja(CARGANDO, true);
     blobPromesa.then(function (blob) {
       var datos = new FormData();
       datos.append("foto", blob, "foto.jpg");
@@ -233,7 +234,7 @@
   function buscarAdjunto() {
     if (!adjunto) return;
     var archivo = adjunto;
-    ponerPanel("Identificando el producto…");
+    ponerPanel(CARGANDO, true);
     if (hayIA) {
       createImageBitmap(archivo).then(function (b) { return reducir(b, b.width, b.height); })
         .then(function (blob) {

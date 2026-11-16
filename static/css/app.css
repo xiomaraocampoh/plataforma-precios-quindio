@@ -354,8 +354,6 @@ textarea { width: 100%; min-height: 90px; padding: .6rem .95rem; font: inherit; 
 .buscador .escanear:hover { background: var(--marca-suave); }
 .buscador .escanear:focus-visible { outline: 3px solid var(--marca); outline-offset: 2px; }
 .buscador .escanear .ico { position: static; transform: none; pointer-events: none; color: inherit; }
-.foto-error { color: var(--texto); background: var(--marca-suave); border-radius: 12px; padding: .75rem 1rem; }
-.foto-candidatos { list-style: none; padding: 0; margin: .5rem 0; display: grid; gap: .5rem; }
 
 /* Pantalla de escaneo (RF-04) */
 .escaner { padding: 0; border: 0; background: #000; color: #fff; width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; overflow: hidden; }
@@ -413,13 +411,11 @@ textarea { width: 100%; min-height: 90px; padding: .6rem .95rem; font: inherit; 
 @keyframes esc-sube { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .esc-hoja { animation: none; } }
 .esc-hoja .btn { margin-top: .5rem; }
-.foto-error { color: var(--texto, #1d1d1f); background: var(--marca-suave, #e8f1fd); border-radius: 12px; padding: .75rem 1rem; }
-.foto-candidatos { list-style: none; padding: 0; margin: .5rem 0; display: grid; gap: .5rem; }
 .escaner[data-sincamara] .esc-marco { display: none; }
 .esc-vacio p { margin: 0; max-width: 26ch; }
 
 /* Foto pegada en la página: miniatura DENTRO de la barra y resultado flotante (sin mover el fondo) */
-.resultado-pagina { padding: 1rem 1.25rem; text-align: left; color: var(--texto); }
+.hero-buscador .resultado-pagina { padding: 1.25rem; text-align: left; color: var(--texto); }
 .resultado-pagina[hidden] { display: none; }
 .resultado-pagina .btn { margin-top: .25rem; }
 .buscador .adjunto { position: absolute; left: .6rem; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; }
@@ -433,4 +429,21 @@ textarea { width: 100%; min-height: 90px; padding: .6rem .95rem; font: inherit; 
 .buscador .identificar { background: var(--marca); color: #fff; }
 .buscador .identificar:hover { background: var(--marca-hover); }
 .buscador .identificar[hidden] { display: none; }
-.foto-aun { background: var(--marca-suave); border-radius: 12px; padding: .75rem 1rem; margin: .5rem 0; }
+
+/* Resultado de la búsqueda por foto */
+.foto-res { display: grid; gap: 1rem; text-align: left; }
+.foto-sobre { margin: 0 0 .2rem; font-size: .75rem; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--texto-suave); }
+.foto-nombre { margin: 0; font-size: 1.4rem; line-height: 1.2; letter-spacing: -.02em; font-weight: 700; }
+.foto-meta { display: flex; flex-wrap: wrap; gap: .4rem; margin: .6rem 0 0; }
+.etq { padding: .25rem .75rem; border-radius: 999px; background: var(--superficie-2); border: 1px solid var(--borde); font-size: .85rem; }
+.foto-candidatos { list-style: none; padding: 0; margin: 0; display: grid; gap: .5rem; }
+.foto-aun, .foto-error { display: flex; align-items: flex-start; gap: .75rem; margin: 0; padding: 1rem; border-radius: 16px; background: var(--marca-suave); color: var(--texto); }
+.foto-aun .ico, .foto-error .ico { flex: none; width: 1.4em; height: 1.4em; color: var(--marca-enlace); margin-top: .1rem; }
+.foto-aun p { margin: 0; }
+.foto-aun p + p { margin-top: .25rem; font-size: .95rem; }
+.foto-res .btn { margin: 0; }
+.foto-aviso { margin: 0; font-size: .8rem; line-height: 1.4; color: var(--texto-suave); text-align: center; }
+.foto-cargando { display: flex; align-items: center; justify-content: center; gap: .75rem; padding: .75rem 0; color: var(--texto-suave); }
+.giro { width: 1.25rem; height: 1.25rem; border: 3px solid var(--borde); border-top-color: var(--marca); border-radius: 50%; animation: giro .8s linear infinite; }
+@keyframes giro { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .giro { animation-duration: 2.4s; } }
