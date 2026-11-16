@@ -1,0 +1,14 @@
+{% extends "correo/base.txt" %}
+{% block titulo %}[Falta confirmar] Confirma tu correo{% endblock %}
+{% block cuerpo %}Hola {{ nombre }}, confirma que este es tu correo para recibir los avisos de seguridad de tu cuenta.
+
+El enlace vence en 24 horas y sirve una sola vez.
+
+{% endblock %}
+{% block accion %}Confirmar mi correo: {{ enlace }}
+
+{% endblock %}
+{% block despues %}Si no creaste una cuenta en AhorraPues, ignora este mensaje.
+
+{% endblock %}
+{% block motivo %}alguien escribió esta dirección al crear o actualizar una cuenta en AhorraPues{% endblock %}

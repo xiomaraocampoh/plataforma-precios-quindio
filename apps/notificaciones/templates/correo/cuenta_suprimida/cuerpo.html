@@ -1,0 +1,6 @@
+{% extends "correo/base.html" %}
+{% block preheader %}Borramos tus datos personales, como lo pediste.{% endblock %}
+{% block chip %}{% include 'correo/_chip.html' with tono='seguridad' texto='Cuenta suprimida' %}{% endblock %}
+{% block titulo %}Suprimimos tu cuenta{% endblock %}
+{% block cuerpo %}<p style="margin:0 0 16px 0;font-size:16px;line-height:1.5;color:#5f5f64;">Como lo pediste, borramos tus datos personales de AhorraPues (Ley 1581 de 2012).</p><p style="margin:0 0 16px 0;font-size:16px;line-height:1.5;color:#5f5f64;">Tus precios siguen publicados sin tu identidad. Este es el último correo que recibirás de nosotros.</p><p style="margin:0 0 16px 0;font-size:16px;line-height:1.5;color:#5f5f64;">Si no lo pediste, responde a este correo de inmediato.</p>{% endblock %}
+{% block motivo %}pediste suprimir tu cuenta{% endblock %}

@@ -378,3 +378,13 @@ textarea { width: 100%; min-height: 90px; padding: .6rem .95rem; font: inherit; 
   .tabla-formset input:not([type=checkbox]), .tabla-formset select { width: 100%; min-width: 0; }
   .tabla-formset .etiqueta-celda { position: static; width: auto; height: auto; overflow: visible; clip: auto; white-space: normal; display: block; margin-bottom: .25rem; font-size: .85rem; font-weight: 600; }
 }
+
+/* ---------- Verificación en dos pasos (RF-27) ---------- */
+.campo-codigo { font-size: 1.5rem; letter-spacing: .35em; font-variant-numeric: tabular-nums; max-width: 12rem; }
+.qr { margin: 1rem 0; display: grid; gap: .5rem; justify-items: start; }
+.qr-imagen { background: #fff; padding: .5rem; border-radius: var(--radio-sm); width: 200px; }
+.qr-imagen svg { width: 100%; height: auto; display: block; }
+.clave-totp, .codigos-respaldo code { font-family: Menlo, Consolas, monospace; word-break: break-all; }
+.codigos-respaldo { list-style: none; padding: 0; margin: 1rem 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); gap: .5rem; }
+.codigos-respaldo li { background: var(--superficie-2); border-radius: 10px; padding: .6rem .8rem; font-size: 1.05rem; text-align: center; }
+.aviso-pendientes form { margin: 0; }

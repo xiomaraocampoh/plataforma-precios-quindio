@@ -11,6 +11,8 @@ from django.utils import timezone
 from apps.catalogo import services as catalogo
 from apps.cuentas import services as cuentas
 from apps.establecimientos import services as establecimientos
+from apps.notificaciones import services as notificaciones
+from apps.notificaciones.domain.catalogo import Tipo
 from apps.precios import services as precios
 from apps.precios.models import ReportePrecio
 
@@ -62,10 +64,55 @@ def _registrar(moderador, accion: str, tipo: str, objeto_id: int, motivo: str):
     )
 
 
+# ---------- RF-26: avisos de moderación (informativos; nunca dicen quién denunció ni moderó) ----
+
+
+def _avisar(tipo: str, usuario, clave: str, **contexto) -> None:
+    if usuario is not None:
+        notificaciones.encolar(
+            tipo=tipo, usuario=usuario, clave_idempotencia=clave, contexto=contexto
+        )
+
+
+def _pesos(valor) -> str:
+    return f"{valor:,.0f}".replace(",", ".")
+
+
+def _avisar_reporte(reporte_id: int, aprobado: bool) -> None:
+    r = ReportePrecio.objects.select_related(
+        "autor", "presentacion__producto__marca", "establecimiento"
+    ).get(pk=reporte_id)
+    _avisar(
+        Tipo.REPORTE_MODERADO,
+        r.autor,
+        f"reporte_moderado:{r.pk}",
+        aprobado=aprobado,
+        presentacion=str(r.presentacion),
+        precio=_pesos(r.precio),
+        establecimiento=r.establecimiento.nombre,
+    )
+
+
+def _avisar_denuncia(denuncia: Denuncia, aceptada: bool) -> None:
+    r = ReportePrecio.objects.select_related(
+        "presentacion__producto__marca", "establecimiento"
+    ).get(pk=denuncia.reporte_id)
+    _avisar(
+        Tipo.DENUNCIA_RESUELTA,
+        denuncia.denunciante,
+        f"denuncia_resuelta:{denuncia.pk}",
+        aprobado=aceptada,
+        producto=str(r.presentacion),
+        producto_id=r.presentacion.producto_id,
+        establecimiento=r.establecimiento.nombre,
+    )
+
+
 @transaction.atomic
 def decidir_reporte(*, moderador, reporte_id: int, aprobar: bool, motivo: str = ""):
     _exigir_moderador(moderador)
     precios.resolver_revision(reporte_id=reporte_id, aprobar=aprobar)
+    _avisar_reporte(reporte_id, aprobar)
     accion = Accion.APROBAR_REPORTE if aprobar else Accion.RECHAZAR_REPORTE
     return _registrar(moderador, accion, "reporte", reporte_id, motivo)
 
@@ -82,6 +129,7 @@ def resolver_denuncia(*, moderador, denuncia_id: int, aceptar: bool, motivo: str
     denuncia.save(update_fields=["estado", "resuelto_por", "resuelto_en"])
     if aceptar:
         precios.retirar_reporte(reporte_id=denuncia.reporte_id)
+    _avisar_denuncia(denuncia, aceptar)
     accion = Accion.ACEPTAR_DENUNCIA if aceptar else Accion.DESCARTAR_DENUNCIA
     return _registrar(moderador, accion, "denuncia", denuncia_id, motivo)
 
@@ -90,9 +138,16 @@ def resolver_denuncia(*, moderador, denuncia_id: int, aceptar: bool, motivo: str
 def decidir_solicitud(*, moderador, solicitud_id: int, aprobar: bool, motivo: str = ""):
     _exigir_moderador(moderador)
     if aprobar:
-        catalogo.aprobar_solicitud(solicitud_id=solicitud_id, moderador=moderador)
+        solicitud = catalogo.aprobar_solicitud(solicitud_id=solicitud_id, moderador=moderador)
     else:
-        catalogo.rechazar_solicitud(solicitud_id=solicitud_id, moderador=moderador)
+        solicitud = catalogo.rechazar_solicitud(solicitud_id=solicitud_id, moderador=moderador)
+    _avisar(
+        Tipo.SOLICITUD_RESUELTA,
+        solicitud.solicitante,
+        f"solicitud_resuelta:{solicitud.pk}",
+        aprobado=aprobar,
+        producto=f"{solicitud.nombre} {solicitud.marca}".strip(),
+    )
     accion = Accion.APROBAR_SOLICITUD if aprobar else Accion.RECHAZAR_SOLICITUD
     return _registrar(moderador, accion, "solicitud", solicitud_id, motivo)
 
@@ -101,13 +156,20 @@ def decidir_solicitud(*, moderador, solicitud_id: int, aprobar: bool, motivo: st
 def decidir_establecimiento(*, moderador, establecimiento_id: int, aprobar: bool, motivo=""):
     _exigir_moderador(moderador)
     if aprobar:
-        establecimientos.aprobar_establecimiento(
+        local = establecimientos.aprobar_establecimiento(
             establecimiento_id=establecimiento_id, moderador=moderador
         )
     else:
-        establecimientos.rechazar_establecimiento(
+        local = establecimientos.rechazar_establecimiento(
             establecimiento_id=establecimiento_id, moderador=moderador
         )
+    _avisar(
+        Tipo.ESTABLECIMIENTO_RESUELTO,
+        local.sugerido_por,
+        f"establecimiento_resuelto:{local.pk}",
+        aprobado=aprobar,
+        establecimiento=local.nombre,
+    )
     accion = Accion.APROBAR_ESTABLECIMIENTO if aprobar else Accion.RECHAZAR_ESTABLECIMIENTO
     return _registrar(moderador, accion, "establecimiento", establecimiento_id, motivo)
 

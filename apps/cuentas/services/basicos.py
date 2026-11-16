@@ -8,7 +8,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 
-from .domain.roles import (
+from ..domain.roles import (
     GRUPOS,
     PERMISOS,
     CambioDeCuentaNoPermitidoError,
@@ -16,12 +16,14 @@ from .domain.roles import (
     grupo_de,
     validar_cambio_de_cuenta,
 )
-from .models import Usuario
+from ..models import CodigoRespaldo, DispositivoConocido, SegundoFactor, Usuario
+from . import correo
 
 
 def registrar_usuario(*, username: str, email: str, password: str) -> Usuario:
-    """Crea un Reportante. Solo se invoca tras la autorización expresa de datos (Ley 1581)."""
-    return Usuario.objects.create_user(
+    """Crea un Reportante. Solo se invoca tras la autorización expresa de datos (Ley 1581).
+    Si dio un correo, recibe el enlace para confirmarlo (RF-24)."""
+    usuario = Usuario.objects.create_user(
         username=username,
         email=email,
         password=password,
@@ -29,6 +31,8 @@ def registrar_usuario(*, username: str, email: str, password: str) -> Usuario:
         acepto_tratamiento_datos=True,
         fecha_aceptacion_datos=timezone.now(),
     )
+    correo.enviar_verificacion(usuario)
+    return usuario
 
 
 def permisos_por_nombre(nombres) -> list[Permission]:
@@ -94,8 +98,11 @@ def cambiar_estado_cuenta(*, actor, usuario_id: int, activa: bool) -> Usuario:
         raise ValidationError(
             "La cuenta fue suprimida por su titular (Ley 1581 de 2012); no se puede reactivar."
         )
+    estaba_activa = usuario.is_active
     usuario.is_active = activa
     usuario.save(update_fields=["is_active"])
+    if estaba_activa and not activa:
+        correo.notificar_suspension(usuario)
     return usuario
 
 
@@ -127,9 +134,16 @@ def asegurar_moderador(*, username: str, password: str) -> tuple[Usuario, bool]:
 
 def actualizar_datos(*, usuario: Usuario, username: str, email: str) -> Usuario:
     """RF-03: el titular actualiza sus datos (Ley 1581, derecho de rectificación)."""
+    cambio_correo = usuario.email.lower() != (email or "").lower()
     usuario.username = username
     usuario.email = email
-    usuario.save(update_fields=["username", "email"])
+    campos = ["username", "email"]
+    if cambio_correo:  # un correo nuevo se vuelve a confirmar (RF-24)
+        usuario.email_verificado_en = None
+        campos.append("email_verificado_en")
+    usuario.save(update_fields=campos)
+    if cambio_correo:
+        correo.enviar_verificacion(usuario)
     return usuario
 
 
@@ -141,8 +155,10 @@ def suprimir_cuenta(*, usuario: Usuario) -> Usuario:
     contiene datos personales: alias aleatorio, sin correo ni nombre, sin contraseña utilizable e
     inactivo. Así la comparación no pierde precios y nadie puede volver a identificar al autor.
     """
+    correo.notificar_supresion(usuario)  # antes de borrar el correo; la cola lo redacta al enviar
     usuario.username = f"anonimo-{uuid.uuid4().hex[:12]}"
     usuario.email = ""
+    usuario.email_verificado_en = None
     usuario.first_name = ""
     usuario.last_name = ""
     usuario.is_active = False
@@ -153,6 +169,9 @@ def suprimir_cuenta(*, usuario: Usuario) -> Usuario:
     usuario.set_unusable_password()
     usuario.save()
     usuario.groups.clear()
+    SegundoFactor.objects.filter(usuario=usuario).delete()
+    CodigoRespaldo.objects.filter(usuario=usuario).delete()
+    DispositivoConocido.objects.filter(usuario=usuario).delete()
     return usuario
 
 
@@ -163,4 +182,5 @@ def suspender_cuenta(*, usuario_id: int) -> Usuario:
         raise ValueError("No se puede suspender una cuenta de moderación o administración.")
     usuario.is_active = False
     usuario.save(update_fields=["is_active"])
+    correo.notificar_suspension(usuario)
     return usuario

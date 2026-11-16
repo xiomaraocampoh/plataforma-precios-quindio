@@ -101,3 +101,87 @@ class SuprimirCuentaForm(forms.Form):
         if not self.usuario.check_password(password):
             raise forms.ValidationError("La contraseña no es correcta.")
         return password
+
+
+# ---------- Verificación en dos pasos y preferencias (RF-27) ----------
+
+_CODIGO = {
+    "inputmode": "numeric",
+    "autocomplete": "one-time-code",
+    "pattern": "[0-9 ]*",
+    "maxlength": "7",
+    "class": "campo-codigo",
+}
+
+
+class CodigoForm(forms.Form):
+    """Código de 6 dígitos (correo o app) o, si no hay celular, un código de respaldo."""
+
+    codigo = forms.CharField(
+        label="Código de 6 dígitos",
+        required=False,
+        max_length=7,
+        widget=forms.TextInput(attrs=_CODIGO),
+    )
+    respaldo = forms.CharField(
+        label="Código de respaldo",
+        required=False,
+        max_length=12,
+        help_text="Uno de los 10 códigos que guardaste (abcd-efgh). Cada uno sirve una vez.",
+        widget=forms.TextInput(attrs={"autocomplete": "off", "autocapitalize": "off"}),
+    )
+    confiar = forms.BooleanField(label="Confiar en este dispositivo 30 días", required=False)
+
+    def clean(self):
+        datos = super().clean()
+        codigo = "".join((datos.get("codigo") or "").split())
+        respaldo = (datos.get("respaldo") or "").strip()
+        if not codigo and not respaldo:
+            raise forms.ValidationError("Escribe el código de 6 dígitos o un código de respaldo.")
+        if codigo and (len(codigo) != 6 or not codigo.isdigit()):
+            self.add_error("codigo", "El código tiene 6 dígitos.")
+        datos["valor"] = respaldo or codigo
+        return datos
+
+
+class ContrasenaActualForm(forms.Form):
+    """Las acciones de seguridad piden la contraseña actual (RF-27)."""
+
+    password = forms.CharField(
+        label="Tu contraseña actual",
+        strip=False,
+        widget=forms.PasswordInput(attrs={"autocomplete": "current-password"}),
+    )
+
+    def __init__(self, *args, usuario, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.usuario = usuario
+
+    def clean_password(self):
+        password = self.cleaned_data["password"]
+        if not self.usuario.check_password(password):
+            raise forms.ValidationError("La contraseña no es correcta.")
+        return password
+
+
+class ActivarAppForm(ContrasenaActualForm):
+    codigo = forms.CharField(
+        label="Código que muestra la app", max_length=7, widget=forms.TextInput(attrs=_CODIGO)
+    )
+
+
+class PrimerCodigoAppForm(forms.Form):
+    """Al ingresar sin método configurado (rol con 2FA obligatoria): la contraseña ya se pidió."""
+
+    codigo = forms.CharField(
+        label="Código que muestra la app", max_length=7, widget=forms.TextInput(attrs=_CODIGO)
+    )
+
+
+class PreferenciasForm(forms.Form):
+    correos_informativos = forms.BooleanField(
+        label="Recibir correos informativos (bienvenida y resultados de moderación)",
+        required=False,
+        help_text="Los correos de seguridad (códigos, cambios de contraseña, ingresos nuevos) "
+        "siempre llegan: protegen tu cuenta.",
+    )

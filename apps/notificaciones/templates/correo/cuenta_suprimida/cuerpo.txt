@@ -1,0 +1,10 @@
+{% extends "correo/base.txt" %}
+{% block titulo %}[Cuenta suprimida] Suprimimos tu cuenta{% endblock %}
+{% block cuerpo %}Como lo pediste, borramos tus datos personales de AhorraPues (Ley 1581 de 2012).
+
+Tus precios siguen publicados sin tu identidad. Este es el último correo que recibirás de nosotros.
+
+Si no lo pediste, responde a este correo de inmediato.
+
+{% endblock %}
+{% block motivo %}pediste suprimir tu cuenta{% endblock %}

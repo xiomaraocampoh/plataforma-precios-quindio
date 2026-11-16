@@ -1,0 +1,9 @@
+{% extends "correo/base.txt" %}
+{% block titulo %}{% if aprobado %}[Solicitud aprobada]{% else %}[Solicitud no aprobada]{% endif %} {% if aprobado %}Agregamos {{ producto }} al catálogo{% else %}No agregamos {{ producto }} al catálogo{% endif %}{% endblock %}
+{% block cuerpo %}{% if aprobado %}Gracias a tu solicitud ya se puede registrar y comparar su precio.{% else %}Moderación revisó tu solicitud y no la aprobó, por ejemplo porque el producto ya existía o faltaban datos.{% endif %}
+
+{% endblock %}
+{% block accion %}Registrar un precio: {{ enlace_registrar }}
+
+{% endblock %}
+{% block motivo %}solicitaste agregar un producto al catálogo{% endblock %}

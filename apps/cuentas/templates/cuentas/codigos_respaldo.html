@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block titulo %}Códigos de respaldo · AhorraPues{% endblock %}
+{% block contenido %}
+<div class="auth bento">
+  <section class="tile tile-4" aria-labelledby="t-respaldo">
+    <p><span class="chip chip-positivo">Verificación en dos pasos activa</span></p>
+    <h1 id="t-respaldo">Guarda tus códigos de respaldo</h1>
+    <p>Si pierdes el celular, cada código sirve <strong>una sola vez</strong> para ingresar. <strong>Solo los verás ahora</strong>: guárdalos en un lugar seguro (impresos o en un gestor de contraseñas).</p>
+    <ul class="codigos-respaldo" aria-label="Códigos de respaldo">
+      {% for c in codigos %}<li><code>{{ c }}</code></li>{% endfor %}
+    </ul>
+    <p class="suave">Puedes generar códigos nuevos en Seguridad; los anteriores dejarán de servir.</p>
+    <p><a class="btn" href="{{ siguiente }}">Ya los guardé, continuar</a></p>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block titulo %}Seguridad de la cuenta · AhorraPues{% endblock %}
+{% block contenido %}
+<div class="auth bento">
+  <section class="tile tile-3" aria-labelledby="t-seg">
+    <h1 id="t-seg">Seguridad</h1>
+    <h2>Verificación en dos pasos</h2>
+    <p>
+      {% if metodo == Metodo.APP %}<span class="chip chip-positivo">Activa: app autenticadora</span>
+      {% elif metodo == Metodo.CORREO %}<span class="chip chip-positivo">Activa: código por correo</span>
+      {% else %}<span class="chip chip-promo">Desactivada</span>{% endif %}
+      {% if obligatorio %}<span class="chip">Obligatoria para tu rol</span>{% endif %}
+    </p>
+    <p class="suave">Al ingresar, además de la contraseña te pediremos un código de 6 dígitos.{% if metodo != Metodo.NINGUNO %} Te quedan {{ respaldo }} código{{ respaldo|pluralize }} de respaldo.{% endif %}</p>
+    <p><a class="btn btn-sec" href="{% url 'cuentas:configurar_app' %}">{% if metodo == Metodo.APP %}Cambiar de app{% else %}Usar una app autenticadora{% endif %}</a></p>
+    <form method="post" novalidate hx-disabled-elt="find button">
+      {% csrf_token %}
+      {% include "partials/_errores_generales.html" %}
+      {% include "partials/_campo.html" with campo=form.password %}
+      <p class="ayuda" id="ayuda-acciones">Cada acción pide tu contraseña actual.</p>
+      <div class="acciones-fila">
+        {% if metodo != Metodo.CORREO %}<button class="btn btn-sec" type="submit" name="accion" value="correo"{% if not user.email_verificado_en %} disabled aria-describedby="sin-correo"{% endif %}>Usar código por correo</button>{% endif %}
+        {% if metodo != Metodo.NINGUNO %}<button class="btn btn-sec" type="submit" name="accion" value="respaldo">Nuevos códigos de respaldo</button>{% endif %}
+        <button class="btn btn-sec" type="submit" name="accion" value="olvidar">Olvidar dispositivos de confianza</button>
+        {% if metodo != Metodo.NINGUNO and not obligatorio %}<button class="btn btn-peligro" type="submit" name="accion" value="desactivar">Desactivar</button>{% endif %}
+      </div>
+      {% if not user.email_verificado_en %}<p class="ayuda" id="sin-correo">Para recibir códigos por correo, primero confirma tu correo en Mis datos.</p>{% endif %}
+    </form>
+  </section>
+  <aside class="tile tile-3" aria-labelledby="t-disp">
+    <h2 id="t-disp">Contraseña</h2>
+    <p><a class="btn btn-sec" href="{% url 'cuentas:contrasena' %}">Cambiar mi contraseña</a></p>
+    <h2>Dispositivos con los que ingresaste</h2>
+    <p class="suave">Te avisamos por correo cuando alguien ingresa desde uno nuevo. No guardamos tu dirección IP completa.</p>
+    {% if dispositivos %}
+    <ul class="lista-simple">{% for d in dispositivos %}<li>{{ d.navegador }} · último ingreso <time datetime="{{ d.visto_en|date:'c' }}">{{ d.visto_en|date:"j M Y, H:i" }}</time></li>{% endfor %}</ul>
+    {% else %}<p class="suave">Aún no hay registros.</p>{% endif %}
+  </aside>
+</div>
+{% endblock %}

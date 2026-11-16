@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="Compara y comparte precios de la canasta familiar en Armenia y el Quindío.">
   <title>{% block titulo %}AhorraPues{% endblock %}</title>
-  <link rel="stylesheet" href="{% static 'css/app.css' %}?v=2026-11-16e">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}?v=2026-11-16f">
   {% block head %}{% endblock %}
   {# htmx servido localmente (sin CDN): funciona con red móvil limitada y sin terceros #}
   <script src="{% static 'vendor/htmx.min.js' %}" defer></script>
@@ -46,6 +46,7 @@
             <ul>
               <li><a href="{% url 'precios:mis_aportes' %}">Mis aportes</a></li>
               <li><a href="{% url 'cuentas:mis_datos' %}">Mis datos</a></li>
+              <li><a href="{% url 'cuentas:seguridad' %}">Seguridad</a></li>
               {% if panel_disponible %}<li><a href="{% url 'panel:inicio' %}">Panel de administración</a></li>{% endif %}
               {% if user.is_staff or user.rol == "moderador" or user.rol == "administrador" %}<li><a href="{% url 'moderacion:bandeja' %}">Moderación</a></li>{% endif %}
               <li><form method="post" action="{% url 'cuentas:salir' %}">{% csrf_token %}<button type="submit">Salir</button></form></li>
@@ -66,6 +67,14 @@
       {% comment %}Siempre presente para que el lector de pantalla anuncie los cambios (4.1.3).
          La página de registro lo pone junto al botón Guardar, donde se está mirando.{% endcomment %}
       {% block registros_pendientes %}<div id="registros-pendientes" role="status" aria-live="polite"></div>{% endblock %}
+      {% endif %}
+      {% if user.is_authenticated and user.email and not user.email_verificado_en %}
+      {# RF-24: aviso hasta confirmar el correo #}
+      <div class="aviso-pendientes" role="note">
+        <svg class="ico" aria-hidden="true"><use href="#i-info"/></svg>
+        <div><p class="aviso-titulo">Verifica tu correo</p><p>Te enviamos un enlace para confirmarlo. Sin confirmarlo no recibirás los avisos de tus aportes.</p></div>
+        <form method="post" action="{% url 'cuentas:reenviar_verificacion' %}">{% csrf_token %}<input type="hidden" name="volver" value="{{ request.path }}"><button class="btn btn-sec" type="submit">Reenviar enlace</button></form>
+      </div>
       {% endif %}
       {% if messages %}
       <ul class="mensajes" role="status">

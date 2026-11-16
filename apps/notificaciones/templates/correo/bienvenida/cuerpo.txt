@@ -1,0 +1,11 @@
+{% extends "correo/base.txt" %}
+{% block titulo %}[Correo confirmado] Te damos la bienvenida a AhorraPues{% endblock %}
+{% block cuerpo %}Tu correo quedó confirmado, {{ nombre }}.
+
+Con AhorraPues comparas el precio por unidad entre tiendas de barrio, minimercados y supermercados de Armenia y el Quindío. Cada precio que reportas ayuda a otras familias a ahorrar.
+
+{% endblock %}
+{% block accion %}Registrar mi primer precio: {{ enlace_registrar }}
+
+{% endblock %}
+{% block motivo %}confirmaste tu correo en AhorraPues{% endblock %}

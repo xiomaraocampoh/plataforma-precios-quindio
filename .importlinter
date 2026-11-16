@@ -26,6 +26,7 @@ source_modules =
     apps.integraciones.domain
     apps.cuentas.domain
     apps.administracion.domain
+    apps.notificaciones.domain
 forbidden_modules =
     django
     rest_framework
@@ -41,6 +42,7 @@ source_modules =
     apps.integraciones.domain
     apps.cuentas.domain
     apps.administracion.domain
+    apps.notificaciones.domain
 forbidden_modules =
     core
     config
@@ -73,6 +75,7 @@ containers =
     apps.integraciones
     apps.comercios
     apps.administracion
+    apps.notificaciones
 layers =
     (urls)
     (admin)
@@ -95,6 +98,7 @@ source_modules =
     apps.integraciones
     apps.comercios
     apps.administracion
+    apps.notificaciones
     core
 forbidden_modules =
     apps.precios.views
@@ -114,6 +118,7 @@ source_modules =
     apps.integraciones
     apps.comercios
     apps.administracion
+    apps.notificaciones
     core
 forbidden_modules =
     apps.comparacion.views
@@ -132,6 +137,22 @@ source_modules =
     apps.moderacion
     apps.integraciones
     apps.administracion
+    apps.notificaciones
     core
 forbidden_modules =
+    apps.comercios
+
+[importlinter:contract:notificaciones-infraestructura]
+name = El correo es infraestructura: no depende de los módulos de negocio (ADR-021)
+type = forbidden
+source_modules =
+    apps.notificaciones
+forbidden_modules =
+    apps.cuentas
+    apps.catalogo
+    apps.establecimientos
+    apps.precios
+    apps.comparacion
+    apps.moderacion
+    apps.administracion
     apps.comercios

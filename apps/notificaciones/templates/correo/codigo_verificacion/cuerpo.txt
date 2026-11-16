@@ -1,0 +1,10 @@
+{% extends "correo/base.txt" %}
+{% block titulo %}[Verificación en dos pasos] Tu código de verificación{% endblock %}
+{% block cuerpo %}    {{ codigo }}
+
+Escríbelo en AhorraPues para {{ proposito }}. Vence en 10 minutos.
+
+Nunca te lo pediremos por teléfono ni por chat. Si no intentaste ingresar, cambia tu contraseña.
+
+{% endblock %}
+{% block motivo %}se pidió un código para tu cuenta{% endblock %}
