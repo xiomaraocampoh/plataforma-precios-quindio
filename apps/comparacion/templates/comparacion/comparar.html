@@ -11,11 +11,17 @@
   </div>
   <a class="btn btn-sec" href="{% url 'precios:registrar' %}"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>Registrar un precio</a>
 </div>
+{# WCAG 2.2.2: la actualización automática se puede pausar; accesibilidad.js muestra el control.
+   Sin aria-live aquí: releer toda la lista cada minuto interrumpe al lector de pantalla;
+   los cambios reales se anuncian en #avisos (4.1.3). #}
+<p class="actualizacion suave" id="control-actualizacion" hidden>
+  Los precios se actualizan cada minuto.
+  <button type="button" class="btn-texto" id="pausar-actualizacion">Pausar actualización</button>
+</p>
 <div id="resultados"
      hx-get="{% url 'comparacion:comparar' producto.pk %}"
-     hx-trigger="every 60s"
-     hx-swap="innerHTML"
-     aria-live="polite">
+     hx-trigger="every 60s [!window.actualizacionPausada]"
+     hx-swap="innerHTML">
   {% include "comparacion/partials/_resultados.html" %}
 </div>
 {% endblock %}

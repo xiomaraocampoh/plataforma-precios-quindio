@@ -54,3 +54,20 @@ def test_inicio_ofrece_control_para_pausar_la_rotacion_del_titular(client, db):
     # M-03 · 2.2.2: el contenido en movimiento de más de 5 s debe poder detenerse
     html = client.get(reverse("comparacion:inicio")).content.decode()
     assert re.search(r'<button type="button"[^>]*id="pausar-rotacion"', html)
+
+
+def test_comparacion_permite_pausar_la_actualizacion_automatica(client, db, arroz):
+    # M-03 · 2.2.2: la recarga cada 60 s se puede pausar; 4.1.3: sin releer toda la lista
+    producto, _, _ = arroz
+    html = client.get(reverse("comparacion:comparar", args=[producto.pk])).content.decode()
+    assert 'hx-trigger="every 60s [!window.actualizacionPausada]"' in html
+    assert re.search(r'<button type="button"[^>]*id="pausar-actualizacion"', html)
+    contenedor = re.search(r'<div id="resultados"[^>]*>', html).group(0)
+    assert "aria-live" not in contenedor
+
+
+def test_la_region_de_avisos_existe_antes_de_cualquier_cambio(client, db):
+    # M-03 · 4.1.3: la región viva debe estar en la página desde la carga
+    html = client.get(reverse("comparacion:inicio")).content.decode()
+    assert re.search(r'id="avisos" role="status" aria-live="polite"', html)
+    assert "js/accesibilidad.js" in html
