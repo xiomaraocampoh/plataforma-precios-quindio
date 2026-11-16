@@ -1,0 +1,27 @@
+# TDD 2 · ROJO · tests/unit/catalogo/test_duplicados.py (el módulo de dominio aún no existe)
+# 2026-11-16 10:40:16 -0500 · 24c195e
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0 -- C:\Users\Windows\Desktop\plataforma-precios-quindio\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.18, settings: config.settings.test (from ini)
+rootdir: C:\Users\Windows\Desktop\plataforma-precios-quindio
+configfile: pyproject.toml
+plugins: Faker-40.44.0, platformdirs-4.14.3, cov-7.1.0, django-4.14.0
+collecting ... collected 0 items / 1 error
+
+=================================== ERRORS ====================================
+___________ ERROR collecting tests/unit/catalogo/test_duplicados.py ___________
+ImportError while importing test module 'C:\Users\Windows\Desktop\plataforma-precios-quindio\tests\unit\catalogo\test_duplicados.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\unit\catalogo\test_duplicados.py:5: in <module>
+    from apps.catalogo.domain.duplicados import normalizar_nombre, son_posibles_duplicados
+E   ModuleNotFoundError: No module named 'apps.catalogo.domain.duplicados'
+=========================== short test summary info ===========================
+ERROR tests/unit/catalogo/test_duplicados.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+============================== 1 error in 0.31s ===============================
+# código de salida: 2
