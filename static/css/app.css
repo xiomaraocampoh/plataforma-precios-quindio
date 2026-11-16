@@ -329,3 +329,19 @@ textarea { width: 100%; min-height: 90px; padding: .6rem .95rem; font: inherit; 
 .menu-cuenta li a:hover, .menu-cuenta li button:hover { background: var(--superficie-2); text-decoration: none; }
 /* WCAG 2.5.8: enlaces sueltos (migas, pie de formularios, datos) con objetivo de 24 px o más */
 .migas a, .enlace-pie a, .datos dd a { display: inline-flex; align-items: center; min-height: 24px; }
+
+/* Escáner de código de barras (RF-04) */
+.buscador input { padding-right: 4rem; }
+.buscador .escanear { position: absolute; right: .5rem; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; border-radius: 50%; border: 0; background: transparent; color: var(--marca-enlace); display: grid; place-items: center; cursor: pointer; }
+.buscador .escanear:hover { background: var(--marca-suave); }
+.buscador .escanear:focus-visible { outline: 3px solid var(--marca); outline-offset: 2px; }
+.buscador .escanear .ico { position: static; transform: none; pointer-events: none; color: inherit; }
+.escaner { width: min(92vw, 28rem); border: 0; border-radius: 24px; padding: 1.5rem; background: var(--superficie); color: var(--texto); box-shadow: 0 24px 80px -12px rgb(0 0 0 / .45); }
+.escaner::backdrop { background: rgb(0 0 0 / .55); }
+.escaner video { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 16px; background: #000; margin: .75rem 0; }
+.escaner [data-estado] { min-height: 2.5em; margin: .5rem 0; }
+.escaner .btn { margin-top: .5rem; }
+.escaner .btn input:focus-visible + * { outline: 3px solid var(--marca); }
+.escaner label.btn:focus-within { outline: 3px solid var(--marca); outline-offset: 2px; }
+.escaner-manual { margin: 1rem 0 .5rem; display: grid; gap: .5rem; }
+.escaner-manual input { min-height: 48px; padding: 0 1rem; border-radius: 12px; border: 1px solid var(--borde); background: var(--superficie); color: var(--texto); font-size: 1.1rem; }

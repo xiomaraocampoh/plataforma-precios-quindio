@@ -2,7 +2,8 @@
 {% load static %}
 {% block titulo %}AhorraPues · Compara precios en Armenia y el Quindío{% endblock %}
 {% block head %}<link rel="preload" as="image" href="{% static 'img/hero-supermercado.webp' %}" media="(min-width: 900px)" fetchpriority="high">
-<script src="{% static 'js/hero.js' %}?v=3" defer></script>{% endblock %}
+<script src="{% static 'js/hero.js' %}?v=3" defer></script>
+<script src="{% static 'js/escanear.js' %}?v=1" defer></script>{% endblock %}
 {% block hero %}
 <div class="hero-fondo">
 <div class="hero-contenedor">
@@ -20,8 +21,30 @@
              hx-trigger="input changed delay:300ms, search"
              hx-target="#sugerencias"
              aria-controls="sugerencias">
+      <button type="button" class="escanear" data-escanear
+              data-destino="{% url 'comparacion:escanear' %}"
+              data-zxing="{% static 'vendor/zxing/zxing-library.min.js' %}"
+              aria-label="Buscar por código de barras" title="Buscar por código de barras">
+        <svg class="ico" aria-hidden="true"><use href="#i-escanear"/></svg>
+      </button>
     </div>
   </div>
+  <dialog id="escaner" class="escaner" aria-labelledby="t-escaner">
+    <h2 id="t-escaner">Buscar por código de barras</h2>
+    <p class="suave">La imagen se lee en tu celular y no se guarda ni se envía: solo se usan los números del código.</p>
+    <video playsinline muted hidden aria-label="Vista de la cámara"></video>
+    <p data-estado role="status" aria-live="polite"></p>
+    <label class="btn btn-sec btn-bloque">
+      Tomar o elegir una foto
+      <input type="file" accept="image/*" capture="environment" class="sr-only">
+    </label>
+    <form method="get" action="{% url 'comparacion:escanear' %}" class="escaner-manual">
+      <label for="codigo-manual">O escribe el número bajo las barras</label>
+      <input id="codigo-manual" name="codigo" inputmode="numeric" autocomplete="off" maxlength="20" required>
+      <button class="btn" type="submit">Buscar</button>
+    </form>
+    <button type="button" class="btn btn-sec btn-bloque" data-cerrar>Cancelar</button>
+  </dialog>
   <ul id="sugerencias" class="sugerencias" aria-label="Sugerencias de productos" aria-live="polite"></ul>
 
   {% if destacados %}
