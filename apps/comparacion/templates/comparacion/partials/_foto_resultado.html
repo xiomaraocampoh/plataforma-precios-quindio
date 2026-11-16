@@ -1,0 +1,17 @@
+{% if error %}
+  <p class="foto-error">{{ error }}</p>
+{% elif no_reconocido %}
+  <p class="foto-error">No pudimos reconocer un producto en la foto. Acércate, mejora la luz o busca por nombre o código.</p>
+{% else %}
+  <p><strong>Esto parece ser:</strong> {{ pista.nombre }}{% if pista.marca %} · {{ pista.marca }}{% endif %}{% if pista.cantidad %} · {{ pista.cantidad }} {{ pista.unidad }}{% endif %}</p>
+  {% if candidatos %}
+    <p class="suave">Elige el que corresponde para ver la comparación:</p>
+    <ul class="foto-candidatos">
+      {% for p in candidatos %}<li><a class="btn btn-sec btn-bloque" href="{% url 'comparacion:comparar' p.pk %}">{{ p }}</a></li>{% endfor %}
+    </ul>
+  {% else %}
+    <p class="suave">Aún no está en el catálogo.</p>
+    <p><a class="btn btn-bloque" href="{% url 'catalogo:solicitar' %}?nombre={{ pista.nombre|urlencode }}&marca={{ pista.marca|urlencode }}&codigo_barras={{ pista.codigo_barras|urlencode }}">Solicitar este producto</a></p>
+  {% endif %}
+  <p class="suave">Revisa que sea el producto correcto: la lectura por foto puede equivocarse.</p>
+{% endif %}

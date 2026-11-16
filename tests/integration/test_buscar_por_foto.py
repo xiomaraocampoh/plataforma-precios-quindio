@@ -166,7 +166,7 @@ def test_la_respuesta_no_incluye_datos_de_personas(client, usuario, cafe, falso)
     assert "u1" not in html and "@" not in html  # M-15
 
 
-def test_inicio_muestra_la_foto_solo_si_esta_activada(client, settings):
+def test_inicio_muestra_la_foto_solo_si_esta_activada(client, settings, db):
     assert "data-foto" in client.get(reverse("comparacion:inicio")).content.decode()
     settings.INTEGRACIONES = {**settings.INTEGRACIONES, "ANTHROPIC_API_KEY": ""}
     assert "data-foto" not in client.get(reverse("comparacion:inicio")).content.decode()

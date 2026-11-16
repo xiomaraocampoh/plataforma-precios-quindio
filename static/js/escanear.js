@@ -126,6 +126,39 @@
     }
   }
 
+  /* Búsqueda por foto con IA (ADR-019). Se reduce a 1024 px y se recodifica en el navegador:
+   * ahorra datos y descarta los metadatos EXIF (incluida la ubicación). */
+  var fotoIA = dialogo.querySelector("[data-foto]");
+  var salida = dialogo.querySelector("[data-foto-resultado]");
+  function reducir(archivo) {
+    return createImageBitmap(archivo).then(function (b) {
+      var k = Math.min(1, 1024 / Math.max(b.width, b.height));
+      var c = document.createElement("canvas");
+      c.width = Math.round(b.width * k); c.height = Math.round(b.height * k);
+      c.getContext("2d").drawImage(b, 0, 0, c.width, c.height);
+      return new Promise(function (ok) { c.toBlob(ok, "image/jpeg", 0.85); });
+    });
+  }
+  function csrf() {
+    try { return JSON.parse(document.body.getAttribute("hx-headers"))["X-CSRFToken"]; }
+    catch (e) { return ""; }
+  }
+  if (fotoIA) {
+    fotoIA.addEventListener("change", function () {
+      var archivo = fotoIA.files && fotoIA.files[0];
+      fotoIA.value = "";
+      if (!archivo) return;
+      salida.textContent = "Identificando el producto…";
+      reducir(archivo).then(function (blob) {
+        var datos = new FormData();
+        datos.append("foto", blob, "foto.jpg");
+        return fetch(fotoIA.dataset.url, { method: "POST", body: datos, headers: { "X-CSRFToken": csrf() }, credentials: "same-origin" });
+      }).then(function (r) { return r.text(); })
+        .then(function (html) { salida.innerHTML = html; }) // fragmento propio del servidor
+        .catch(function () { salida.textContent = "No pudimos enviar la foto. Busca por nombre o código."; });
+    });
+  }
+
   boton.addEventListener("click", function () {
     dialogo.showModal();
     iniciarCamara();

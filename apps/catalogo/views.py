@@ -13,7 +13,11 @@ from .forms import SolicitudForm
 @login_required
 @require_http_methods(["GET", "POST"])
 def solicitar(request):
-    inicial = {"codigo_barras": normalizar_codigo(request.GET.get("codigo_barras", ""))[:14]}
+    inicial = {
+        "codigo_barras": normalizar_codigo(request.GET.get("codigo_barras", ""))[:14],
+        "nombre": request.GET.get("nombre", "")[:120],
+        "marca": request.GET.get("marca", "")[:80],
+    }
     form = SolicitudForm(request.POST or None, initial=inicial)
     if request.method == "POST" and form.is_valid():
         d = form.cleaned_data

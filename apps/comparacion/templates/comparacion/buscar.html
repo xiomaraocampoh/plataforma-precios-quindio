@@ -3,7 +3,7 @@
 {% block titulo %}AhorraPues · Compara precios en Armenia y el Quindío{% endblock %}
 {% block head %}<link rel="preload" as="image" href="{% static 'img/hero-supermercado.webp' %}" media="(min-width: 900px)" fetchpriority="high">
 <script src="{% static 'js/hero.js' %}?v=3" defer></script>
-<script src="{% static 'js/escanear.js' %}?v=2" defer></script>{% endblock %}
+<script src="{% static 'js/escanear.js' %}?v=3" defer></script>{% endblock %}
 {% block hero %}
 <div class="hero-fondo">
 <div class="hero-contenedor">
@@ -38,6 +38,22 @@
       Tomar o elegir una foto
       <input type="file" accept="image/*" capture="environment" class="sr-only">
     </label>
+    {% if foto_activa %}
+    <section class="escaner-foto" aria-labelledby="t-foto">
+      <h3 id="t-foto">¿No tiene código? Busca por foto</h3>
+      {% if user.is_authenticated %}
+        <label class="btn btn-sec btn-bloque">
+          Fotografiar el producto (IA)
+          <input type="file" accept="image/*" capture="environment" class="sr-only"
+                 data-foto data-url="{% url 'comparacion:buscar_por_foto' %}">
+        </label>
+        <p class="suave">La foto se reduce en tu celular y se envía a Anthropic, un servicio externo de IA, solo para identificar el producto. No se guarda. Evita que salgan personas.</p>
+      {% else %}
+        <p class="suave"><a href="{% url 'cuentas:ingresar' %}?next=/">Ingresa</a> para buscar por foto.</p>
+      {% endif %}
+      <div data-foto-resultado role="status" aria-live="polite"></div>
+    </section>
+    {% endif %}
     <form method="get" action="{% url 'comparacion:escanear' %}" class="escaner-manual">
       <label for="codigo-manual">O escribe el número bajo las barras</label>
       <input id="codigo-manual" name="codigo" inputmode="numeric" autocomplete="off" maxlength="20" required>
