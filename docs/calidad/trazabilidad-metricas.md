@@ -14,6 +14,7 @@ Fuente de métricas y umbrales: documento *Modelo Proyecto nuclear* (pasos 4 y 5
 | M-15 | Confidencialidad | Respuesta pública sin autor | `test_respuesta_publica_no_expone_al_reportante` |
 | M-16 | Resistencia | Throttling `reportes`, ZAP, SonarQube | `config/settings/base.py`, CI |
 | M-16 | Resistencia (RN-10) | Límite de registros por hora en el servicio (HTMX y API) | `tests/integration/test_limite_registros.py` |
+| M-17 | Modificabilidad | Línea base de esfuerzo del módulo comercial: 79 h (91 con 15 % de contingencia), por componente. *Planificado:* se mide en el Corte 3 con horas reales | `docs/arquitectura/analisis-impacto-modulo-comercial.md` (secciones 4 y 8) |
 | M-18 | Modularidad | Contratos de capas y módulos en CI + diff del Corte III limitado a `apps/comercios` | `.importlinter` (`lint-imports`), `git diff --stat` del PR del módulo comercial |
 | M-19 | Testabilidad | `pytest --cov` (CI falla < 70 %) | `.github/workflows/ci.yml` |
 | M-21 | Disponibilidad | `/healthz/` comprueba PostgreSQL y caché (503 si falla) | `core/views.py`, `tests/integration/test_healthz.py` |
