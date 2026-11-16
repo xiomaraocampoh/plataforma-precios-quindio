@@ -1,0 +1,21 @@
+# TDD · 05-sipsa-valores · ROJO
+# 2026-11-16 11:42:32 -0500 · feat/nucleo-completo @ f2306ce + cambios
+$ pytest tests/unit/integraciones/test_sipsa.py -v
+============================= test session starts =============================
+collecting ... collected 0 items / 1 error
+
+=================================== ERRORS ====================================
+___________ ERROR collecting tests/unit/integraciones/test_sipsa.py ___________
+ImportError while importing test module 'C:\Users\Windows\Desktop\plataforma-precios-quindio\tests\unit\integraciones\test_sipsa.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\unit\integraciones\test_sipsa.py:8: in <module>
+    from apps.integraciones.domain.sipsa import interpretar_fecha, interpretar_precio_cop
+E   ModuleNotFoundError: No module named 'apps.integraciones.domain.sipsa'
+=========================== short test summary info ===========================
+ERROR tests/unit/integraciones/test_sipsa.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+============================== 1 error in 0.29s ===============================
