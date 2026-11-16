@@ -318,3 +318,12 @@ a.chip:hover { text-decoration: none; background: var(--borde); }
 .panel-plegable[open] summary { margin-bottom: .5rem; }
 .referencia { border: 1px dashed var(--borde-fuerte); }
 textarea { width: 100%; min-height: 90px; padding: .6rem .95rem; font: inherit; color: var(--texto); background: var(--superficie); border: 1px solid var(--borde-fuerte); border-radius: var(--radio-sm); }
+
+/* Menú de la cuenta: <details> nativo (teclado y lector de pantalla sin JS) */
+.menu-cuenta { position: relative; }
+.menu-cuenta summary { display: inline-flex; align-items: center; gap: .4rem; min-height: 40px; padding: 0 .8rem; border-radius: 999px; border: 1px solid var(--borde-fuerte); color: var(--texto); font-size: .9rem; cursor: pointer; list-style: none; }
+.menu-cuenta summary::-webkit-details-marker { display: none; }
+.menu-cuenta summary::after { content: "▾"; color: var(--texto-suave); }
+.menu-cuenta ul { position: absolute; right: 0; top: calc(100% + .4rem); z-index: 30; min-width: 190px; margin: 0; padding: .4rem; list-style: none; background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio-sm); box-shadow: 0 12px 32px -12px rgb(0 0 0 / .25); }
+.menu-cuenta li a, .menu-cuenta li button { display: flex; align-items: center; width: 100%; min-height: 40px; padding: 0 .75rem; border: 0; border-radius: 8px; background: none; color: var(--texto); font: inherit; font-size: .95rem; text-align: left; cursor: pointer; }
+.menu-cuenta li a:hover, .menu-cuenta li button:hover { background: var(--superficie-2); text-decoration: none; }
