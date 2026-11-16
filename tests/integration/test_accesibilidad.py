@@ -1,8 +1,10 @@
 """Accesibilidad WCAG 2.2 AA verificable en el HTML del servidor (M-03)."""
 
 import re
+from pathlib import Path
 
 import pytest
+from django.conf import settings
 from django.urls import reverse
 
 pytestmark = pytest.mark.integration
@@ -50,10 +52,17 @@ def test_ingreso_con_campos_vacios_muestra_un_error_por_campo(client):
     assert _referencias_rotas(html) == []
 
 
-def test_inicio_ofrece_control_para_pausar_la_rotacion_del_titular(client, db):
-    # M-03 · 2.2.2: el contenido en movimiento de más de 5 s debe poder detenerse
+def test_el_titular_se_anima_menos_de_5_segundos_y_termina_en_su_palabra_inicial(client, db):
+    # M-03 · 2.2.2: un movimiento automático que dura ≤ 5 s no necesita control de pausa.
     html = client.get(reverse("comparacion:inicio")).content.decode()
-    assert re.search(r'<button type="button"[^>]*id="pausar-rotacion"', html)
+    palabras = re.search(r'data-palabras="([^"]+)"', html).group(1).split(",")
+    assert palabras[-1] == palabras[0]  # termina donde empezó: el titular no cambia de sentido
+    assert "pausar-rotacion" not in html  # sin control: la animación se detiene sola
+    fuente = (Path(settings.BASE_DIR) / "static/js/hero.js").read_text(encoding="utf-8")
+    assert "setInterval" not in fuente  # nada corre para siempre
+    intervalo = int(re.search(r"INTERVALO_MS = (\d+)", fuente).group(1))
+    transicion = 700  # ms que tarda en entrar la última palabra
+    assert (len(palabras) - 1) * intervalo + transicion <= 5000
 
 
 def test_comparacion_permite_pausar_la_actualizacion_automatica(client, db, arroz):
