@@ -62,8 +62,9 @@
     {% block hero %}{% endblock %}
     <div class="sitio">
       {% if user.is_authenticated %}
-      {# Siempre presente para que el lector de pantalla anuncie los cambios (4.1.3) #}
-      <div id="registros-pendientes" role="status" aria-live="polite"></div>
+      {% comment %}Siempre presente para que el lector de pantalla anuncie los cambios (4.1.3).
+         La página de registro lo pone junto al botón Guardar, donde se está mirando.{% endcomment %}
+      {% block registros_pendientes %}<div id="registros-pendientes" role="status" aria-live="polite"></div>{% endblock %}
       {% endif %}
       {% if messages %}
       <ul class="mensajes" role="status">
