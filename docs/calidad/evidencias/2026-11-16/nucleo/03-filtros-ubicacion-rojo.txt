@@ -1,0 +1,21 @@
+# TDD · 03-filtros-ubicacion · ROJO
+# 2026-11-16 11:41:21 -0500 · feat/nucleo-completo @ e137246 + cambios
+$ pytest tests/unit/comparacion/test_filtros.py -v
+============================= test session starts =============================
+collecting ... collected 0 items / 1 error
+
+=================================== ERRORS ====================================
+___________ ERROR collecting tests/unit/comparacion/test_filtros.py ___________
+ImportError while importing test module 'C:\Users\Windows\Desktop\plataforma-precios-quindio\tests\unit\comparacion\test_filtros.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\unit\comparacion\test_filtros.py:7: in <module>
+    from apps.comparacion.domain.filtros import FiltroUbicacion, filtrar
+E   ModuleNotFoundError: No module named 'apps.comparacion.domain.filtros'
+=========================== short test summary info ===========================
+ERROR tests/unit/comparacion/test_filtros.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+============================== 1 error in 0.29s ===============================
