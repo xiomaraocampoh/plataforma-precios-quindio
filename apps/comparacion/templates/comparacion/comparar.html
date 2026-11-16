@@ -11,8 +11,8 @@
   </div>
   <a class="btn btn-sec" href="{% url 'precios:registrar' %}"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>Registrar un precio</a>
 </div>
-{% if municipios|length > 1 or barrios|length > 1 %}
-<form class="filtros" id="filtros-comparacion" method="get" action="{% url 'comparacion:comparar' producto.pk %}" aria-label="Filtrar por ubicación"
+{% if total > 1 or municipios|length > 1 or barrios|length > 1 %}
+<form class="filtros" id="filtros-comparacion" method="get" action="{% url 'comparacion:comparar' producto.pk %}" aria-label="Filtrar por ubicación y precio"
       hx-get="{% url 'comparacion:comparar' producto.pk %}" hx-target="#resultados" hx-push-url="true" hx-trigger="change, submit">
   <div class="campo">
     <label for="f-municipio">Municipio</label>
@@ -27,6 +27,14 @@
       <option value="">Todos</option>
       {% for b in barrios %}<option value="{{ b }}"{% if b == filtro.barrio %} selected{% endif %}>{{ b }}</option>{% endfor %}
     </select>
+  </div>
+  <div class="campo">
+    <label for="f-precio-min">Precio desde ($)</label>
+    <input id="f-precio-min" name="precio_min" type="text" inputmode="decimal" autocomplete="off" placeholder="Ej.: 2.500" value="{{ precio_min }}"{% if error_precio %} aria-invalid="true" aria-describedby="error-precio"{% endif %}>
+  </div>
+  <div class="campo">
+    <label for="f-precio-max">Precio hasta ($)</label>
+    <input id="f-precio-max" name="precio_max" type="text" inputmode="decimal" autocomplete="off" placeholder="Ej.: 5.000" value="{{ precio_max }}"{% if error_precio %} aria-invalid="true" aria-describedby="error-precio"{% endif %}>
   </div>
   <div class="acciones-filtro">
     <button class="btn" type="submit">Filtrar</button>

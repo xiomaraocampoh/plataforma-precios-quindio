@@ -28,7 +28,7 @@ from apps.precios.selectors import (
 )
 from core.cache import clave_comparacion, clave_resumen, ttl_comparacion
 
-from .domain.filtros import FiltroUbicacion, filtrar
+from .domain.filtros import FiltroPrecio, FiltroUbicacion, filtrar, filtrar_por_precio
 from .domain.ranking import ResultadoComparacion, ordenar_neutral
 from .domain.resumen import ResumenComparacion, resumir_precios
 
@@ -128,12 +128,16 @@ def comparar_producto(producto_id: int) -> list[ResultadoComparacion]:
 
 
 def comparar_con_resumen(
-    producto_id: int, filtro: FiltroUbicacion | None = None
+    producto_id: int,
+    filtro: FiltroUbicacion | None = None,
+    filtro_precio: FiltroPrecio | None = None,
 ) -> tuple[list[FilaComparacion], ResumenComparacion]:
     """RF-19: el filtro de ubicación solo reduce las filas ya ordenadas (EC-06)."""
     filas = comparar_filas(producto_id)
     if filtro is not None and filtro.activo:
         filas = filtrar(filas, filtro, lambda f: (f.municipio, f.barrio))
+    if filtro_precio is not None and filtro_precio.activo:  # precio total, el que ve la persona
+        filas = filtrar_por_precio(filas, filtro_precio, lambda f: f.resultado.precio)
     return filas, resumir_precios([f.resultado for f in filas])
 
 
