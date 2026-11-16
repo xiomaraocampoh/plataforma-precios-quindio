@@ -20,4 +20,7 @@ class RegistroPrecioForm(forms.Form):
         label="Precio en góndola ($)",
         widget=forms.NumberInput(attrs={"inputmode": "numeric", "autocomplete": "off"}),
     )
+    # Registro sin conexión (ADR-009): la cola del navegador reenvía con el mismo id y la hora
+    # en que se vio el precio; el servicio aplica RN-08 a esa fecha.
     id_cliente = forms.UUIDField(required=False, widget=forms.HiddenInput)
+    fecha_observacion = forms.DateTimeField(required=False, widget=forms.HiddenInput)

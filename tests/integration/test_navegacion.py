@@ -37,3 +37,16 @@ def test_la_pagina_actual_se_marca(client, db):
     assert (
         f'href="{reverse("establecimientos:directorio")}"\n           aria-current="page"' in html
     )
+
+
+def test_ningun_comentario_de_plantilla_se_muestra_en_la_pagina(client, reportante, arroz):
+    # Django solo admite {# #} en una línea; uno de varias líneas se imprime como texto
+    producto, _, _ = arroz
+    client.force_login(reportante)
+    for url in (
+        reverse("comparacion:inicio"),
+        reverse("comparacion:comparar", args=[producto.pk]),
+        reverse("precios:registrar"),
+    ):
+        html = client.get(url).content.decode()
+        assert "{#" not in html and "#}" not in html, url

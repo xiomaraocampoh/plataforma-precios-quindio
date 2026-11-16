@@ -48,7 +48,7 @@ de 2026; en `docs/adr/` aún no coincide del todo (decisión D-1 pendiente del e
 | Tema | Estado | Qué hay hoy | Por qué | Para cubrirlo |
 |---|---|---|---|---|
 | Entrar como dueño de un comercio | No existe (Corte 3) | El rol «comercio» existe en la base de datos, pero ninguna pantalla lo usa; `apps/comercios` está reservado | La guía introduce el módulo como cambio de alcance en el Corte 3, para medir EC-05 | Ver el análisis de impacto del módulo comercial |
-| Registro sin conexión | Parcial | El servidor ya es idempotente por `id_cliente` (un reenvío no duplica). **Falta la cola en el navegador**: hay un `TODO` en el formulario | ADR-009 y RF-12 (prioridad S). En la encuesta, el 80 % reportó buena señal | Guardar el registro en el navegador y reenviarlo al recuperar la conexión (M-22) |
+| Registro sin conexión | Completo | `static/js/cola-registros.js` guarda en `localStorage` el registro que no se pudo enviar (con la hora en que se vio el precio) y lo reenvía al cargar la página y al volver la red; el servidor es idempotente por `id_cliente`. M-22 = 100 % con 10 registros simulados (Playwright) | ADR-009 y RF-12 (prioridad S). En la encuesta, el 80 % reportó buena señal | Límite conocido: sin *service worker*, la página de registro debe haberse abierto antes de perder la señal |
 
 ## 5. Entrega del Corte 2 *(según lo informado por el equipo el 2026-11-16; no verificado en el repositorio)*
 

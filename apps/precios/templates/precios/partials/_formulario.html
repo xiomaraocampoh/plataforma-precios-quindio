@@ -1,8 +1,9 @@
 <form method="post" action="{% url 'precios:registrar' %}"
       hx-post="{% url 'precios:registrar' %}" hx-target="#registro" hx-swap="innerHTML"
-      hx-disabled-elt="find button">
+      hx-disabled-elt="find button" hx-request='{"timeout": 15000}' data-cola-registros>
   {% csrf_token %}
-  {% if form.non_field_errors %}<div class="campo" role="alert">{% for e in form.non_field_errors %}<span class="error">{{ e }}</span>{% endfor %}</div>{% endif %}
+  {# los errores de campos ocultos (p. ej. fecha de un registro sin conexión) también se muestran #}
+  {% if form.non_field_errors or form.fecha_observacion.errors %}<div class="campo" role="alert">{% for e in form.non_field_errors %}<span class="error">{{ e }}</span>{% endfor %}{% for e in form.fecha_observacion.errors %}<span class="error">{{ e }}</span>{% endfor %}</div>{% endif %}
   {% for campo in form.visible_fields %}
     <div class="campo">
       {{ campo.label_tag }}
@@ -15,4 +16,3 @@
   {% for oculto in form.hidden_fields %}{{ oculto }}{% endfor %}
   <button class="btn btn-bloque" type="submit">Guardar precio</button>
 </form>
-{# TODO(Corte II): cola offline en localStorage/IndexedDB que reenvía con id_cliente (M-22) #}

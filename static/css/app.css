@@ -108,6 +108,18 @@ p a:not(.btn), .enlace-pie a { text-decoration: underline; text-underline-offset
 .mensaje { display: flex; align-items: center; gap: .6rem; padding: .8rem 1.1rem; border-radius: 16px; background: var(--ok-fondo); color: var(--texto); font-weight: 500; }
 .mensaje .ico { color: var(--positivo); }
 .mensaje.error { background: var(--error-fondo); }
+/* Registros sin conexión (RF-12, M-22): no depende solo del color, siempre hay icono y texto */
+.aviso-pendientes { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem; padding: .8rem 1.1rem; margin-bottom: var(--gap); border-radius: 16px; background: var(--marca-suave); color: var(--texto); }
+.aviso-pendientes > div { flex: 1 1 14rem; display: grid; gap: .15rem; }
+.aviso-pendientes .ico { color: var(--marca); width: 1.4em; height: 1.4em; flex: none; }
+.aviso-pendientes .aviso-titulo { font-weight: 600; }
+.aviso-pendientes p { margin: 0; }
+.aviso-pendientes .btn { min-height: 44px; }
+.pendientes-en-registro .aviso-pendientes { margin: .25rem 0 0; }
+.aviso-pendientes.aviso-ok { background: var(--ok-fondo); }
+.aviso-pendientes.aviso-ok .ico { color: var(--positivo); }
+.aviso-pendientes.aviso-error { background: var(--error-fondo); }
+.aviso-pendientes.aviso-error .ico { color: var(--error); }
 
 /* ---------- Bento ---------- */
 .bento { display: grid; gap: var(--gap); grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-flow: dense; }
