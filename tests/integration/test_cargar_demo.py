@@ -35,7 +35,7 @@ def test_crea_admin_y_moderador_con_la_clave_de_entorno(db, monkeypatch):
     assert admin.is_superuser and admin.check_password(CLAVE)
     assert moderador.rol == Usuario.Rol.MODERADOR and moderador.is_staff
     assert moderador.check_password(CLAVE)
-    assert moderador.groups.filter(name="Moderadores").exists()
+    assert moderador.groups.filter(name="Moderador").exists()  # grupo del rol (antes «Moderadores»)
     assert CLAVE not in salida  # la clave de entorno no se imprime
 
 
