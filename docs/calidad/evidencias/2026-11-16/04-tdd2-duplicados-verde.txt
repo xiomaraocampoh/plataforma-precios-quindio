@@ -1,0 +1,38 @@
+# TDD 2 · VERDE · código mínimo en apps/catalogo/domain/duplicados.py
+# 2026-11-16 10:40:36 -0500 · ecd3a99 + cambios
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0 -- C:\Users\Windows\Desktop\plataforma-precios-quindio\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.18, settings: config.settings.test (from ini)
+rootdir: C:\Users\Windows\Desktop\plataforma-precios-quindio
+configfile: pyproject.toml
+plugins: Faker-40.44.0, platformdirs-4.14.3, cov-7.1.0, django-4.14.0
+collecting ... collected 17 items
+
+tests/unit/catalogo/test_duplicados.py::test_normalizar_nombre[Arroz Diana-arroz diana] PASSED [  5%]
+tests/unit/catalogo/test_duplicados.py::test_normalizar_nombre[arroz DIANA-arroz diana] PASSED [ 11%]
+tests/unit/catalogo/test_duplicados.py::test_normalizar_nombre[Caf\xe9 \xc1guila Roja-cafe aguila roja] PASSED [ 17%]
+tests/unit/catalogo/test_duplicados.py::test_normalizar_nombre[Pi\xf1a-pi\xf1a] PASSED [ 23%]
+tests/unit/catalogo/test_duplicados.py::test_normalizar_nombre[PI\xd1A Golden-pi\xf1a golden] PASSED [ 29%]
+tests/unit/catalogo/test_duplicados.py::test_normalizar_nombre[  Arroz,   Diana. -arroz diana] PASSED [ 35%]
+tests/unit/catalogo/test_duplicados.py::test_normalizar_nombre[Coca-Cola!-coca cola] PASSED [ 41%]
+tests/unit/catalogo/test_duplicados.py::test_mayusculas_distintas_son_el_mismo_nombre PASSED [ 47%]
+tests/unit/catalogo/test_duplicados.py::test_nombres_similares_son_posibles_duplicados[Arroz Diana-arroz DIANA] PASSED [ 52%]
+tests/unit/catalogo/test_duplicados.py::test_nombres_similares_son_posibles_duplicados[Caf\xe9 \xc1guila Roja-cafe aguila roja] PASSED [ 58%]
+tests/unit/catalogo/test_duplicados.py::test_nombres_similares_son_posibles_duplicados[Aceite Premier-Aceite Premir] PASSED [ 64%]
+tests/unit/catalogo/test_duplicados.py::test_nombres_distintos_no_son_duplicados[Arroz Diana-Arroz Roa] PASSED [ 70%]
+tests/unit/catalogo/test_duplicados.py::test_nombres_distintos_no_son_duplicados[Leche entera-Leche deslactosada] PASSED [ 76%]
+tests/unit/catalogo/test_duplicados.py::test_umbral_es_parametrizable PASSED [ 82%]
+tests/unit/catalogo/test_duplicados.py::test_nombres_vacios_no_son_duplicados PASSED [ 88%]
+tests/unit/catalogo/test_duplicados.py::test_umbral_fuera_de_rango_es_rechazado[-0.1] PASSED [ 94%]
+tests/unit/catalogo/test_duplicados.py::test_umbral_fuera_de_rango_es_rechazado[1.5] PASSED [100%]
+
+============================= 17 passed in 0.19s ==============================
+# código de salida: 0
+
+# Suite unitaria completa
+.......................................................                  [100%]
+55 passed, 21 deselected in 0.53s
+
+# Cobertura del módulo
+TOTAL      21      0     10      0   100%
