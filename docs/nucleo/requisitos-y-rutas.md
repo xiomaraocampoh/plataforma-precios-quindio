@@ -36,7 +36,7 @@ Si la variable no existe al crear los usuarios, se genera una contraseña aleato
 | RF-09 Mapa | Enlace a OpenStreetMap con las coordenadas, sin API key | «Ver en el mapa» en el directorio | `test_mapas.py`, `test_establecimientos.py` |
 | RF-10 Sugerir establecimiento | Queda pendiente e inactivo (restricción en la base de datos) y no se usa en la comparación ni en el registro hasta aprobarse | `/establecimientos/sugerir/` | `test_establecimientos.py` |
 | RF-14 Sigue igual | Confirmación idempotente por usuario, reporte y día; renueva la vigencia y suma confianza; máximo 30 por hora | botón en cada resultado | `test_renovacion.py`, `test_sigue_igual.py` |
-| RF-19 Filtros | Municipio y barrio en la comparación (solo reducen, `test_filtros.py`); marca y categoría en el listado de productos; el criterio de orden siempre visible | `/productos/<id>/?municipio=&barrio=`, `/productos/?marca=&categoria=` | `test_filtros_comparacion.py`, `test_busqueda.py` |
+| RF-19 Filtros | Municipio, barrio y **rango de precio total** en la comparación (solo reducen; el orden no cambia); marca y categoría en el listado de productos; el criterio de orden siempre visible. El rango acepta el formato colombiano (`2.500`, `$2.500`, `2500,50`) y, si es inválido, avisa y no filtra | `/productos/<id>/?municipio=&barrio=&precio_min=&precio_max=`, `/productos/?marca=&categoria=` | `test_filtros.py`, `test_filtro_precio.py`, `test_interpretar_monto.py`, `test_filtros_comparacion.py`, `test_filtro_precio_comparacion.py`, `test_busqueda.py` |
 | RF-20 Denunciar | Motivo y detalle; una sola denuncia por usuario y reporte | «Denunciar» en cada resultado | `test_moderacion.py` |
 | RF-21 Bandeja | Solo rol moderador o staff: reportes en revisión, denuncias, solicitudes y establecimientos; aprobar o rechazar; cada decisión guarda moderador y fecha | `/moderacion/` y acciones en `/admin/` | `test_moderacion.py`, `test_admin.py` |
 | RF-22 Suspender | Suspende la cuenta (no a staff ni a uno mismo); los reportes quedan auditables | bandeja y `/admin/` | `test_moderacion.py` |
@@ -68,7 +68,10 @@ un establecimiento (EC-07). Los serializers usan lista blanca de campos.
 3. **Vigencia (EC-02):** en «Frijol cargamanto» solo aparecen Supermercado del Parque (oficial, 29
    días) y Tienda El Vecino (6 días). Los de 8 y 31 días no se muestran.
 4. **RF-19:** en la comparación del arroz, filtra por barrio «Centro». El orden no cambia, solo
-   desaparecen filas.
+   desaparecen filas. Después escribe «Precio desde» `2.500` y «Precio hasta» `4.800`: el mensaje
+   dice «Mostrando N resultados entre $2500 y $4800» y el orden por precio por unidad se conserva.
+   Escribe `abc` en un campo de precio: aparece un aviso y no se filtra. El rango se aplica al
+   **precio total** del empaque (el que se ve en grande), no al precio por unidad.
 5. **RF-20 y RF-21:** denuncia un precio con `demo_ana`. Ingresa como `moderador_demo`, abre
    Mi cuenta → Moderación y acepta la denuncia: el precio sale de la comparación y la decisión
    aparece en «Últimas decisiones».
