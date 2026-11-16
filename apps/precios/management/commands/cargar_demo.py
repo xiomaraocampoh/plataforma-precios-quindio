@@ -2,8 +2,9 @@
 
 Uso: python manage.py cargar_demo [--con-vencidos]
 
-- Los precios se registran mediante `services.registrar_reporte` para respetar las reglas de
-  negocio (vigencia, anomalías, caché). Cada parte es idempotente.
+- Los precios se cargan con `services.cargar_reporte_historico`: son datos históricos, fechados
+  cuando se «observaron», así que no consumen el cupo de registros por hora (RN-10) y se puede
+  probar el registro con `demo` justo después de cargar. Cada parte es idempotente.
 - Accesos: superusuario «admin» y moderador «moderador_demo» (rol moderador, is_staff). Su
   contraseña sale de DEMO_ADMIN_PASSWORD; la de los usuarios demo, de DEMO_PASSWORD. Si la variable
   no existe se genera una aleatoria y se muestra UNA vez en consola. Nunca hay contraseñas en el
@@ -273,7 +274,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def _registrar(autor, pres, local, precio, fecha) -> None:
-        services.registrar_reporte(
+        services.cargar_reporte_historico(
             autor=autor,
             presentacion_id=pres.pk,
             establecimiento_id=local.pk,
