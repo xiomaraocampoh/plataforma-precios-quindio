@@ -21,6 +21,17 @@
     <div class="acciones-fila">
       {% include "precios/partials/_sigue_igual.html" with reporte_id=fila.reporte_id confirmado=False mensaje="" %}
     </div>
+    {% if fila.reporte_id in denunciados %}
+    <p class="suave">Ya denunciaste este precio; moderación lo revisará.</p>
+    {% else %}
+    <details class="panel-plegable">
+      <summary>Denunciar<span class="sr-only"> el precio de {{ r.establecimiento }}</span></summary>
+      {% url 'moderacion:denunciar' fila.reporte_id as url_denuncia %}
+      <div hx-get="{{ url_denuncia }}" hx-trigger="toggle from:closest details once" hx-swap="innerHTML">
+        <a href="{{ url_denuncia }}">Abrir el formulario de denuncia</a>
+      </div>
+    </details>
+    {% endif %}
     {% endif %}
   </li>
   {% if forloop.first %}

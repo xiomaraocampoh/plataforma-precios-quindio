@@ -9,6 +9,7 @@ api_v1 = [
     path("comparacion/", include("apps.comparacion.api.urls")),
     path("catalogo/", include("apps.catalogo.api.urls")),
     path("establecimientos/", include("apps.establecimientos.api.urls")),
+    path("moderacion/", include("apps.moderacion.api.urls")),
 ]
 
 urlpatterns = [
@@ -21,5 +22,6 @@ urlpatterns = [
     path("precios/", include("apps.precios.urls")),
     path("catalogo/", include("apps.catalogo.urls")),
     path("establecimientos/", include("apps.establecimientos.urls")),
+    path("moderacion/", include("apps.moderacion.urls")),
     path("", include("apps.comparacion.urls")),
 ]

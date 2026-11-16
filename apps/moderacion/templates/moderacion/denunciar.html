@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block titulo %}Denunciar un precio · AhorraPues{% endblock %}
+{% block contenido %}
+<div class="auth bento">
+  <section class="tile tile-4" aria-labelledby="t-denunciar">
+    <p class="etiqueta">Moderación</p>
+    <h1 id="t-denunciar">Denunciar un precio</h1>
+    <p class="suave">Cuéntanos qué está mal. Una persona moderadora lo revisará; tu identidad no se publica.</p>
+    {% include "moderacion/partials/_denunciar.html" %}
+  </section>
+</div>
+{% endblock %}

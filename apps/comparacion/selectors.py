@@ -16,6 +16,7 @@ from apps.catalogo import selectors as catalogo
 from apps.catalogo.domain.normalizacion import precio_por_unidad
 from apps.catalogo.models import Producto
 from apps.establecimientos.models import Establecimiento
+from apps.moderacion.selectors import denunciados_por
 from apps.precios.domain.confianza import nivel_confianza
 from apps.precios.domain.vigencia import Fuente, es_vigente, fecha_de_referencia
 from apps.precios.models import ReportePrecio
@@ -197,5 +198,5 @@ def estado_del_usuario(usuario, reporte_ids: list[int]) -> dict[str, set[int]]:
     return {
         "confirmados_hoy": confirmados_hoy(usuario, reporte_ids),
         "propios": reportes_propios(usuario, reporte_ids),
-        "denunciados": set(),
+        "denunciados": denunciados_por(usuario, reporte_ids),
     }

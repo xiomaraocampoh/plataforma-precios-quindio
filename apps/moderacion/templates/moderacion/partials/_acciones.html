@@ -1,0 +1,16 @@
+{% comment %}
+Formulario de decisión de un elemento de la bandeja. Parámetros: tipo, objeto_id, sí, no (textos de los botones).
+Un solo campo de motivo; el botón pulsado define la decisión (HTMX envía el «submitter»).
+{% endcomment %}
+<form method="post" action="{% url 'moderacion:decidir' %}" class="acciones-fila"
+      hx-post="{% url 'moderacion:decidir' %}" hx-target="closest li" hx-swap="innerHTML" hx-disabled-elt="find button">
+  {% csrf_token %}
+  <input type="hidden" name="tipo" value="{{ tipo }}">
+  <input type="hidden" name="objeto_id" value="{{ objeto_id }}">
+  <div class="campo" style="flex:1 1 220px;margin:0">
+    <label for="motivo-{{ tipo }}-{{ objeto_id }}">Motivo <span class="suave">(opcional)</span></label>
+    <input type="text" id="motivo-{{ tipo }}-{{ objeto_id }}" name="motivo" maxlength="500" autocomplete="off">
+  </div>
+  <button class="btn btn-pequeno" type="submit" name="decision" value="aprobar">{{ si }}</button>
+  {% if no %}<button class="btn btn-sec btn-pequeno" type="submit" name="decision" value="rechazar">{{ no }}</button>{% endif %}
+</form>

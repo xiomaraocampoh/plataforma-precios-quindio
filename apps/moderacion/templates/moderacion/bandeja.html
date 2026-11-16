@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block titulo %}Moderación · AhorraPues{% endblock %}
+{% block contenido %}
+<div class="encabezado">
+  <div>
+    <p class="etiqueta">Moderación</p>
+    <h1>Bandeja</h1>
+  </div>
+  {% if user.is_staff %}<a class="btn btn-sec" href="{% url 'admin:index' %}">Administración</a>{% endif %}
+</div>
+<p class="suave">Cada decisión guarda quién la tomó y cuándo. Los datos de quien reporta solo se ven aquí, para poder suspender cuentas abusivas.</p>
+
+<nav class="chips" aria-label="Secciones de la bandeja" style="margin:1rem 0">
+  <a class="chip" href="#t-revision">En revisión ({{ reportes|length }})</a>
+  <a class="chip" href="#t-denuncias">Denuncias ({{ denuncias|length }})</a>
+  <a class="chip" href="#t-solicitudes">Productos ({{ solicitudes|length }})</a>
+  <a class="chip" href="#t-establecimientos">Establecimientos ({{ establecimientos|length }})</a>
+</nav>
+
+<section class="seccion" style="margin-top:1.5rem" aria-labelledby="t-revision">
+  <h2 id="t-revision">Reportes en revisión</h2>
+  <p class="suave">Precios muy distintos a los recientes (posible anomalía, EC-03).</p>
+  {% if reportes %}<ul class="lista-filas">
+    {% for r in reportes %}<li class="tile" style="margin-top:.75rem">
+      <p><strong>{{ r.presentacion }}</strong> · {{ r.establecimiento.nombre }} · <span class="num">${{ r.precio|floatformat:0 }}</span></p>
+      <p class="suave">Visto {{ r.fecha_observacion|date:"j M Y, H:i" }} · cuenta: {{ r.autor.username }}</p>
+      {% include "moderacion/partials/_acciones.html" with tipo="reporte" objeto_id=r.pk si="Publicar" no="Rechazar" %}
+      {% if not r.autor.is_staff and r.autor.is_active %}<details class="panel-plegable"><summary>Suspender la cuenta {{ r.autor.username }}</summary>
+        {% include "moderacion/partials/_acciones.html" with tipo="usuario" objeto_id=r.autor_id si="Suspender cuenta" no="" %}</details>{% endif %}
+    </li>{% endfor %}
+  </ul>{% else %}<p class="tile tile-tenue">No hay reportes en revisión.</p>{% endif %}
+</section>
+
+<section class="seccion" style="margin-top:2rem" aria-labelledby="t-denuncias">
+  <h2 id="t-denuncias">Denuncias abiertas</h2>
+  <p class="suave">Aceptar una denuncia retira el precio de la comparación.</p>
+  {% if denuncias %}<ul class="lista-filas">
+    {% for d in denuncias %}<li class="tile" style="margin-top:.75rem">
+      <p><strong>{{ d.get_motivo_display }}</strong> · {{ d.reporte.presentacion }} · {{ d.reporte.establecimiento.nombre }} · <span class="num">${{ d.reporte.precio|floatformat:0 }}</span></p>
+      {% if d.detalle %}<p class="suave">«{{ d.detalle }}»</p>{% endif %}
+      <p class="suave">Denunciado {{ d.creado_en|date:"j M Y, H:i" }} · cuenta que reportó: {{ d.reporte.autor.username }}</p>
+      {% include "moderacion/partials/_acciones.html" with tipo="denuncia" objeto_id=d.pk si="Aceptar y retirar precio" no="Descartar" %}
+      {% if not d.reporte.autor.is_staff and d.reporte.autor.is_active %}<details class="panel-plegable"><summary>Suspender la cuenta {{ d.reporte.autor.username }}</summary>
+        {% include "moderacion/partials/_acciones.html" with tipo="usuario" objeto_id=d.reporte.autor_id si="Suspender cuenta" no="" %}</details>{% endif %}
+    </li>{% endfor %}
+  </ul>{% else %}<p class="tile tile-tenue">No hay denuncias abiertas.</p>{% endif %}
+</section>
+
+<section class="seccion" style="margin-top:2rem" aria-labelledby="t-solicitudes">
+  <h2 id="t-solicitudes">Solicitudes de productos</h2>
+  {% if solicitudes %}<ul class="lista-filas">
+    {% for s in solicitudes %}<li class="tile" style="margin-top:.75rem">
+      <p><strong>{{ s.nombre }}{% if s.marca %} {{ s.marca }}{% endif %}</strong> · {{ s.cantidad|floatformat:"-3" }} {{ s.unidad }} · {{ s.categoria }}{% if s.codigo_barras %} · código {{ s.codigo_barras }}{% endif %}</p>
+      {% if s.detalle %}<p class="suave">«{{ s.detalle }}»</p>{% endif %}
+      <p class="suave">Solicitado {{ s.creado_en|date:"j M Y" }} por {{ s.solicitante.username }}</p>
+      {% include "moderacion/partials/_acciones.html" with tipo="solicitud" objeto_id=s.pk si="Agregar al catálogo" no="Rechazar" %}
+    </li>{% endfor %}
+  </ul>{% else %}<p class="tile tile-tenue">No hay solicitudes pendientes.</p>{% endif %}
+</section>
+
+<section class="seccion" style="margin-top:2rem" aria-labelledby="t-establecimientos">
+  <h2 id="t-establecimientos">Establecimientos sugeridos</h2>
+  {% if establecimientos %}<ul class="lista-filas">
+    {% for e in establecimientos %}<li class="tile" style="margin-top:.75rem">
+      <p><strong>{{ e.nombre }}</strong> · {{ e.get_tipo_display }} · {{ e.direccion }}{% if e.barrio %}, {{ e.barrio }}{% endif %}, {{ e.municipio }}</p>
+      <p class="suave">{% if e.latitud is not None %}Coordenadas {{ e.latitud }}, {{ e.longitud }}{% else %}Sin coordenadas: complétalas en Administración antes de aprobar si las conoces.{% endif %} · sugerido por {{ e.sugerido_por.username }}</p>
+      {% include "moderacion/partials/_acciones.html" with tipo="establecimiento" objeto_id=e.pk si="Aprobar" no="Rechazar" %}
+    </li>{% endfor %}
+  </ul>{% else %}<p class="tile tile-tenue">No hay establecimientos pendientes.</p>{% endif %}
+</section>
+
+<section class="seccion" style="margin-top:2rem" aria-labelledby="t-historial">
+  <h2 id="t-historial">Últimas decisiones</h2>
+  {% if decisiones %}<div class="tabla-envoltura" role="region" aria-labelledby="t-historial" tabindex="0"><table class="tabla">
+    <thead><tr><th scope="col">Fecha</th><th scope="col">Moderador</th><th scope="col">Decisión</th><th scope="col">Motivo</th></tr></thead>
+    <tbody>{% for d in decisiones %}<tr><td>{{ d.creado_en|date:"j M Y, H:i" }}</td><td>{{ d.moderador.username }}</td><td>{{ d.get_accion_display }} #{{ d.objeto_id }}</td><td>{{ d.motivo|default:"—" }}</td></tr>{% endfor %}</tbody>
+  </table></div>{% else %}<p class="tile tile-tenue">Aún no hay decisiones.</p>{% endif %}
+</section>
+{% endblock %}

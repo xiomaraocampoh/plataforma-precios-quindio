@@ -101,3 +101,13 @@ def suprimir_cuenta(*, usuario: Usuario) -> Usuario:
     usuario.save()
     usuario.groups.clear()
     return usuario
+
+
+def suspender_cuenta(*, usuario_id: int) -> Usuario:
+    """RF-22: no puede ingresar ni registrar; sus reportes quedan auditables."""
+    usuario = Usuario.objects.get(pk=usuario_id)
+    if usuario.is_staff or usuario.is_superuser:
+        raise ValueError("No se puede suspender una cuenta de moderación o administración.")
+    usuario.is_active = False
+    usuario.save(update_fields=["is_active"])
+    return usuario

@@ -188,3 +188,31 @@ def confirmar_precio(*, usuario, reporte_id: int) -> tuple[ConfirmacionPrecio, b
     producto_id = reporte.presentacion.producto_id
     transaction.on_commit(lambda: invalidar_comparacion(producto_id))
     return confirmacion, True
+
+
+@transaction.atomic
+def resolver_revision(*, reporte_id: int, aprobar: bool) -> ReportePrecio:
+    """RF-21: un reporte «en revisión» se publica o se rechaza. Invalida la comparación."""
+    reporte = (
+        ReportePrecio.objects.select_for_update().select_related("presentacion").get(pk=reporte_id)
+    )
+    if reporte.estado != ReportePrecio.Estado.EN_REVISION:
+        raise ValidationError("El reporte no está en revisión.")
+    reporte.estado = ReportePrecio.Estado.PUBLICADO if aprobar else ReportePrecio.Estado.RECHAZADO
+    reporte.save(update_fields=["estado"])
+    producto_id = reporte.presentacion.producto_id
+    transaction.on_commit(lambda: invalidar_comparacion(producto_id))
+    return reporte
+
+
+@transaction.atomic
+def retirar_reporte(*, reporte_id: int) -> ReportePrecio:
+    """RF-20: una denuncia aceptada saca el precio de la comparación (queda «rechazado»)."""
+    reporte = (
+        ReportePrecio.objects.select_for_update().select_related("presentacion").get(pk=reporte_id)
+    )
+    reporte.estado = ReportePrecio.Estado.RECHAZADO
+    reporte.save(update_fields=["estado"])
+    producto_id = reporte.presentacion.producto_id
+    transaction.on_commit(lambda: invalidar_comparacion(producto_id))
+    return reporte

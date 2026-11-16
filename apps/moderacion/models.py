@@ -44,3 +44,36 @@ class Denuncia(models.Model):
 
     def __str__(self) -> str:
         return f"Denuncia #{self.pk} ({self.estado})"
+
+
+class DecisionModeracion(models.Model):
+    """RF-21, RF-22: cada decisión de moderación guarda quién la tomó y cuándo (M-14)."""
+
+    class Accion(models.TextChoices):
+        APROBAR_REPORTE = "aprobar_reporte", "Aprobar reporte"
+        RECHAZAR_REPORTE = "rechazar_reporte", "Rechazar reporte"
+        ACEPTAR_DENUNCIA = "aceptar_denuncia", "Aceptar denuncia"
+        DESCARTAR_DENUNCIA = "descartar_denuncia", "Descartar denuncia"
+        APROBAR_SOLICITUD = "aprobar_solicitud", "Aprobar solicitud de catálogo"
+        RECHAZAR_SOLICITUD = "rechazar_solicitud", "Rechazar solicitud de catálogo"
+        APROBAR_ESTABLECIMIENTO = "aprobar_establecimiento", "Aprobar establecimiento"
+        RECHAZAR_ESTABLECIMIENTO = "rechazar_establecimiento", "Rechazar establecimiento"
+        SUSPENDER_CUENTA = "suspender_cuenta", "Suspender cuenta"
+
+    moderador = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="decisiones_moderacion"
+    )
+    accion = models.CharField(max_length=30, choices=Accion.choices)
+    objeto_tipo = models.CharField(max_length=20)
+    objeto_id = models.PositiveIntegerField()
+    motivo = models.TextField(blank=True)
+    creado_en = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["objeto_tipo", "objeto_id"], name="idx_decision_objeto"),
+            models.Index(fields=["-creado_en"], name="idx_decision_fecha"),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.get_accion_display()} #{self.objeto_id} por {self.moderador}"
