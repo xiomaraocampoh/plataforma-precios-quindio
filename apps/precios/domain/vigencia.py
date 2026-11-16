@@ -4,6 +4,7 @@ Decisión provisional (ADR-0003): reportado 7 días, perecedero 3 días,
 oficial de comercio 30 días sin confirmar.
 """
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import StrEnum
@@ -44,3 +45,10 @@ def es_vigente(
     return ahora - fecha_observacion <= ventana_vigencia(
         fuente, perecedero=perecedero, politica=politica
     )
+
+
+def fecha_de_referencia(
+    fecha_observacion: datetime, confirmaciones: Iterable[datetime]
+) -> datetime:
+    """RF-14: la vigencia corre desde la evidencia más reciente (observación o «Sigue igual»)."""
+    return max([fecha_observacion, *confirmaciones])

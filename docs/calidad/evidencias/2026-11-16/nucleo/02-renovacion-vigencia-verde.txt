@@ -1,0 +1,12 @@
+# TDD · 02-renovacion-vigencia · VERDE
+# 2026-11-16 11:41:02 -0500 · feat/nucleo-completo @ 24ee5c6 + cambios
+$ pytest tests/unit/precios/test_renovacion.py -v
+============================= test session starts =============================
+collecting ... collected 4 items
+
+tests/unit/precios/test_renovacion.py::test_sin_confirmaciones_la_referencia_es_la_observacion PASSED [ 25%]
+tests/unit/precios/test_renovacion.py::test_la_confirmacion_mas_reciente_renueva_la_referencia PASSED [ 50%]
+tests/unit/precios/test_renovacion.py::test_una_confirmacion_anterior_a_la_observacion_no_la_retrasa PASSED [ 75%]
+tests/unit/precios/test_renovacion.py::test_un_precio_vencido_vuelve_a_ser_vigente_si_alguien_lo_confirma PASSED [100%]
+
+============================== 4 passed in 0.17s ==============================
