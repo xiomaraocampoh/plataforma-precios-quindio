@@ -57,6 +57,11 @@ WSGI_APPLICATION = "config.wsgi.application"
 AUTH_USER_MODEL = "cuentas.Usuario"
 LOGIN_URL = "cuentas:ingresar"
 LOGIN_REDIRECT_URL = "comparacion:inicio"
+
+# RF-02: recuperación de contraseña por correo. En desarrollo el correo se imprime en consola.
+EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="AhorraPues <no-responder@localhost>")
+PASSWORD_RESET_TIMEOUT = env.int("PASSWORD_RESET_TIMEOUT", default=60 * 60)  # 1 hora
 LOGOUT_REDIRECT_URL = "comparacion:inicio"
 
 TEMPLATES = [

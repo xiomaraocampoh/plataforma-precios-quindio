@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block titulo %}Contraseña actualizada · AhorraPues{% endblock %}
+{% block contenido %}
+<div class="auth bento">
+  <section class="tile tile-6" aria-labelledby="t-listo" role="status">
+    <span class="icono-caja" aria-hidden="true"><svg class="ico"><use href="#i-check"/></svg></span>
+    <h1 id="t-listo">Tu contraseña quedó actualizada</h1>
+    <p><a class="btn" href="{% url 'cuentas:ingresar' %}">Ingresar</a></p>
+  </section>
+</div>
+{% endblock %}

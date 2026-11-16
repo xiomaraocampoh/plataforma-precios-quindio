@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block titulo %}Suprimir cuenta · AhorraPues{% endblock %}
+{% block contenido %}
+<div class="auth bento">
+  <section class="tile tile-3" aria-labelledby="t-suprimir">
+    <h1 id="t-suprimir">Suprimir mi cuenta</h1>
+    <p class="suave">Al confirmar:</p>
+    <ul class="lista-simple">
+      <li>Borramos tu nombre de usuario, tu correo y tu contraseña, y cerramos tu sesión.</li>
+      <li>Tus precios, confirmaciones y denuncias se conservan <strong>anonimizados</strong>: nadie podrá saber que fueron tuyos.</li>
+      <li>No se puede deshacer. Si vuelves, crearás una cuenta nueva.</li>
+    </ul>
+    <form method="post" novalidate hx-disabled-elt="find button">
+      {% csrf_token %}
+      {% include "partials/_errores_generales.html" %}
+      {% include "partials/_campo.html" with campo=form.password %}
+      {% include "partials/_campo.html" with campo=form.confirmo %}
+      <button class="btn btn-bloque btn-peligro" type="submit">Suprimir mi cuenta</button>
+    </form>
+    <p class="enlace-pie"><a href="{% url 'cuentas:mis_datos' %}">Cancelar y volver a Mis datos</a></p>
+  </section>
+</div>
+{% endblock %}

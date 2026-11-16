@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block titulo %}Nueva contraseña · AhorraPues{% endblock %}
+{% block contenido %}
+<div class="auth bento">
+  <section class="tile tile-3" aria-labelledby="t-restablecer">
+    {% if validlink %}
+    <h1 id="t-restablecer">Crea una contraseña nueva</h1>
+    <form method="post" novalidate hx-disabled-elt="find button">
+      {% csrf_token %}
+      {% include "partials/_errores_generales.html" %}
+      {% include "partials/_campo.html" with campo=form.new_password1 %}
+      {% include "partials/_campo.html" with campo=form.new_password2 %}
+      <button class="btn btn-bloque" type="submit">Guardar contraseña</button>
+    </form>
+    {% else %}
+    <h1 id="t-restablecer">El enlace ya no es válido</h1>
+    <p class="suave" role="alert">El enlace se usó antes o venció. Pide uno nuevo.</p>
+    <p><a class="btn" href="{% url 'cuentas:recuperar' %}">Pedir otro enlace</a></p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

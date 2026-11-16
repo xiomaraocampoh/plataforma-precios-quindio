@@ -14,6 +14,8 @@ class Usuario(AbstractUser):
     # Ley 1581 de 2012: autorización expresa del titular
     acepto_tratamiento_datos = models.BooleanField(default=False)
     fecha_aceptacion_datos = models.DateTimeField(null=True, blank=True)
+    # RF-03: fecha en que el titular suprimió su cuenta (los aportes quedan anonimizados)
+    suprimido_en = models.DateTimeField(null=True, blank=True)
 
     def __str__(self) -> str:
         return self.username

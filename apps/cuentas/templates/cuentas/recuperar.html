@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block titulo %}Recuperar contraseña · AhorraPues{% endblock %}
+{% block contenido %}
+<div class="auth bento">
+  <section class="tile tile-3" aria-labelledby="t-recuperar">
+    <h1 id="t-recuperar">Recuperar contraseña</h1>
+    <p class="suave">Escribe el correo de tu cuenta. Si existe, te enviaremos un enlace de un solo uso que vence en una hora.</p>
+    <form method="post" novalidate hx-disabled-elt="find button">
+      {% csrf_token %}
+      {% include "partials/_errores_generales.html" %}
+      {% include "partials/_campo.html" with campo=form.email %}
+      <button class="btn btn-bloque" type="submit">Enviar enlace</button>
+    </form>
+    <p class="enlace-pie"><a href="{% url 'cuentas:ingresar' %}">Volver a ingresar</a></p>
+  </section>
+  <aside class="tile tile-3 tile-oscuro" aria-label="Sobre la recuperación" style="justify-content:center">
+    <span class="icono-caja" aria-hidden="true"><svg class="ico"><use href="#i-shield"/></svg></span>
+    <h2 style="font-size:1.3rem">¿Te registraste sin correo?</h2>
+    <p class="suave">El correo es opcional. Si no lo registraste, no podemos enviarte el enlace; puedes crear una cuenta nueva.</p>
+  </aside>
+</div>
+{% endblock %}

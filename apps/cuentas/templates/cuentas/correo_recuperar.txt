@@ -1,0 +1,9 @@
+{% autoescape off %}Hola, {{ user.get_username }}:
+
+Recibimos una solicitud para cambiar la contraseña de tu cuenta en AhorraPues.
+Abre este enlace para crear una nueva (sirve una sola vez y vence en una hora):
+
+{{ protocol }}://{{ domain }}{% url 'cuentas:restablecer' uidb64=uid token=token %}
+
+Si no pediste el cambio, ignora este mensaje: tu contraseña sigue igual.
+{% endautoescape %}

@@ -19,6 +19,7 @@
       </div>
       <button class="btn btn-bloque" type="submit">Ingresar</button>
     </form>
+    <p class="enlace-pie"><a href="{% url 'cuentas:recuperar' %}">¿Olvidaste tu contraseña?</a></p>
     <p class="enlace-pie">¿No tienes cuenta? <a href="{% url 'cuentas:registro' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Crear cuenta</a></p>
   </section>
 

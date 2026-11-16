@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block titulo %}Mis datos · AhorraPues{% endblock %}
+{% block contenido %}
+<div class="auth bento">
+  <section class="tile tile-3" aria-labelledby="t-datos">
+    <h1 id="t-datos">Mis datos</h1>
+    <p class="suave">Estos son los datos personales que guardamos de ti. Ninguno se muestra en tus reportes.</p>
+    <form method="post" novalidate hx-disabled-elt="find button">
+      {% csrf_token %}
+      {% include "partials/_errores_generales.html" %}
+      {% include "partials/_campo.html" with campo=form.username %}
+      {% include "partials/_campo.html" with campo=form.email %}
+      <button class="btn btn-bloque" type="submit">Guardar cambios</button>
+    </form>
+  </section>
+  <aside class="tile tile-3" aria-labelledby="t-resumen">
+    <h2 id="t-resumen">Tu cuenta</h2>
+    <dl class="datos">
+      <div><dt>Cuenta creada</dt><dd>{{ user.date_joined|date:"j \d\e F \d\e Y" }}</dd></div>
+      <div><dt>Autorización de datos (Ley 1581)</dt><dd>{% if user.acepto_tratamiento_datos %}Otorgada el {{ user.fecha_aceptacion_datos|date:"j \d\e F \d\e Y" }}{% else %}No registrada{% endif %}</dd></div>
+      <div><dt>Precios aportados</dt><dd><a href="{% url 'precios:mis_aportes' %}">{{ aportes }} precio{{ aportes|pluralize }}</a></dd></div>
+    </dl>
+    <h2>Suprimir la cuenta</h2>
+    <p class="suave">Puedes pedir que borremos tus datos personales. Tus precios seguirán ayudando a otros, sin tu identidad.</p>
+    <p><a class="btn btn-sec" href="{% url 'cuentas:suprimir' %}">Suprimir mi cuenta</a></p>
+  </aside>
+</div>
+{% endblock %}

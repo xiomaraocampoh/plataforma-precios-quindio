@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block titulo %}Revisa tu correo · AhorraPues{% endblock %}
+{% block contenido %}
+<div class="auth bento">
+  <section class="tile tile-6" aria-labelledby="t-enviado" role="status">
+    <span class="icono-caja" aria-hidden="true"><svg class="ico"><use href="#i-check"/></svg></span>
+    <h1 id="t-enviado">Revisa tu correo</h1>
+    <p class="suave">Si el correo corresponde a una cuenta, en unos minutos recibirás un enlace para crear una contraseña nueva. El enlace sirve una sola vez y vence en una hora.</p>
+    <p><a class="btn btn-sec" href="{% url 'cuentas:ingresar' %}">Volver a ingresar</a></p>
+  </section>
+</div>
+{% endblock %}

@@ -1,6 +1,9 @@
 """Casos de uso de cuentas (escritura)."""
 
+import uuid
+
 from django.contrib.auth.models import Group, Permission
+from django.db import transaction
 from django.utils import timezone
 
 from .models import Usuario
@@ -67,3 +70,34 @@ def asegurar_moderador(*, username: str, password: str) -> tuple[Usuario, bool]:
         )
     usuario.groups.add(asegurar_grupo_moderadores())
     return usuario, creado
+
+
+def actualizar_datos(*, usuario: Usuario, username: str, email: str) -> Usuario:
+    """RF-03: el titular actualiza sus datos (Ley 1581, derecho de rectificación)."""
+    usuario.username = username
+    usuario.email = email
+    usuario.save(update_fields=["username", "email"])
+    return usuario
+
+
+@transaction.atomic
+def suprimir_cuenta(*, usuario: Usuario) -> Usuario:
+    """RF-03: supresión de la cuenta (Ley 1581). Los aportes se conservan anonimizados.
+
+    Los reportes, confirmaciones y denuncias siguen apuntando al mismo registro, pero este ya no
+    contiene datos personales: alias aleatorio, sin correo ni nombre, sin contraseña utilizable e
+    inactivo. Así la comparación no pierde precios y nadie puede volver a identificar al autor.
+    """
+    usuario.username = f"anonimo-{uuid.uuid4().hex[:12]}"
+    usuario.email = ""
+    usuario.first_name = ""
+    usuario.last_name = ""
+    usuario.is_active = False
+    usuario.is_staff = False
+    usuario.acepto_tratamiento_datos = False
+    usuario.fecha_aceptacion_datos = None
+    usuario.suprimido_en = timezone.now()
+    usuario.set_unusable_password()
+    usuario.save()
+    usuario.groups.clear()
+    return usuario
