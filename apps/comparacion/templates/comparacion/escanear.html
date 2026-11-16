@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block titulo %}Buscar por código de barras · AhorraPues{% endblock %}
+{% block contenido %}
+<div class="auth bento">
+  <section class="tile tile-4" aria-labelledby="t-escanear" aria-live="polite">
+    <p class="etiqueta">Código de barras</p>
+    {% if not codigo %}
+      <h1 id="t-escanear">No pudimos leer ningún código</h1>
+      <p class="suave">Acerca el código de barras a la cámara con buena luz, o escribe el nombre del producto.</p>
+    {% elif not valido %}
+      <h1 id="t-escanear">Ese número no parece un código de barras válido</h1>
+      <p class="suave">Leímos <strong>{{ codigo }}</strong>, pero no cumple el formato (8, 12, 13 o 14 dígitos con dígito de control). Vuelve a escanearlo o escríbelo con cuidado.</p>
+    {% else %}
+      <h1 id="t-escanear">Aún no tenemos ese producto</h1>
+      <p class="suave">El código <strong>{{ codigo }}</strong> no está en el catálogo. Puedes pedir que lo agreguemos y, mientras tanto, buscarlo por nombre.</p>
+      <p><a class="btn" href="{% url 'catalogo:solicitar' %}?codigo_barras={{ codigo|urlencode }}">Solicitar este producto</a></p>
+    {% endif %}
+    <p><a class="btn btn-sec" href="{% url 'comparacion:inicio' %}">Volver a buscar</a></p>
+  </section>
+</div>
+{% endblock %}

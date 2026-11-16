@@ -15,6 +15,16 @@ def es_codigo_de_barras(texto: str) -> bool:
     return bool(_CODIGO_DE_BARRAS.match(texto.strip()))
 
 
+def productos_por_codigo(codigo: str):
+    """RF-04: productos con una presentación de ese código de barras exacto (sin repetir)."""
+    return (
+        Producto.objects.filter(presentaciones__codigo_barras=codigo)
+        .select_related("categoria")
+        .distinct()
+        .order_by("nombre", "marca")
+    )
+
+
 def buscar_productos(texto: str, limite: int = 10):
     """RF-04: por nombre sin distinguir tildes ni mayúsculas, o por código de barras exacto."""
     texto = (texto or "").strip()

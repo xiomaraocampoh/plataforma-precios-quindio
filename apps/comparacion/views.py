@@ -3,10 +3,12 @@
 from urllib.parse import urlencode
 
 from django.core.paginator import Paginator
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_GET
 
 from apps.catalogo import selectors as catalogo
+from apps.catalogo.domain.codigo_barras import es_gtin_valido, normalizar_codigo
 from apps.catalogo.models import Producto
 from apps.integraciones.selectors import referencia_sipsa
 
@@ -34,6 +36,23 @@ def inicio(request):
         "ejemplo": ejemplo_comparacion(destacados[0].pk) if destacados else [],
     }
     return render(request, "comparacion/buscar.html", contexto)
+
+
+@require_GET
+def escanear(request):
+    """RF-04: un código leído con la cámara (o escrito) lleva a la comparación del producto.
+
+    La imagen nunca llega al servidor: el navegador la decodifica y solo envía los dígitos.
+    """
+    codigo = normalizar_codigo(request.GET.get("codigo", ""))
+    valido = es_gtin_valido(codigo)
+    if valido:
+        encontrados = list(catalogo.productos_por_codigo(codigo)[:2])
+        if len(encontrados) == 1:
+            return redirect("comparacion:comparar", producto_id=encontrados[0].pk)
+        if encontrados:  # el mismo código en varios productos: que la persona elija
+            return redirect(f"{reverse('comparacion:productos')}?{urlencode({'q': codigo})}")
+    return render(request, "comparacion/escanear.html", {"codigo": codigo, "valido": valido})
 
 
 @require_GET

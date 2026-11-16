@@ -6,13 +6,15 @@ from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_http_methods
 
 from . import selectors, services
+from .domain.codigo_barras import normalizar_codigo
 from .forms import SolicitudForm
 
 
 @login_required
 @require_http_methods(["GET", "POST"])
 def solicitar(request):
-    form = SolicitudForm(request.POST or None)
+    inicial = {"codigo_barras": normalizar_codigo(request.GET.get("codigo_barras", ""))[:14]}
+    form = SolicitudForm(request.POST or None, initial=inicial)
     if request.method == "POST" and form.is_valid():
         d = form.cleaned_data
         services.solicitar_producto(
