@@ -52,6 +52,10 @@ def coincide(codigo: str, hash_guardado: str, *, clave: str) -> bool:
     return hmac.compare_digest(hash_codigo(codigo, clave=clave), hash_guardado)
 
 
+def esta_bloqueado(estado: EstadoIntentos, ahora: datetime) -> bool:
+    return estado.bloqueado_hasta is not None and ahora < estado.bloqueado_hasta
+
+
 def evaluar(
     *,
     es_correcto: Callable[[], bool],
@@ -60,7 +64,7 @@ def evaluar(
     vence_en: datetime | None,
 ) -> tuple[Resultado, EstadoIntentos]:
     """Aplica la política de intentos. `es_correcto` no se llama si la cuenta está bloqueada."""
-    if estado.bloqueado_hasta and ahora < estado.bloqueado_hasta:
+    if esta_bloqueado(estado, ahora):
         return Resultado.BLOQUEADO, estado
     if vence_en is not None and ahora > vence_en:
         return Resultado.VENCIDO, estado

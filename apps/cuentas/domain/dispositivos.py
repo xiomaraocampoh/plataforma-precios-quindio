@@ -39,10 +39,15 @@ _SISTEMAS = (
 )
 
 
+def _primero_que_aparece(marcas: tuple[tuple[str, str], ...], texto: str) -> str:
+    """El orden importa: el user-agent de Chrome también dice «Safari» y el de iPhone «Mac OS X»."""
+    return next((nombre for marca, nombre in marcas if marca in texto), "")
+
+
 def describir_navegador(user_agent: str) -> str:
     """«Chrome en Windows»: ayuda a reconocer el ingreso en el correo, sin datos personales."""
-    navegador = next((n for marca, n in _NAVEGADORES if marca in user_agent), "")
-    sistema = next((s for marca, s in _SISTEMAS if marca in user_agent), "")
+    navegador = _primero_que_aparece(_NAVEGADORES, user_agent)
+    sistema = _primero_que_aparece(_SISTEMAS, user_agent)
     if not navegador and not sistema:
         return "Navegador desconocido"
     return f"{navegador or 'Navegador'} en {sistema or 'un sistema desconocido'}"
