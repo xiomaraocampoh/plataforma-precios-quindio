@@ -26,7 +26,7 @@ Se ofrece, **de forma opcional y apagada por defecto**, la búsqueda por foto co
    nuestros servidores. La pantalla lo avisa antes de usarla.
 5. **Costo y abuso.** **No exige cuenta** (decisión del equipo, 2026-11-16: menos fricción, EC-01).
    Para acotar el gasto: tope por persona y hora (`RECONOCIMIENTOS_POR_HORA`=20 con cuenta,
-   `RECONOCIMIENTOS_ANONIMO_POR_HORA`=5 sin cuenta, identificada por una huella de la dirección IP,
+   `RECONOCIMIENTOS_ANONIMO_POR_HORA`=10 sin cuenta, identificada por una huella de la dirección IP,
    nunca la IP en claro) y un tope diario total (`RECONOCIMIENTOS_POR_DIA_TOTAL`=300). Limitación
    conocida: detrás de un proxy sin configurar, los visitantes comparten la misma dirección y por tanto
    el mismo tope. Sin `ANTHROPIC_API_KEY` la función no aparece. La clave vive solo en variables de
