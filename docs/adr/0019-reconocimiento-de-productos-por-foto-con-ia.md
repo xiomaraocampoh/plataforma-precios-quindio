@@ -23,9 +23,13 @@ Se ofrece, **de forma opcional y apagada por defecto**, la búsqueda por foto co
    reintento y toda falla se traduce a «no disponible»; la plataforma sigue por nombre o código.
 4. **Privacidad.** La foto se reduce a 1024 px y se recodifica en el navegador (se pierden los metadatos
    EXIF, incluida la ubicación), se envía a Anthropic solo para esta consulta y **no se guarda** en
-   nuestros servidores. La pantalla lo avisa antes de usarla. Se exige cuenta (no es anónimo).
-5. **Costo y abuso.** Requiere sesión y tiene un tope por usuario y hora (`RECONOCIMIENTOS_POR_HORA`,
-   20 por defecto). Sin `ANTHROPIC_API_KEY` la función no aparece. La clave vive solo en variables de
+   nuestros servidores. La pantalla lo avisa antes de usarla.
+5. **Costo y abuso.** **No exige cuenta** (decisión del equipo, 2026-11-16: menos fricción, EC-01).
+   Para acotar el gasto: tope por persona y hora (`RECONOCIMIENTOS_POR_HORA`=20 con cuenta,
+   `RECONOCIMIENTOS_ANONIMO_POR_HORA`=5 sin cuenta, identificada por una huella de la dirección IP,
+   nunca la IP en claro) y un tope diario total (`RECONOCIMIENTOS_POR_DIA_TOTAL`=300). Limitación
+   conocida: detrás de un proxy sin configurar, los visitantes comparten la misma dirección y por tanto
+   el mismo tope. Sin `ANTHROPIC_API_KEY` la función no aparece. La clave vive solo en variables de
    entorno.
 6. **Modelo configurable** (`RECONOCIMIENTO_MODELO`, por defecto `claude-opus-5-5`; una opción más
    económica es `claude-haiku-5-5`, a decidir con una prueba de precisión y costo).

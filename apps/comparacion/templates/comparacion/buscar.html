@@ -3,7 +3,7 @@
 {% block titulo %}AhorraPues · Compara precios en Armenia y el Quindío{% endblock %}
 {% block head %}<link rel="preload" as="image" href="{% static 'img/hero-supermercado.webp' %}" media="(min-width: 900px)" fetchpriority="high">
 <script src="{% static 'js/hero.js' %}?v=3" defer></script>
-<script src="{% static 'js/escanear.js' %}?v=8" defer></script>{% endblock %}
+<script src="{% static 'js/escanear.js' %}?v=9" defer></script>{% endblock %}
 {% block hero %}
 <div class="hero-fondo">
 <div class="hero-contenedor">
@@ -31,7 +31,7 @@
   </div>
   <dialog id="escaner" class="escaner" aria-label="Escanear un producto"
           data-login="{% url 'cuentas:ingresar' %}?next=/"
-          {% if foto_activa %}data-foto-url="{% url 'comparacion:buscar_por_foto' %}"{% if user.is_authenticated %} data-sesion{% endif %}{% endif %}>
+          {% if foto_activa %}data-foto-url="{% url 'comparacion:buscar_por_foto' %}"{% endif %}>
     <header class="esc-barra">
       <button type="button" class="esc-icono" data-cerrar aria-label="Cerrar el escáner"><svg class="ico" aria-hidden="true"><use href="#i-x"/></svg></button>
       <h2>Escanear</h2>
@@ -42,7 +42,7 @@
       <video playsinline muted aria-label="Vista de la cámara"></video>
       <div class="esc-vacio" data-vacio hidden>
         <svg class="ico" aria-hidden="true"><use href="#i-camara"/></svg>
-        <p>La cámara en vivo no está disponible aquí.<br>Usa el botón de abajo para tomar una foto o elegir una imagen.</p>
+        <p></p>
       </div>
       <div class="esc-marco" aria-hidden="true"><i></i><i></i><i></i><i></i><b class="esc-linea"></b></div>
       <p class="esc-guia" data-estado role="status" aria-live="polite"></p>
