@@ -20,11 +20,13 @@ class FiltroUbicacion:
         return bool(normalizar_nombre(self.municipio) or normalizar_nombre(self.barrio))
 
     def admite(self, municipio: str, barrio: str) -> bool:
-        for buscado, valor in ((self.municipio, municipio), (self.barrio, barrio)):
-            buscado = normalizar_nombre(buscado)
-            if buscado and buscado != normalizar_nombre(valor):
-                return False
-        return True
+        return _coincide(self.municipio, municipio) and _coincide(self.barrio, barrio)
+
+
+def _coincide(buscado: str, valor: str) -> bool:
+    """Un criterio vacío admite cualquier valor; si no, compara las formas normalizadas."""
+    criterio = normalizar_nombre(buscado)
+    return not criterio or criterio == normalizar_nombre(valor)
 
 
 def filtrar[T](

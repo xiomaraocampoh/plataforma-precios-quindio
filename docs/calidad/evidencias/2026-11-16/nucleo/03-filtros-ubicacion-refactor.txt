@@ -1,0 +1,14 @@
+# TDD · 03-filtros-ubicacion · REFACTOR
+# 2026-11-16 11:41:47 -0500 · feat/nucleo-completo @ 5a6bb36 + cambios
+$ pytest tests/unit/comparacion/test_filtros.py -v
+============================= test session starts =============================
+collecting ... collected 6 items
+
+tests/unit/comparacion/test_filtros.py::test_sin_filtro_devuelve_todo_en_el_mismo_orden PASSED [ 16%]
+tests/unit/comparacion/test_filtros.py::test_filtra_por_municipio_y_conserva_el_orden_neutral PASSED [ 33%]
+tests/unit/comparacion/test_filtros.py::test_filtra_por_municipio_y_barrio PASSED [ 50%]
+tests/unit/comparacion/test_filtros.py::test_ignora_mayusculas_tildes_y_espacios PASSED [ 66%]
+tests/unit/comparacion/test_filtros.py::test_el_resultado_es_siempre_una_subsecuencia_de_la_entrada PASSED [ 83%]
+tests/unit/comparacion/test_filtros.py::test_filtro_activo PASSED        [100%]
+
+============================== 6 passed in 0.17s ==============================
