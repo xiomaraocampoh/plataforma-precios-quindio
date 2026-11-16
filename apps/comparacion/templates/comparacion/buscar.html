@@ -2,7 +2,7 @@
 {% load static %}
 {% block titulo %}AhorraPues · Compara precios en Armenia y el Quindío{% endblock %}
 {% block head %}<link rel="preload" as="image" href="{% static 'img/hero-supermercado.webp' %}" media="(min-width: 900px)" fetchpriority="high">
-<script src="{% static 'js/hero.js' %}?v=3" defer></script>{% endblock %}
+<script src="{% static 'js/hero.js' %}?v=4" defer></script>{% endblock %}
 {% block hero %}
 <div class="hero-fondo">
 <div class="hero-contenedor">
@@ -37,6 +37,8 @@
       <a class="btn btn-grande" href="{% url 'cuentas:registro' %}">Crear cuenta gratis</a>
     {% endif %}
     <a class="enlace-flecha" href="#como-funciona">Cómo funciona</a>
+    {# WCAG 2.2.2: la rotación del titular se puede detener; hero.js lo muestra solo si anima #}
+    <button type="button" class="btn-texto" id="pausar-rotacion" hidden>Pausar animación</button>
   </div>
 </section>
 

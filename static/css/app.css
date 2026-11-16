@@ -76,6 +76,7 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 p a:not(.btn), .enlace-pie a { text-decoration: underline; text-underline-offset: 3px; }
 :focus-visible { outline: 3px solid var(--marca); outline-offset: 3px; border-radius: 8px; }
 
+[hidden] { display: none !important; }  /* que .btn (inline-flex) no muestre controles ocultos */
 .saltar { position: absolute; left: -9999px; }
 .saltar:focus { left: 1rem; top: 1rem; z-index: 50; background: var(--superficie); padding: .6rem 1rem; border-radius: var(--radio-sm); }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
@@ -163,6 +164,8 @@ input[type=checkbox] { width: 24px; height: 24px; accent-color: var(--marca); fl
 .btn-claro:hover { background: #e8e8ed; color: #1d1d1f; border-color: #e8e8ed; }
 .btn-grande { min-height: 52px; padding: 0 1.9rem; font-size: 1.0625rem; }
 .btn-bloque { width: 100%; min-height: 50px; }
+.btn-texto { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; border: 0; background: none; color: var(--texto-suave); font-size: .9rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.btn-texto:hover { color: var(--texto); }
 .enlace-flecha { font-weight: 500; }
 .enlace-flecha::after { content: " ›"; }
 
