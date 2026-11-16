@@ -40,6 +40,7 @@ addopts = "-ra --strict-markers"
 markers = [
   "unit: reglas de dominio puras, sin base de datos",
   "integration: requiere base de datos / API",
+  "e2e: navegador real con Playwright (python -m playwright install chromium)",
 ]
 
 # ── Cobertura (M-19) ──────────────────────────────────

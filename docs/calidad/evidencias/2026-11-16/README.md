@@ -16,6 +16,9 @@ PostgreSQL 16.
 | `08-cobertura-dominio.txt` | Cobertura de `apps/*/domain` por módulo |
 | `09-complejidad.txt` | Complejidad ciclomática (McCabe) de las funciones más complejas |
 | `sonarqube.md` | SonarQube: no ejecutado (sin Docker) y qué falta |
+| `10-m22-e2e-rojo.txt` | Rama `feat/registro-sin-conexion`: prueba de navegador en rojo (aún sin `cola-registros.js`) |
+| `10-m22-e2e-verde.txt` | La misma prueba en verde (Playwright 1.65, Chromium) |
+| `10-m22-resultado.json` | **M-22** con 10 registros simulados (5 con la respuesta perdida y 5 sin señal): 10/10 sincronizados = 100 %, 0 duplicados. Umbral aceptable ≥ 98 % |
 
 | Indicador | Inicial | Final |
 |---|---|---|

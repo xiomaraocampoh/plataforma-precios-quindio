@@ -65,7 +65,7 @@ repositorio dicen cosas distintas.
 | Iteración | Pendiente en el repositorio |
 |---|---|
 | **I0 Esqueleto** | ✅ Esta rama. Queda pendiente decidir el proveedor de nube (ADR-014) y el primer despliegue. |
-| **I1 Registro** | Cola sin conexión `static/js/cola-registros.js` (ADR-009, M-22; hay un TODO en `_formulario.html`), comando de carga del catálogo semilla y de los establecimientos piloto, y endpoints `catalogo/` y `establecimientos/` (RF-01, RF-02, RF-05). |
+| **I1 Registro** | ✅ Cola sin conexión `static/js/cola-registros.js` (ADR-009, M-22). Pendiente: comando de carga del catálogo semilla y de los establecimientos piloto, y endpoints `catalogo/` y `establecimientos/` (RF-01, RF-02, RF-05). |
 | **I2 Comparación** | Filtro por municipio y barrio (RF-11 del Consolidado; RF-19 de la Especificación), ETag y `Cache-Control: max-age=30`, criterio de orden según D-2, arreglos `referencias` y `promociones` según D-3, y la primera medición con k6 sobre el esqueleto. |
 | **I3 Confiabilidad** | Niveles de confianza según D-5 y advertencia en los resultados de confianza «baja», denuncias por API, bandeja de moderación con servicio de aprobar o rechazar, entidad de **Auditoría** (solo inserción, M-14) y conjunto sembrado para M-11 y M-12. |
 | **I4 Cierre** | Registro de cuentas con autorización de datos y recuperación de contraseña (RF-17, RF-18), adaptador SIPSA real, detección de duplicados (RF-04, D-05), revisión WCAG 2.2 AA, SonarQube y la prueba de carga completa. |
