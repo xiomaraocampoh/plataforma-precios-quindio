@@ -41,7 +41,9 @@ def test_registro_de_precio_por_htmx_asocia_errores_a_sus_campos(client, reporta
 
 def test_ingreso_con_campos_vacios_muestra_un_error_por_campo(client):
     # M-03 · 3.3.1: antes la página se recargaba sin ningún mensaje
-    html = client.post(reverse("cuentas:ingresar"), {"username": "", "password": ""}).content.decode()
+    html = client.post(
+        reverse("cuentas:ingresar"), {"username": "", "password": ""}
+    ).content.decode()
     assert html.count('aria-invalid="true"') == 2
     assert 'id="id_username_error"' in html
     assert 'id="id_password_error"' in html
