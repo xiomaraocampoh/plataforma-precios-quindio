@@ -85,7 +85,10 @@ class ProductoForm(forms.ModelForm):
 
 
 class PresentacionForm(forms.ModelForm):
-    unidad = forms.ChoiceField(label="Unidad", choices=[(u.value, u.value) for u in Unidad])
+    # Opción vacía: así la fila libre no cuenta como modificada si nadie la llena
+    unidad = forms.ChoiceField(
+        label="Unidad", choices=[("", "Elige")] + [(u.value, u.value) for u in Unidad]
+    )
 
     class Meta:
         model = Presentacion
@@ -95,6 +98,11 @@ class PresentacionForm(forms.ModelForm):
             "cantidad": forms.NumberInput(attrs={"inputmode": "decimal", "step": "any"}),
             "codigo_barras": forms.TextInput(attrs={"inputmode": "numeric", "autocomplete": "off"}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:  # 500, no 500.000: en es-CO «1.000» se lee como mil
+            self.initial["cantidad"] = format(self.instance.cantidad.normalize(), "f")
 
     def clean_cantidad(self):
         cantidad = self.cleaned_data["cantidad"]

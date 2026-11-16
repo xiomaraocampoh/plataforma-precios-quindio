@@ -11,7 +11,7 @@
         <td>{{ u.get_rol_display }}</td>
         <td>{% if u.suprimido_en %}<span class="chip chip-alerta">Suprimida por su titular</span>{% else %}{% include "administracion/partials/_estado.html" with activo=u.is_active si="Activa" no="Suspendida" %}{% endif %}</td>
         <td><div class="acciones-fila">
-          <a class="btn btn-sec btn-pequeno" href="{% url 'panel:usuario' u.pk %}">{% if puede_gestionar and u.pk != user.pk %}Cambiar rol{% else %}Ver{% endif %}<span class="sr-only"> {{ u.username }}</span></a>
+          <a class="btn btn-sec btn-pequeno" href="{% url 'panel:usuario' u.pk %}">{% if puede_gestionar and u.pk != user.pk and not u.is_superuser or puede_gestionar and u.pk != user.pk and user.is_superuser %}Cambiar rol{% else %}Ver{% endif %}<span class="sr-only"> {{ u.username }}</span></a>
           {% if puede_gestionar and u.pk != user.pk and not u.suprimido_en %}{% if not u.is_superuser or user.is_superuser %}
           <a class="btn btn-sec btn-pequeno" href="{% url 'panel:usuario_estado' u.pk %}">{% if u.is_active %}Suspender{% else %}Reactivar{% endif %}<span class="sr-only"> {{ u.username }}</span></a>
           {% endif %}{% endif %}
