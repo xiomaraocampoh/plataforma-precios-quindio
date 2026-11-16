@@ -111,7 +111,12 @@
     decir("Leyendo la foto…");
     var url = URL.createObjectURL(archivo);
     var fin = function () { URL.revokeObjectURL(url); };
-    var noLeido = function () { decir("No encontramos un código en la foto. Acércate, mejora la luz o escríbelo abajo."); };
+    var pideSesion = !fotoIA && dialogo.querySelector(".escaner-foto");
+    var noLeido = function () {
+      decir(pideSesion
+        ? "No encontramos un código de barras en la imagen. Para identificar el producto por foto con IA, ingresa a tu cuenta."
+        : "No encontramos un código en la foto. Acércate, mejora la luz o escríbelo abajo.");
+    };
     if ("BarcodeDetector" in window) {
       var d = new window.BarcodeDetector({ formats: formatos });
       createImageBitmap(archivo).then(function (b) { return d.detect(b); }).then(function (r) {
@@ -167,7 +172,9 @@
     return archivos.filter(function (a) { return /^image\//.test(a.type); })[0] || null;
   }
   function procesarImagen(archivo) {
-    if (!dialogo.open) { dialogo.showModal(); iniciarCamara(); }
+    if (!dialogo.open) dialogo.showModal(); // sin cámara: la imagen ya está aquí
+    detener();
+    video.hidden = true;
     if (fotoIA) enviarFotoIA(archivo); else leerFoto(archivo);
   }
   document.addEventListener("paste", function (e) {
