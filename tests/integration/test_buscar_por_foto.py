@@ -35,6 +35,8 @@ def _limpio(settings):
         **settings.INTEGRACIONES,
         "ANTHROPIC_API_KEY": "clave-de-prueba",
         "RECONOCIMIENTOS_POR_HORA": 2,
+        "RECONOCIMIENTOS_ANONIMO_POR_HORA": 1,
+        "RECONOCIMIENTOS_POR_DIA_TOTAL": 4,
     }
     yield
     cache.clear()
@@ -77,6 +79,10 @@ def test_servicio_devuelve_la_pista(usuario, falso):
     assert services.reconocer_producto(usuario=usuario, imagen=JPEG) == PISTA
 
 
+def test_servicio_acepta_visitante_con_su_direccion(falso):
+    assert services.reconocer_producto(usuario=None, ip="198.51.100.4", imagen=JPEG) == PISTA
+
+
 def test_servicio_rechaza_archivos_que_no_son_imagen_sin_llamar_a_la_ia(usuario, falso):
     with pytest.raises(ImagenInvalidaError):
         services.reconocer_producto(usuario=usuario, imagen=b"%PDF-1.7")
@@ -99,10 +105,41 @@ def test_el_limite_es_por_usuario(usuario, falso, django_user_model):
 
 
 # --- vista ------------------------------------------------------------------------------------
-def test_exige_sesion(client, falso):
+def test_sin_cuenta_tambien_se_puede_buscar_por_foto(client, cafe, falso):
     r = _subir(client)
-    assert r.status_code == 302 and "ingresar" in r.url
-    assert falso.llamadas == 0
+    assert r.status_code == 200 and falso.llamadas == 1
+
+
+def test_sin_cuenta_el_tope_por_hora_es_menor(client, falso):
+    _subir(client)
+    assert _subir(client).status_code == 429
+    assert falso.llamadas == 1
+
+
+def test_el_tope_sin_cuenta_es_por_direccion_no_global(client, falso):
+    _subir(client)
+    from django.core.files.uploadedfile import SimpleUploadedFile
+
+    r = client.post(
+        reverse("comparacion:buscar_por_foto"),
+        {"foto": SimpleUploadedFile("f.jpg", JPEG)},
+        REMOTE_ADDR="203.0.113.9",
+    )
+    assert r.status_code == 200
+
+
+def test_hay_un_tope_diario_total_para_cuidar_el_saldo(client, usuario, falso, django_user_model):
+    for n in range(4):
+        otro = django_user_model.objects.create_user(username=f"x{n}", password="clave-segura-123")
+        services.reconocer_producto(usuario=otro, imagen=JPEG)
+    with pytest.raises(services.LimiteDeReconocimientosExcedidoError):
+        services.reconocer_producto(usuario=usuario, imagen=JPEG)
+
+
+def test_la_direccion_ip_no_se_guarda_en_claro(client, falso):
+    _subir(client)
+    claves = list(cache._cache.keys()) if hasattr(cache, "_cache") else []
+    assert not any("127.0.0.1" in str(k) for k in claves)
 
 
 def test_solo_acepta_post(client, usuario):
