@@ -1,0 +1,14 @@
+# TDD · 04-enlace-mapa · VERDE
+# 2026-11-16 11:42:13 -0500 · feat/nucleo-completo @ 8d8af10 + cambios
+$ pytest tests/unit/establecimientos/test_mapas.py -v
+============================= test session starts =============================
+collecting ... collected 6 items
+
+tests/unit/establecimientos/test_mapas.py::test_enlace_con_marcador_y_zoom_de_calle PASSED [ 16%]
+tests/unit/establecimientos/test_mapas.py::test_sin_coordenadas_no_hay_enlace PASSED [ 33%]
+tests/unit/establecimientos/test_mapas.py::test_coordenadas_fuera_de_rango_se_rechazan[latitud0-longitud0] PASSED [ 50%]
+tests/unit/establecimientos/test_mapas.py::test_coordenadas_fuera_de_rango_se_rechazan[latitud1-longitud1] PASSED [ 66%]
+tests/unit/establecimientos/test_mapas.py::test_coordenadas_fuera_de_rango_se_rechazan[latitud2-longitud2] PASSED [ 83%]
+tests/unit/establecimientos/test_mapas.py::test_el_zoom_es_parametrizable PASSED [100%]
+
+============================== 6 passed in 0.17s ==============================
