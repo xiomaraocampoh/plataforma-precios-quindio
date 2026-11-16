@@ -1,0 +1,102 @@
+{
+  "productos-claro": {
+    "url": "/productos/",
+    "violaciones": [],
+    "objetivos_menores_24px": []
+  },
+  "comparacion-filtros-claro": {
+    "url": "/productos/10/",
+    "violaciones": [],
+    "objetivos_menores_24px": []
+  },
+  "establecimientos-claro": {
+    "url": "/establecimientos/",
+    "violaciones": [],
+    "objetivos_menores_24px": []
+  },
+  "sugerir-establecimiento-claro": {
+    "url": "/establecimientos/sugerir/",
+    "violaciones": [],
+    "objetivos_menores_24px": []
+  },
+  "solicitar-producto-claro": {
+    "url": "/catalogo/solicitar/",
+    "violaciones": [],
+    "objetivos_menores_24px": []
+  },
+  "mis-aportes-claro": {
+    "url": "/precios/mis-aportes/",
+    "violaciones": [],
+    "objetivos_menores_24px": []
+  },
+  "mis-datos-claro": {
+    "url": "/cuentas/mis-datos/",
+    "violaciones": [],
+    "objetivos_menores_24px": []
+  },
+  "suprimir-cuenta-claro": {
+    "url": "/cuentas/mis-datos/suprimir/",
+    "violaciones": [],
+    "objetivos_menores_24px": []
+  },
+  "recuperar-contrasena-claro": {
+    "url": "/cuentas/contrasena/recuperar/",
+    "violaciones": [],
+    "objetivos_menores_24px": []
+  },
+  "bandeja-moderacion-claro": {
+    "url": "/moderacion/",
+    "violaciones": [],
+    "objetivos_menores_24px": []
+  },
+  "productos-oscuro": {
+    "url": "/productos/",
+    "violaciones": [],
+    "objetivos_menores_24px": []
+  },
+  "comparacion-filtros-oscuro": {
+    "url": "/productos/10/",
+    "violaciones": [],
+    "objetivos_menores_24px": []
+  },
+  "establecimientos-oscuro": {
+    "url": "/establecimientos/",
+    "violaciones": [],
+    "objetivos_menores_24px": []
+  },
+  "sugerir-establecimiento-oscuro": {
+    "url": "/establecimientos/sugerir/",
+    "violaciones": [],
+    "objetivos_menores_24px": []
+  },
+  "solicitar-producto-oscuro": {
+    "url": "/catalogo/solicitar/",
+    "violaciones": [],
+    "objetivos_menores_24px": []
+  },
+  "mis-aportes-oscuro": {
+    "url": "/precios/mis-aportes/",
+    "violaciones": [],
+    "objetivos_menores_24px": []
+  },
+  "mis-datos-oscuro": {
+    "url": "/cuentas/mis-datos/",
+    "violaciones": [],
+    "objetivos_menores_24px": []
+  },
+  "suprimir-cuenta-oscuro": {
+    "url": "/cuentas/mis-datos/suprimir/",
+    "violaciones": [],
+    "objetivos_menores_24px": []
+  },
+  "recuperar-contrasena-oscuro": {
+    "url": "/cuentas/contrasena/recuperar/",
+    "violaciones": [],
+    "objetivos_menores_24px": []
+  },
+  "bandeja-moderacion-oscuro": {
+    "url": "/moderacion/",
+    "violaciones": [],
+    "objetivos_menores_24px": []
+  }
+}

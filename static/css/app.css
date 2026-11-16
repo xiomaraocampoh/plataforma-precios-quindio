@@ -143,7 +143,7 @@ input[type=text], input[type=email], input[type=password], input[type=number], i
 }
 input:hover, select:hover { border-color: var(--texto-suave); }
 input:focus-visible, select:focus-visible { outline: 3px solid color-mix(in srgb, var(--marca) 40%, transparent); outline-offset: 0; border-color: var(--marca); }
-input[type=checkbox] { width: 22px; height: 22px; accent-color: var(--marca); flex: none; margin-top: .15rem; }
+input[type=checkbox] { width: 24px; height: 24px; accent-color: var(--marca); flex: none; margin-top: .15rem; }
 .check { display: flex; gap: .65rem; align-items: flex-start; }
 .check label { margin: 0; font-weight: 400; }
 
@@ -327,3 +327,5 @@ textarea { width: 100%; min-height: 90px; padding: .6rem .95rem; font: inherit; 
 .menu-cuenta ul { position: absolute; right: 0; top: calc(100% + .4rem); z-index: 30; min-width: 190px; margin: 0; padding: .4rem; list-style: none; background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio-sm); box-shadow: 0 12px 32px -12px rgb(0 0 0 / .25); }
 .menu-cuenta li a, .menu-cuenta li button { display: flex; align-items: center; width: 100%; min-height: 40px; padding: 0 .75rem; border: 0; border-radius: 8px; background: none; color: var(--texto); font: inherit; font-size: .95rem; text-align: left; cursor: pointer; }
 .menu-cuenta li a:hover, .menu-cuenta li button:hover { background: var(--superficie-2); text-decoration: none; }
+/* WCAG 2.5.8: enlaces sueltos (migas, pie de formularios, datos) con objetivo de 24 px o más */
+.migas a, .enlace-pie a, .datos dd a { display: inline-flex; align-items: center; min-height: 24px; }
