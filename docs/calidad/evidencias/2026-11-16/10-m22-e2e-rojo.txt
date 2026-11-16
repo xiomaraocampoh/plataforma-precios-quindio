@@ -1,0 +1,241 @@
+FFF                                                                      [100%]
+================================== FAILURES ===================================
+___ test_sin_senal_guarda_el_registro_y_lo_envia_al_volver_la_red[chromium] ___
+
+pagina_con_sesion = <Page url='http://localhost:56870/precios/registrar/'>
+live_server = <LiveServer listening at http://localhost:56870>
+context = <BrowserContext browser=<Browser type=<BrowserType name=chromium executable_path=C:\Users\Windows\AppData\Local\ms-playwright\chromium-1255\chrome-win64\chrome.exe> version=159.0.8154.6>>
+
+    def test_sin_senal_guarda_el_registro_y_lo_envia_al_volver_la_red(
+        pagina_con_sesion, live_server, context
+    ):  # M-22: reenvío por el evento "online"
+        pagina = pagina_con_sesion
+>       _abrir_registro(pagina, live_server)
+
+tests\integration\e2e\test_navegador_sin_conexion.py:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pagina = <Page url='http://localhost:56870/precios/registrar/'>
+live_server = <LiveServer listening at http://localhost:56870>
+
+    def _abrir_registro(pagina, live_server):
+        pagina.goto(live_server.url + RUTA_REGISTRO)
+>       expect(pagina.locator("input[name=id_cliente]")).to_have_value(UUID)  # crypto.randomUUID
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Locator expected to have Value 're.compile('^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$')'
+E       Actual value:  
+E       Call log:
+E         - Expect "to_have_value" locator("input[name=id_cliente]") with timeout 5000ms
+E         - waiting for locator("input[name=id_cliente]")
+E           14 × locator resolved to <input type="hidden" name="id_cliente" id="id_id_cliente"/>
+E              - unexpected value ""
+E       
+E       Aria snapshot:
+E       - link "Saltar al contenido":
+E         - /url: "#contenido"
+E       - banner:
+E         - link "AhorraPues":
+E           - /url: /
+E         - navigation "Principal":
+E           - link "Comparar":
+E             - /url: /
+E           - link "Productos":
+E             - /url: /productos/
+E           - link "Establecimientos":
+E             - /url: /establecimientos/
+E           - link "Registrar precio":
+E             - /url: /precios/registrar/
+E         - group: "reportante1 : men\xfa de tu cuenta \u25be"
+E       - main:
+E         - status
+E         - region "Registrar un precio":
+E           - paragraph: Tres campos · menos de 15 segundos
+E           - heading "Registrar un precio" [level=1]
+E           - paragraph: Reporta el precio que ves en góndola. Tu nombre no se muestra a nadie.
+E           - text: ¿Dónde estás?
+E           - combobox "¿Dónde estás?":
+E             - option "---------" [selected]
+E             - option "Tienda Doña Rosa (Tienda de barrio)"
+E             - option "Súper Quindío (Supermercado)"
+E           - text: "Producto y presentación:"
+E           - combobox "Producto y presentación:":
+E             - option "---------" [selected]
+E             - option "Arroz blanco 500 g"
+E             - option "Arroz blanco 1 kg"
+E           - text: "Precio en góndola ($):"
+E           - spinbutton "Precio en góndola ($):"
+E           - button "Guardar precio"
+E         - region "Elige la presentación exacta":
+E           - heading "Elige la presentación exacta" [level=2]
+E           - paragraph: 500 g y 1 kg no cuestan lo mismo. Con la presentación correcta, la comparación por unidad es justa.
+E         - region "Tu reporte es anónimo":
+E           - heading "Tu reporte es anónimo" [level=2]
+E           - paragraph: Guardamos tu autoría solo para evitar abusos. Nunca se publica.
+E       - contentinfo: Plataforma colaborativa de precios de la canasta familiar · Armenia y Quindío. No vende ni es un sistema oficial de precios.
+E       - status
+
+tests\integration\e2e\test_navegador_sin_conexion.py:25: AssertionError
+_ test_respuesta_perdida_se_reenvia_al_cargar_la_pagina_sin_duplicar[chromium] _
+
+pagina_con_sesion = <Page url='http://localhost:56870/precios/registrar/'>
+live_server = <LiveServer listening at http://localhost:56870>
+
+    def test_respuesta_perdida_se_reenvia_al_cargar_la_pagina_sin_duplicar(
+        pagina_con_sesion, live_server
+    ):  # M-22: el primer envío sí llegó; el reenvío con el mismo id_cliente no crea otro
+        pagina = pagina_con_sesion
+>       _abrir_registro(pagina, live_server)
+
+tests\integration\e2e\test_navegador_sin_conexion.py:73: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pagina = <Page url='http://localhost:56870/precios/registrar/'>
+live_server = <LiveServer listening at http://localhost:56870>
+
+    def _abrir_registro(pagina, live_server):
+        pagina.goto(live_server.url + RUTA_REGISTRO)
+>       expect(pagina.locator("input[name=id_cliente]")).to_have_value(UUID)  # crypto.randomUUID
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Locator expected to have Value 're.compile('^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$')'
+E       Actual value:  
+E       Call log:
+E         - Expect "to_have_value" locator("input[name=id_cliente]") with timeout 5000ms
+E         - waiting for locator("input[name=id_cliente]")
+E           14 × locator resolved to <input type="hidden" name="id_cliente" id="id_id_cliente"/>
+E              - unexpected value ""
+E       
+E       Aria snapshot:
+E       - link "Saltar al contenido":
+E         - /url: "#contenido"
+E       - banner:
+E         - link "AhorraPues":
+E           - /url: /
+E         - navigation "Principal":
+E           - link "Comparar":
+E             - /url: /
+E           - link "Productos":
+E             - /url: /productos/
+E           - link "Establecimientos":
+E             - /url: /establecimientos/
+E           - link "Registrar precio":
+E             - /url: /precios/registrar/
+E         - group: "reportante1 : men\xfa de tu cuenta \u25be"
+E       - main:
+E         - status
+E         - region "Registrar un precio":
+E           - paragraph: Tres campos · menos de 15 segundos
+E           - heading "Registrar un precio" [level=1]
+E           - paragraph: Reporta el precio que ves en góndola. Tu nombre no se muestra a nadie.
+E           - text: ¿Dónde estás?
+E           - combobox "¿Dónde estás?":
+E             - option "---------" [selected]
+E             - option "Tienda Doña Rosa (Tienda de barrio)"
+E             - option "Súper Quindío (Supermercado)"
+E           - text: "Producto y presentación:"
+E           - combobox "Producto y presentación:":
+E             - option "---------" [selected]
+E             - option "Arroz blanco 500 g"
+E             - option "Arroz blanco 1 kg"
+E           - text: "Precio en góndola ($):"
+E           - spinbutton "Precio en góndola ($):"
+E           - button "Guardar precio"
+E         - region "Elige la presentación exacta":
+E           - heading "Elige la presentación exacta" [level=2]
+E           - paragraph: 500 g y 1 kg no cuestan lo mismo. Con la presentación correcta, la comparación por unidad es justa.
+E         - region "Tu reporte es anónimo":
+E           - heading "Tu reporte es anónimo" [level=2]
+E           - paragraph: Guardamos tu autoría solo para evitar abusos. Nunca se publica.
+E       - contentinfo: Plataforma colaborativa de precios de la canasta familiar · Armenia y Quindío. No vende ni es un sistema oficial de precios.
+E       - status
+
+tests\integration\e2e\test_navegador_sin_conexion.py:25: AssertionError
+_ test_m22_diez_registros_sin_conexion_se_sincronizan_sin_perdida_ni_duplicados[chromium] _
+
+pagina_con_sesion = <Page url='http://localhost:56870/precios/registrar/'>
+live_server = <LiveServer listening at http://localhost:56870>
+context = <BrowserContext browser=<Browser type=<BrowserType name=chromium executable_path=C:\Users\Windows\AppData\Local\ms-playwright\chromium-1255\chrome-win64\chrome.exe> version=159.0.8154.6>>
+
+    def test_m22_diez_registros_sin_conexion_se_sincronizan_sin_perdida_ni_duplicados(
+        pagina_con_sesion, live_server, context
+    ):  # M-22 = registros sincronizados / registros hechos sin conexi\xf3n (aceptable \u2265 98 %)
+        pagina = pagina_con_sesion
+>       _abrir_registro(pagina, live_server)
+
+tests\integration\e2e\test_navegador_sin_conexion.py:94: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+pagina = <Page url='http://localhost:56870/precios/registrar/'>
+live_server = <LiveServer listening at http://localhost:56870>
+
+    def _abrir_registro(pagina, live_server):
+        pagina.goto(live_server.url + RUTA_REGISTRO)
+>       expect(pagina.locator("input[name=id_cliente]")).to_have_value(UUID)  # crypto.randomUUID
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Locator expected to have Value 're.compile('^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$')'
+E       Actual value:  
+E       Call log:
+E         - Expect "to_have_value" locator("input[name=id_cliente]") with timeout 5000ms
+E         - waiting for locator("input[name=id_cliente]")
+E           14 × locator resolved to <input type="hidden" name="id_cliente" id="id_id_cliente"/>
+E              - unexpected value ""
+E       
+E       Aria snapshot:
+E       - link "Saltar al contenido":
+E         - /url: "#contenido"
+E       - banner:
+E         - link "AhorraPues":
+E           - /url: /
+E         - navigation "Principal":
+E           - link "Comparar":
+E             - /url: /
+E           - link "Productos":
+E             - /url: /productos/
+E           - link "Establecimientos":
+E             - /url: /establecimientos/
+E           - link "Registrar precio":
+E             - /url: /precios/registrar/
+E         - group: "reportante1 : men\xfa de tu cuenta \u25be"
+E       - main:
+E         - status
+E         - region "Registrar un precio":
+E           - paragraph: Tres campos · menos de 15 segundos
+E           - heading "Registrar un precio" [level=1]
+E           - paragraph: Reporta el precio que ves en góndola. Tu nombre no se muestra a nadie.
+E           - text: ¿Dónde estás?
+E           - combobox "¿Dónde estás?":
+E             - option "---------" [selected]
+E             - option "Tienda Doña Rosa (Tienda de barrio)"
+E             - option "Súper Quindío (Supermercado)"
+E           - text: "Producto y presentación:"
+E           - combobox "Producto y presentación:":
+E             - option "---------" [selected]
+E             - option "Arroz blanco 500 g"
+E             - option "Arroz blanco 1 kg"
+E           - text: "Precio en góndola ($):"
+E           - spinbutton "Precio en góndola ($):"
+E           - button "Guardar precio"
+E         - region "Elige la presentación exacta":
+E           - heading "Elige la presentación exacta" [level=2]
+E           - paragraph: 500 g y 1 kg no cuestan lo mismo. Con la presentación correcta, la comparación por unidad es justa.
+E         - region "Tu reporte es anónimo":
+E           - heading "Tu reporte es anónimo" [level=2]
+E           - paragraph: Guardamos tu autoría solo para evitar abusos. Nunca se publica.
+E       - contentinfo: Plataforma colaborativa de precios de la canasta familiar · Armenia y Quindío. No vende ni es un sistema oficial de precios.
+E       - status
+
+tests\integration\e2e\test_navegador_sin_conexion.py:25: AssertionError
+============================== warnings summary ===============================
+tests/integration/e2e/test_navegador_sin_conexion.py::test_sin_senal_guarda_el_registro_y_lo_envia_al_volver_la_red[chromium]
+  C:\Users\Windows\Desktop\plataforma-precios-quindio\.venv\Lib\site-packages\_pytest\fixtures.py:1392: PytestRemovedIn10Warning: Session-scoped fixtures defined as instance methods are deprecated.
+  Instance attributes set in the 'base_url' fixture will NOT be visible to test methods,
+  as each test gets a new instance while the fixture runs only once per class.
+  Use a @classmethod decorator below @pytest.fixture and set attributes on cls instead.
+  See https://docs.pytest.org/en/stable/deprecations.html#class-scoped-fixture-as-instance-method
+    fixturefunc = resolve_fixture_function(fixturedef, request)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/integration/e2e/test_navegador_sin_conexion.py::test_sin_senal_guarda_el_registro_y_lo_envia_al_volver_la_red[chromium]
+FAILED tests/integration/e2e/test_navegador_sin_conexion.py::test_respuesta_perdida_se_reenvia_al_cargar_la_pagina_sin_duplicar[chromium]
+FAILED tests/integration/e2e/test_navegador_sin_conexion.py::test_m22_diez_registros_sin_conexion_se_sincronizan_sin_perdida_ni_duplicados[chromium]
+3 failed, 1 warning in 21.18s

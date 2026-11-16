@@ -6,3 +6,5 @@ factory-boy>=3.3
 ruff>=0.6
 import-linter>=2.1         # contratos de capas y módulos (ADR-0001, M-18)
 pre-commit>=3.8
+playwright>=1.49           # pruebas de navegador: registro sin conexión (M-22)
+pytest-playwright>=0.6

@@ -30,6 +30,8 @@ jobs:
           cache: pip
           cache-dependency-path: requirements/dev.txt
       - run: pip install -r requirements/dev.txt
+      - name: Navegador para las pruebas e2e (M-22)
+        run: python -m playwright install --with-deps chromium
       - name: Lint y formato (PEP 8)
         run: |
           ruff check .
