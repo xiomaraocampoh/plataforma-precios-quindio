@@ -1,0 +1,3 @@
+<th scope="row">{{ o.nombre }} <span class="suave">· {{ o.get_tipo_display }}</span></th>
+<td>{{ o.direccion }}{% if o.barrio %}, {{ o.barrio }}{% endif %} · {{ o.municipio }}</td>
+<td>{% include "administracion/partials/_estado.html" with activo=o.activo %}{% if o.estado != "aprobado" %} <span class="chip chip-promo">{{ o.get_estado_display }}</span>{% endif %}</td>

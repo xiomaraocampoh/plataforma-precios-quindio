@@ -1,0 +1,29 @@
+{% load panel %}
+<p class="suave" role="status">{{ pagina.paginator.count }} resultado{{ pagina.paginator.count|pluralize }}{% if hay_filtros %} con los filtros aplicados{% endif %}.</p>
+{% if pagina.object_list %}
+<div class="tabla-envoltura" role="region" aria-labelledby="t-{{ seccion.slug }}" tabindex="0">
+  <table class="tabla">
+    <caption id="t-{{ seccion.slug }}">{{ seccion.titulo }} (página {{ pagina.number }} de {{ pagina.paginator.num_pages }}).</caption>
+    <thead><tr>{% for c in seccion.columnas %}<th scope="col">{{ c }}</th>{% endfor %}<th scope="col">Acciones</th></tr></thead>
+    <tbody>
+      {% for o in pagina.object_list %}
+      <tr class="fila-panel">
+        {% include "administracion/partials/filas/_"|add:seccion.entidad|add:".html" %}
+        <td>
+          <div class="acciones-fila">
+            {% if puede.change %}
+            <a class="btn btn-sec btn-pequeno" href="{% url 'panel:editar' seccion.slug o.pk %}">Editar<span class="sr-only"> {{ o }}</span></a>
+            <a class="btn btn-sec btn-pequeno" href="{% url 'panel:estado' seccion.slug o.pk %}">{% if o|esta_activo %}Desactivar{% else %}Activar{% endif %}<span class="sr-only"> {{ o }}</span></a>
+            {% endif %}
+            {% if puede.delete %}<a class="btn btn-sec btn-pequeno" href="{% url 'panel:eliminar' seccion.slug o.pk %}">Eliminar<span class="sr-only"> {{ o }}</span></a>{% endif %}
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "administracion/partials/_paginacion.html" %}
+{% else %}
+<section class="tile tile-marca vacio-estado"><h2>Sin resultados</h2><p class="suave">Prueba con otra búsqueda o quita algún filtro.</p></section>
+{% endif %}

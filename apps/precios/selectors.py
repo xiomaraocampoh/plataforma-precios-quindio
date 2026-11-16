@@ -32,7 +32,7 @@ def listar_aportes(usuario):
     """«Mis aportes»: reportes del usuario con su estado, del más reciente al más antiguo."""
     return (
         ReportePrecio.objects.filter(autor=usuario)
-        .select_related("presentacion__producto", "establecimiento")
+        .select_related("presentacion__producto__marca", "establecimiento")
         .order_by("-creado_en")
     )
 

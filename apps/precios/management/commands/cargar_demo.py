@@ -198,7 +198,7 @@ class Command(BaseCommand):
         for nombre, cat, cantidad, unidad, filas in VENCIDOS:
             producto, _ = Producto.objects.get_or_create(
                 nombre_normalizado=normalizar_nombre(nombre),
-                marca="",
+                marca=None,
                 defaults={"nombre": nombre, "categoria": cats[cat]},
             )
             pres, _ = Presentacion.objects.get_or_create(
@@ -245,7 +245,7 @@ class Command(BaseCommand):
         for nombre, cat, presentaciones in PRODUCTOS:
             producto, _ = Producto.objects.get_or_create(
                 nombre_normalizado=normalizar_nombre(nombre),
-                marca="",
+                marca=None,
                 defaults={"nombre": nombre, "categoria": cats[cat]},
             )
             for cantidad, unidad, base in presentaciones:

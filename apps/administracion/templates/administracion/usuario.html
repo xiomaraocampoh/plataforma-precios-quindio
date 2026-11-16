@@ -1,0 +1,31 @@
+{% extends "administracion/_base_panel.html" %}
+{% block titulo_panel %}{{ cuenta.username }}{% endblock %}
+{% block migas %}<span aria-hidden="true">/</span><a href="{% url 'panel:usuarios' %}">Usuarios</a><span aria-hidden="true">/</span><span aria-current="page">{{ cuenta.username }}</span>{% endblock %}
+{% block panel %}
+<section class="tile" aria-labelledby="titulo-cuenta">
+  <h1 id="titulo-cuenta">{{ cuenta.username }}</h1>
+  <dl class="datos">
+    <div><dt>Rol</dt><dd>{{ cuenta.get_rol_display }}</dd></div>
+    <div><dt>Grupos</dt><dd>{{ grupos|join:", "|default:"Ninguno" }}</dd></div>
+    <div><dt>Estado</dt><dd>{% if cuenta.suprimido_en %}Suprimida por su titular{% elif cuenta.is_active %}Activa{% else %}Suspendida{% endif %}</dd></div>
+    <div><dt>Registro</dt><dd><time datetime="{{ cuenta.date_joined|date:'c' }}">{{ cuenta.date_joined|date:"j M Y" }}</time></dd></div>
+  </dl>
+  {% if puede_gestionar %}
+    {% if es_propia %}
+    <p class="aviso-panel" role="note">No puedes cambiar tu propio rol ni suspender tu propia cuenta. Pídeselo a otra persona administradora.</p>
+    {% endif %}
+    {% if form.errors or not es_propia and not protegida %}
+    <form method="post" class="panel-formulario" hx-disabled-elt="find button">
+      {% csrf_token %}
+      {% include "partials/_errores_generales.html" %}
+      {% include "partials/_campo.html" with campo=form.rol %}
+      <p class="ayuda">El rol define el grupo y los permisos de la cuenta. Queda registrado en la auditoría.</p>
+      <button class="btn" type="submit">Guardar rol</button>
+    </form>
+    {% elif protegida %}
+    <p class="aviso-panel" role="note">Es una cuenta de superusuario: solo otro superusuario puede cambiarla.</p>
+    {% endif %}
+  {% endif %}
+  <p><a class="btn btn-sec" href="{% url 'panel:usuarios' %}">Volver a usuarios</a></p>
+</section>
+{% endblock %}

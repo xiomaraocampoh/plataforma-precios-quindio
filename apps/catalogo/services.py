@@ -3,10 +3,14 @@
 from decimal import Decimal
 
 from django.db import transaction
+from django.db.models import ProtectedError, RestrictedError
 from django.utils import timezone
 
+from core.cache import invalidar_comparacion
+from core.errores import EnUsoError
+
 from .domain.duplicados import normalizar_nombre
-from .models import Presentacion, Producto, SolicitudCatalogo
+from .models import Marca, Presentacion, Producto, SolicitudCatalogo
 
 
 def solicitar_producto(
@@ -33,12 +37,27 @@ def solicitar_producto(
     )
 
 
+def marca_por_nombre(nombre: str) -> Marca | None:
+    """La marca con ese nombre (sin tildes ni mayúsculas); si no existe la crea. Vacío = None."""
+    normal = normalizar_nombre(nombre or "")
+    if not normal:
+        return None
+    marca = Marca.objects.filter(nombre_normalizado=normal).first()
+    return marca or Marca.objects.create(nombre=nombre)
+
+
 def existe_presentacion(*, nombre: str, marca: str, cantidad: Decimal, unidad: str) -> bool:
+    normal_marca = normalizar_nombre(marca or "")
+    filtro_marca = (
+        {"producto__marca__nombre_normalizado": normal_marca}
+        if normal_marca
+        else {"producto__marca__isnull": True}
+    )
     return Presentacion.objects.filter(
         producto__nombre_normalizado=normalizar_nombre(nombre),
-        producto__marca__iexact=marca.strip(),
         cantidad=cantidad,
         unidad=unidad,
+        **filtro_marca,
     ).exists()
 
 
@@ -48,7 +67,7 @@ def aprobar_solicitud(*, solicitud_id: int, moderador) -> SolicitudCatalogo:
     solicitud = SolicitudCatalogo.objects.select_for_update().get(pk=solicitud_id)
     producto, _ = Producto.objects.get_or_create(
         nombre_normalizado=normalizar_nombre(solicitud.nombre),
-        marca=solicitud.marca,
+        marca=marca_por_nombre(solicitud.marca),
         defaults={"nombre": solicitud.nombre, "categoria_id": solicitud.categoria_id},
     )
     presentacion, _ = Presentacion.objects.get_or_create(
@@ -75,3 +94,44 @@ def _resolver(solicitud, estado, moderador, presentacion) -> SolicitudCatalogo:
     solicitud.presentacion_creada = presentacion
     solicitud.save(update_fields=["estado", "resuelto_por", "resuelto_en", "presentacion_creada"])
     return solicitud
+
+
+# ---------- Panel de administración (las vistas llegan por apps.administracion.services) ----------
+
+
+def _invalidar_si_es_producto(objeto) -> None:
+    if isinstance(objeto, Producto):
+        producto_id = objeto.pk
+        transaction.on_commit(lambda: invalidar_comparacion(producto_id))
+
+
+@transaction.atomic
+def guardar_formulario(form, formset=None):
+    """Guarda un formulario del catálogo ya validado y, si hay, sus presentaciones."""
+    objeto = form.save()
+    if formset is not None:
+        formset.instance = objeto
+        try:
+            formset.save()
+        except (ProtectedError, RestrictedError) as exc:  # red de seguridad: lo valida el form
+            raise EnUsoError("Una presentación que quitaste tiene reportes.") from exc
+    _invalidar_si_es_producto(objeto)
+    return objeto
+
+
+def cambiar_estado(objeto, *, activo: bool):
+    """Activa o desactiva una marca, categoría, producto o presentación (no borra nada)."""
+    campo = "activa" if hasattr(objeto, "activa") else "activo"
+    setattr(objeto, campo, activo)
+    objeto.save(update_fields=[campo])
+    _invalidar_si_es_producto(objeto)
+    return objeto
+
+
+def eliminar(objeto) -> None:
+    """Borra solo si nada lo referencia (reportes, productos, solicitudes); si no, EnUsoError."""
+    try:
+        with transaction.atomic():
+            objeto.delete()
+    except (ProtectedError, RestrictedError) as exc:
+        raise EnUsoError("Tiene reportes u otros registros asociados.") from exc

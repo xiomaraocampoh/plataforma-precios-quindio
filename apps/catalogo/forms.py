@@ -20,7 +20,9 @@ class SolicitudForm(forms.Form):
     )
     marca = forms.CharField(label="Marca", max_length=80, required=False)
     categoria = forms.ModelChoiceField(
-        label="Categoría", queryset=Categoria.objects.order_by("nombre"), empty_label="Elige una"
+        label="Categoría",
+        queryset=Categoria.objects.filter(activa=True).order_by("nombre"),
+        empty_label="Elige una",
     )
     cantidad = forms.DecimalField(
         label="Cantidad",

@@ -8,7 +8,6 @@ from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_GET
 
 from apps.catalogo import selectors as catalogo
-from apps.catalogo.models import Producto
 from apps.integraciones.selectors import referencia_sipsa
 
 from .domain.filtros import FiltroPrecio, FiltroUbicacion, interpretar_monto
@@ -64,7 +63,7 @@ def _leer_filtro_precio(parametros) -> tuple[FiltroPrecio, str]:
 
 @require_GET
 def comparar(request, producto_id: int):
-    producto = get_object_or_404(Producto.objects.select_related("categoria"), pk=producto_id)
+    producto = get_object_or_404(catalogo.productos_publicos(), pk=producto_id)
     filtro = FiltroUbicacion(
         municipio=request.GET.get("municipio", ""), barrio=request.GET.get("barrio", "")
     )

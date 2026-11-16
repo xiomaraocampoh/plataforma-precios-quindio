@@ -3,9 +3,19 @@
 import uuid
 
 from django.contrib.auth.models import Group, Permission
+from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.db.models import Q
 from django.utils import timezone
 
+from .domain.roles import (
+    GRUPOS,
+    PERMISOS,
+    CambioDeCuentaNoPermitidoError,
+    Rol,
+    grupo_de,
+    validar_cambio_de_cuenta,
+)
 from .models import Usuario
 
 
@@ -21,29 +31,72 @@ def registrar_usuario(*, username: str, email: str, password: str) -> Usuario:
     )
 
 
-# Permisos del grupo «Moderadores» en /admin/ (RF-21, RF-22). Los que aún no existan se omiten.
-PERMISOS_MODERACION = [
-    "view_reporteprecio",
-    "change_reporteprecio",
-    "view_denuncia",
-    "change_denuncia",
-    "view_decisionmoderacion",
-    "view_establecimiento",
-    "change_establecimiento",
-    "view_solicitudcatalogo",
-    "change_solicitudcatalogo",
-    "view_producto",
-    "view_presentacion",
-    "view_usuario",
-    "change_usuario",
-]
-GRUPO_MODERADORES = "Moderadores"
+def permisos_por_nombre(nombres) -> list[Permission]:
+    """Permission a partir de "app_label.codename" (como en user.has_perm)."""
+    filtro = Q(pk__in=[])
+    for nombre in nombres:
+        app, codigo = nombre.split(".", 1)
+        filtro |= Q(content_type__app_label=app, codename=codigo)
+    return list(Permission.objects.filter(filtro))
 
 
-def asegurar_grupo_moderadores() -> Group:
-    grupo, _ = Group.objects.get_or_create(name=GRUPO_MODERADORES)
-    grupo.permissions.set(Permission.objects.filter(codename__in=PERMISOS_MODERACION))
+def asegurar_grupo(rol: str) -> Group | None:
+    """Grupo del rol con sus permisos (lo crea la migración; aquí se recrea si falta)."""
+    nombre = grupo_de(rol)
+    if nombre is None:
+        return None
+    grupo, creado = Group.objects.get_or_create(name=nombre)
+    if creado:
+        grupo.permissions.set(permisos_por_nombre(PERMISOS[Rol(rol)]))
     return grupo
+
+
+def sincronizar_grupo_de_rol(usuario: Usuario) -> None:
+    """El usuario queda solo en el grupo de su rol; los grupos que no son de rol se conservan."""
+    objetivo = asegurar_grupo(usuario.rol)
+    sobrantes = usuario.groups.filter(name__in=GRUPOS.values())
+    if objetivo is not None:
+        sobrantes = sobrantes.exclude(pk=objetivo.pk)
+        usuario.groups.add(objetivo)
+    usuario.groups.remove(*sobrantes)
+
+
+def _validar_actor(actor, usuario: Usuario) -> None:
+    try:
+        validar_cambio_de_cuenta(
+            actor_id=actor.pk,
+            objetivo_id=usuario.pk,
+            actor_es_superusuario=actor.is_superuser,
+            objetivo_es_superusuario=usuario.is_superuser,
+        )
+    except CambioDeCuentaNoPermitidoError as exc:
+        raise ValidationError(str(exc)) from exc
+
+
+@transaction.atomic
+def asignar_rol(*, actor, usuario_id: int, rol: str) -> Usuario:
+    """Un administrador asigna uno de los roles con grupo (no el suyo propio)."""
+    if grupo_de(rol) is None:
+        raise ValidationError("Elige un rol válido.")
+    usuario = Usuario.objects.select_for_update().get(pk=usuario_id)
+    _validar_actor(actor, usuario)
+    usuario.rol = rol
+    usuario.save(update_fields=["rol"])  # la señal sincroniza el grupo
+    return usuario
+
+
+@transaction.atomic
+def cambiar_estado_cuenta(*, actor, usuario_id: int, activa: bool) -> Usuario:
+    """Activa o suspende una cuenta desde el panel (nunca la propia)."""
+    usuario = Usuario.objects.select_for_update().get(pk=usuario_id)
+    _validar_actor(actor, usuario)
+    if activa and usuario.suprimido_en is not None:
+        raise ValidationError(
+            "La cuenta fue suprimida por su titular (Ley 1581 de 2012); no se puede reactivar."
+        )
+    usuario.is_active = activa
+    usuario.save(update_fields=["is_active"])
+    return usuario
 
 
 def asegurar_administrador(*, username: str, password: str) -> tuple[Usuario, bool]:
@@ -55,7 +108,7 @@ def asegurar_administrador(*, username: str, password: str) -> tuple[Usuario, bo
 
 
 def asegurar_moderador(*, username: str, password: str) -> tuple[Usuario, bool]:
-    """Moderador con acceso a /admin/ (is_staff) y al grupo «Moderadores»."""
+    """Moderador con acceso a /admin/ (is_staff) y al grupo «Moderador»."""
     usuario = Usuario.objects.filter(username=username).first()
     creado = usuario is None
     if creado:
@@ -68,7 +121,7 @@ def asegurar_moderador(*, username: str, password: str) -> tuple[Usuario, bool]:
             acepto_tratamiento_datos=True,
             fecha_aceptacion_datos=timezone.now(),
         )
-    usuario.groups.add(asegurar_grupo_moderadores())
+    sincronizar_grupo_de_rol(usuario)
     return usuario, creado
 
 

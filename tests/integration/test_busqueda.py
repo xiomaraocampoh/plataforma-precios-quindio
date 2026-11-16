@@ -8,6 +8,7 @@ from django.urls import reverse
 from apps.catalogo.domain.duplicados import normalizar_nombre
 from apps.catalogo.models import Categoria, Presentacion, Producto
 from apps.catalogo.selectors import buscar_productos, listar_productos
+from apps.catalogo.services import marca_por_nombre
 
 pytestmark = pytest.mark.integration
 
@@ -22,7 +23,7 @@ def catalogo(db):
     def crear(nombre, categoria, marca=""):
         return Producto.objects.create(
             nombre=nombre,
-            marca=marca,
+            marca=marca_por_nombre(marca),
             nombre_normalizado=normalizar_nombre(nombre),
             categoria=categoria,
         )

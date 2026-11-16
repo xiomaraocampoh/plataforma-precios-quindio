@@ -1,4 +1,4 @@
-"""Quién modera (RF-21): rol moderador o personal (is_staff), con la cuenta activa."""
+"""Quién modera (RF-21): rol moderador o administrador, o personal (is_staff), activo."""
 
 from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import PermissionDenied
@@ -10,7 +10,7 @@ def es_moderador(usuario) -> bool:
         usuario
         and usuario.is_authenticated
         and usuario.is_active
-        and (usuario.is_staff or getattr(usuario, "rol", "") == "moderador")
+        and (usuario.is_staff or getattr(usuario, "rol", "") in ("moderador", "administrador"))
     )
 
 

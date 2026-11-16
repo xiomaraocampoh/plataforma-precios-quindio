@@ -6,9 +6,12 @@ class Usuario(AbstractUser):
     """Usuario personalizado desde el día 1 (cambiarlo después exige migraciones costosas)."""
 
     class Rol(models.TextChoices):
+        # Los valores coinciden con apps.cuentas.domain.roles.Rol (más «comercio», Corte III)
         REPORTANTE = "reportante", "Reportante"
         COMERCIO = "comercio", "Comercio"
         MODERADOR = "moderador", "Moderador"
+        EDITOR_CATALOGO = "editor_catalogo", "Editor de catálogo"
+        ADMINISTRADOR = "administrador", "Administrador"
 
     rol = models.CharField(max_length=20, choices=Rol.choices, default=Rol.REPORTANTE)
     # Ley 1581 de 2012: autorización expresa del titular
@@ -16,6 +19,9 @@ class Usuario(AbstractUser):
     fecha_aceptacion_datos = models.DateTimeField(null=True, blank=True)
     # RF-03: fecha en que el titular suprimió su cuenta (los aportes quedan anonimizados)
     suprimido_en = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        permissions = [("gestionar_cuentas", "Asignar roles y activar o suspender cuentas")]
 
     def __str__(self) -> str:
         return self.username

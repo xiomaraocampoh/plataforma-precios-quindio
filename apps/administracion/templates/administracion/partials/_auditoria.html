@@ -1,0 +1,22 @@
+<p class="suave" role="status">{{ pagina.paginator.count }} registro{{ pagina.paginator.count|pluralize }}{% if hay_filtros %} con los filtros aplicados{% endif %}.</p>
+{% if pagina.object_list %}
+<div class="tabla-envoltura" role="region" aria-labelledby="t-auditoria" tabindex="0">
+  <table class="tabla">
+    <caption id="t-auditoria">Acciones del panel, de la más reciente a la más antigua (página {{ pagina.number }} de {{ pagina.paginator.num_pages }}).</caption>
+    <thead><tr><th scope="col">Cuándo</th><th scope="col">Quién</th><th scope="col">Qué</th><th scope="col">Cambios</th></tr></thead>
+    <tbody>
+      {% for r in pagina.object_list %}
+      <tr class="fila-panel">
+        <td><time datetime="{{ r.creado_en|date:'c' }}">{{ r.creado_en|date:"j M Y, H:i" }}</time></td>
+        <td>{{ r.actor.username }}</td>
+        <th scope="row">{{ r.get_accion_display }} {{ r.entidad }} «{{ r.objeto }}»</th>
+        <td>{% if r.cambios %}<ul class="lista-simple">{% for campo, valores in r.cambios.items %}<li><strong>{{ campo }}</strong>: {{ valores.0|default_if_none:"—" }} → {{ valores.1|default_if_none:"—" }}</li>{% endfor %}</ul>{% else %}<span class="suave">—</span>{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "administracion/partials/_paginacion.html" %}
+{% else %}
+<section class="tile tile-marca vacio-estado"><h2>Sin registros</h2><p class="suave">Aún no hay acciones con esos filtros.</p></section>
+{% endif %}
