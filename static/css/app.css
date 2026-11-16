@@ -506,43 +506,28 @@ textarea { width: 100%; min-height: 90px; padding: .6rem .95rem; font: inherit; 
 .codigos-respaldo li { background: var(--superficie-2); border-radius: 10px; padding: .6rem .8rem; font-size: 1.05rem; text-align: center; }
 .aviso-pendientes form { margin: 0; }
 
-/* Elementos recortados del fondo del hero junto a los títulos de sección (continuidad visual).
-   Decorativos y estáticos: aria-hidden, sin animación, sin interacción y sin ocupar espacio
-   (posición absoluta). `multiply` funde el fondo claro de la imagen con el de la página, por eso
-   solo se muestran en modo claro. Misma imagen que el hero: no añade descargas.
-   Cada variante indica la región de la imagen (x, y, ancho, alto en px de 1774×887). */
-.seccion-cabecera { position: relative; isolation: isolate; }
-.seccion-cabecera::before { content: ""; position: absolute; inset: -2.5rem -3rem; z-index: -1; pointer-events: none;
-  background: radial-gradient(closest-side, rgb(0 113 227 / .08), transparent); }
-.deco { --e: .32; position: absolute; z-index: -1; pointer-events: none; background-repeat: no-repeat;
-  background-image: url("../img/hero-supermercado-960.webp"); mix-blend-mode: multiply;
-  width: calc(var(--w) * var(--e) * 1px); height: calc(var(--h) * var(--e) * 1px);
-  background-size: calc(1774 * var(--e) * 1px) calc(887 * var(--e) * 1px);
-  background-position: calc(var(--x) * var(--e) * -1px) calc(var(--y) * var(--e) * -1px);
-  -webkit-mask-image: radial-gradient(closest-side, #000 64%, transparent); mask-image: radial-gradient(closest-side, #000 64%, transparent); }
-.deco-tomate { --x: 262; --y: 78; --w: 165; --h: 145; left: .25rem; top: -3.5rem; }
-.deco-hoja-b { --x: 1296; --y: 420; --w: 120; --h: 90; right: .5rem; top: -2.5rem; }
-.deco-chispas-izq { display: none; --x: 108; --y: 208; --w: 125; --h: 105; }
-.deco-huevos { --x: 1380; --y: 165; --w: 310; --h: 215; --e: .26; right: .25rem; top: -3.9rem; }
-.deco-hoja-d { --x: 10; --y: 766; --w: 135; --h: 121; left: .5rem; top: -3.1rem; }
-.deco-hoja-c { --x: 1392; --y: 596; --w: 108; --h: 132; left: .5rem; top: -3.2rem; }
-.deco-chispas-der { display: none; --x: 1640; --y: 190; --w: 100; --h: 105; }
-/* Los elementos nunca provocan scroll horizontal: se recortan en el borde de la sección. */
-.seccion { overflow-x: clip; }
-@media (min-width: 600px) { .deco-huevos { --e: .42; } }
-@media (min-width: 900px) {
-  .deco { --e: .5; background-image: url("../img/hero-supermercado.webp"); }
-  .deco-huevos { --e: .5; }
-  /* A la izquierda del título: desde el centro menos X, sin salirse de la página */
-  .deco-tomate { left: max(.5rem, calc(50% - 27.5rem)); top: -.5rem; }
-  .deco-hoja-d { left: max(.5rem, calc(50% - 27rem)); top: .5rem; }
-  .deco-hoja-c { left: max(.5rem, calc(50% - 21rem)); top: -.4rem; }
-  .deco-chispas-izq { display: block; left: max(.5rem, calc(50% - 23rem)); top: 3.4rem; }
-  /* A la derecha del título */
-  .deco-hoja-b { right: auto; left: min(calc(50% + 21.5rem), calc(100% - 6rem)); top: -1.2rem; }
-  .deco-huevos { right: auto; left: min(calc(50% + 21rem), calc(100% - 10rem)); top: -1.4rem; }
-  .deco-chispas-der { display: block; left: min(calc(50% + 19rem), calc(100% - 4rem)); top: -.2rem; }
+/* Fondos ilustrados entre secciones (mismo lenguaje del hero): capa decorativa a todo el ancho, de ALTO
+   FIJO (no depende del contenido, así no se deforma), que arranca en el espacio entre secciones y queda
+   detrás del título. Alternan el lado del carrito: hero a la izquierda, luego derecha, luego izquierda.
+   Se funden con el fondo de la página por arriba y por abajo; en modo oscuro no se muestran. */
+.fondo-der, .fondo-izq { position: relative; isolation: isolate; }
+.fondo-der { --img: url("../img/banda-carrito-der-960.webp"); --img-grande: url("../img/banda-carrito-der.webp"); --pos: right top; }
+.fondo-izq { --img: url("../img/banda-carrito-izq-960.webp"); --img-grande: url("../img/banda-carrito-izq.webp"); --pos: left top; }
+.fondo-der::before, .fondo-izq::before { content: ""; position: absolute; z-index: -1; pointer-events: none;
+  left: 50%; width: 100vw; transform: translateX(-50%);
+  top: calc(-1 * clamp(3.5rem, 9vw, 6.5rem)); height: clamp(18rem, 32vw, 30rem);
+  background: var(--img) no-repeat var(--pos) / cover;
+  -webkit-mask-image: linear-gradient(transparent, #000 22%, #000 58%, transparent);
+  mask-image: linear-gradient(transparent, #000 22%, #000 58%, transparent); }
+/* Pantallas angostas: el título ocupa todo el ancho, así que la imagen queda como una franja ARRIBA
+   del título (con su propio espacio) y nunca pasa por detrás del texto. */
+@media (max-width: 1199px) {
+  .fondo-der, .fondo-izq { padding-top: 6.5rem; }
+  .fondo-der::before, .fondo-izq::before { height: calc(clamp(3.5rem, 9vw, 6.5rem) + 8.5rem);
+    -webkit-mask-image: linear-gradient(transparent, #000 18%, #000 72%, transparent);
+    mask-image: linear-gradient(transparent, #000 18%, #000 72%, transparent); }
 }
-@media (min-width: 1200px) { .deco, .deco-huevos { --e: .72; } }
-@media (prefers-color-scheme: dark) { .deco, .seccion-cabecera::before { display: none; } }
-@media print { .deco, .seccion-cabecera::before { display: none; } }
+@media (min-width: 900px) { .fondo-der::before, .fondo-izq::before { background-image: var(--img-grande); background-position: center top; } }
+@media (prefers-color-scheme: dark) { .fondo-der::before, .fondo-izq::before { display: none; } }
+@media print { .fondo-der::before, .fondo-izq::before { display: none; } }
+body { overflow-x: clip; } /* las capas de fondo a todo el ancho nunca generan scroll horizontal */

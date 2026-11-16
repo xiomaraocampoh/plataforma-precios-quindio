@@ -122,7 +122,6 @@
 {% block contenido %}
 <section class="seccion" id="como-funciona" aria-labelledby="t-valor">
   <div class="seccion-cabecera">
-    <span class="deco deco-tomate" aria-hidden="true"></span><span class="deco deco-hoja-b" aria-hidden="true"></span><span class="deco deco-chispas-izq" aria-hidden="true"></span>
     <h2 id="t-valor">Todo lo que necesitas para comprar mejor.</h2>
     <p>Información clara, hecha por tu comunidad y sin letra pequeña.</p>
   </div>
@@ -174,10 +173,10 @@
   </div>
 </section>
 
+
 {% if destacados %}
-<section class="seccion" aria-labelledby="t-populares">
+<section class="seccion fondo-der" aria-labelledby="t-populares">
   <div class="seccion-cabecera">
-    <span class="deco deco-huevos" aria-hidden="true"></span><span class="deco deco-hoja-d" aria-hidden="true"></span>
     <h2 id="t-populares">Productos con más precios.</h2>
     <p>Empieza por lo que más se consulta en la comunidad.</p>
   </div>
@@ -192,11 +191,11 @@
     {% endfor %}
   </div>
 </section>
+
 {% endif %}
 
-<section class="seccion" aria-labelledby="t-pasos">
+<section class="seccion fondo-izq" aria-labelledby="t-pasos">
   <div class="seccion-cabecera">
-    <span class="deco deco-hoja-c" aria-hidden="true"></span><span class="deco deco-chispas-der" aria-hidden="true"></span>
     <h2 id="t-pasos">Tan simple como tres pasos.</h2>
   </div>
   <div class="bento">
