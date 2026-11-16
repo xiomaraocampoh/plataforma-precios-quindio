@@ -1,0 +1,10 @@
+{% if confirmado %}
+<p class="chip chip-positivo" role="status"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>{{ mensaje }}</p>
+{% else %}
+<form method="post" action="{% url 'precios:sigue_igual' reporte_id %}"
+      hx-post="{% url 'precios:sigue_igual' reporte_id %}" hx-target="this" hx-swap="outerHTML" hx-disabled-elt="find button">
+  {% csrf_token %}
+  <button class="btn btn-sec btn-pequeno" type="submit" aria-describedby="ayuda-sigue-igual">Sigue igual</button>
+  {% if mensaje %}<span class="error" role="alert">{{ mensaje }}</span>{% endif %}
+</form>
+{% endif %}

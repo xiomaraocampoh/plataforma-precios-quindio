@@ -11,9 +11,34 @@
   </div>
   <a class="btn btn-sec" href="{% url 'precios:registrar' %}"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>Registrar un precio</a>
 </div>
+{% if municipios|length > 1 or barrios|length > 1 %}
+<form class="filtros" id="filtros-comparacion" method="get" action="{% url 'comparacion:comparar' producto.pk %}" aria-label="Filtrar por ubicación"
+      hx-get="{% url 'comparacion:comparar' producto.pk %}" hx-target="#resultados" hx-push-url="true" hx-trigger="change, submit">
+  <div class="campo">
+    <label for="f-municipio">Municipio</label>
+    <select id="f-municipio" name="municipio">
+      <option value="">Todos</option>
+      {% for m in municipios %}<option value="{{ m }}"{% if m == filtro.municipio %} selected{% endif %}>{{ m }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="campo">
+    <label for="f-barrio">Barrio</label>
+    <select id="f-barrio" name="barrio">
+      <option value="">Todos</option>
+      {% for b in barrios %}<option value="{{ b }}"{% if b == filtro.barrio %} selected{% endif %}>{{ b }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="acciones-filtro">
+    <button class="btn" type="submit">Filtrar</button>
+    <a class="btn btn-sec" href="{% url 'comparacion:comparar' producto.pk %}">Quitar filtros</a>
+  </div>
+</form>
+{% endif %}
+{% if user.is_authenticated %}<p class="sr-only" id="ayuda-sigue-igual">Confirma que el precio no ha cambiado desde que se reportó. Renueva su vigencia.</p>{% endif %}
 <div id="resultados"
      hx-get="{% url 'comparacion:comparar' producto.pk %}"
      hx-trigger="every 60s"
+     hx-include="#filtros-comparacion"
      hx-swap="innerHTML"
      aria-live="polite">
   {% include "comparacion/partials/_resultados.html" %}

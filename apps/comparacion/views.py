@@ -9,13 +9,17 @@ from django.views.decorators.http import require_GET
 from apps.catalogo import selectors as catalogo
 from apps.catalogo.models import Producto
 
+from .domain.filtros import FiltroUbicacion
 from .domain.ranking import CRITERIO_DECLARADO
 from .selectors import (
     buscar_productos,
     comparar_con_resumen,
+    comparar_filas,
     ejemplo_comparacion,
+    estado_del_usuario,
     productos_destacados,
     resumen_plataforma,
+    ubicaciones_de,
 )
 
 
@@ -41,12 +45,19 @@ def sugerencias(request):
 @require_GET
 def comparar(request, producto_id: int):
     producto = get_object_or_404(Producto.objects.select_related("categoria"), pk=producto_id)
-    resultados, resumen = comparar_con_resumen(producto_id)
+    filtro = FiltroUbicacion(
+        municipio=request.GET.get("municipio", ""), barrio=request.GET.get("barrio", "")
+    )
+    filas, resumen = comparar_con_resumen(producto_id, filtro)
+    ids = [f.reporte_id for f in filas]
     contexto = {
         "producto": producto,
-        "resultados": resultados,
+        "filas": filas,
         "resumen": resumen,
         "criterio": CRITERIO_DECLARADO,
+        "filtro": filtro,
+        **ubicaciones_de(comparar_filas(producto_id)),
+        **estado_del_usuario(request.user, ids),
     }
     plantilla = (
         "comparacion/partials/_resultados.html" if request.htmx else "comparacion/comparar.html"

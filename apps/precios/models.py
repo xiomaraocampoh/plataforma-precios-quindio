@@ -45,3 +45,30 @@ class ReportePrecio(models.Model):
 
     def __str__(self) -> str:
         return f"{self.presentacion} @ {self.establecimiento}: {self.precio}"
+
+
+class ConfirmacionPrecio(models.Model):
+    """RF-14 «Sigue igual»: otra persona confirma que el precio no ha cambiado.
+
+    Renueva la vigencia (fecha_de_referencia) y suma confianza. Una por usuario, reporte y día.
+    """
+
+    reporte = models.ForeignKey(
+        ReportePrecio, on_delete=models.CASCADE, related_name="confirmaciones"
+    )
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="confirmaciones"
+    )
+    fecha = models.DateField()  # día local (America/Bogota): base de la idempotencia
+    creado_en = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["reporte", "usuario", "fecha"], name="una_confirmacion_por_dia"
+            ),
+        ]
+        indexes = [models.Index(fields=["usuario", "creado_en"], name="idx_confirmacion_usuario")]
+
+    def __str__(self) -> str:
+        return f"Confirmación de #{self.reporte_id} ({self.fecha})"

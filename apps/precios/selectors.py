@@ -4,10 +4,14 @@
 dominio. Vive aquí para que servicios de escritura y selectores de otros módulos usen la misma.
 """
 
+from datetime import datetime
+
 from django.conf import settings
+from django.db.models import Count, Max
+from django.utils import timezone
 
 from .domain.vigencia import PoliticaVigencia
-from .models import ReportePrecio
+from .models import ConfirmacionPrecio, ReportePrecio
 
 
 def politica_vigencia() -> PoliticaVigencia:
@@ -30,4 +34,28 @@ def listar_aportes(usuario):
         ReportePrecio.objects.filter(autor=usuario)
         .select_related("presentacion__producto", "establecimiento")
         .order_by("-creado_en")
+    )
+
+
+def confirmaciones_por_reporte(reporte_ids: list[int]) -> dict[int, tuple[int, datetime]]:
+    """{reporte_id: (número de confirmaciones, la más reciente)} en un solo query (RF-14)."""
+    filas = (
+        ConfirmacionPrecio.objects.filter(reporte_id__in=reporte_ids)
+        .values("reporte_id")
+        .annotate(n=Count("id"), ultima=Max("creado_en"))
+    )
+    return {f["reporte_id"]: (f["n"], f["ultima"]) for f in filas}
+
+
+def confirmados_hoy(usuario, reporte_ids: list[int]) -> set[int]:
+    return set(
+        ConfirmacionPrecio.objects.filter(
+            usuario=usuario, reporte_id__in=reporte_ids, fecha=timezone.localdate()
+        ).values_list("reporte_id", flat=True)
+    )
+
+
+def reportes_propios(usuario, reporte_ids: list[int]) -> set[int]:
+    return set(
+        ReportePrecio.objects.filter(autor=usuario, pk__in=reporte_ids).values_list("pk", flat=True)
     )

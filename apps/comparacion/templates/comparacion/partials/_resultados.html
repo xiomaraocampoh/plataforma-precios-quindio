@@ -1,20 +1,27 @@
-{# El orden viene del selector (neutralidad, EC-06): aquí solo se presenta. #}
-{% if resultados %}
+{# El orden viene del selector (neutralidad, EC-06): aquí solo se presenta. Los filtros solo reducen. #}
+{% if filtro.activo %}<p class="suave" role="status">Mostrando {{ filas|length }} resultado{{ filas|length|pluralize }} {% if filtro.municipio %}en {{ filtro.municipio }}{% endif %}{% if filtro.barrio %}{% if filtro.municipio %}, {% else %}en el {% endif %}barrio {{ filtro.barrio }}{% endif %}.</p>{% endif %}
+{% if filas %}
 <ol class="bento" style="padding:0" aria-label="Precios vigentes por establecimiento, en orden">
-  {% for r in resultados %}
+  {% for fila in filas %}{% with r=fila.resultado %}
   <li class="tile {% if forloop.first %}tile-oscuro tile-4{% else %}tile-2{% endif %}">
     <span class="{% if forloop.first %}etiqueta{% else %}puesto{% endif %}">
       {% if forloop.first %}Primero en el orden · menor precio por unidad{% else %}N.º {{ forloop.counter }}{% endif %}
     </span>
     <p class="nombre-tienda">{{ r.establecimiento }}</p>
-    <p class="suave">{{ r.presentacion }}</p>
+    <p class="suave">{{ r.presentacion }}{% if fila.barrio %} · {{ fila.barrio }}{% endif %}{% if fila.municipio %}, {{ fila.municipio }}{% endif %}</p>
     <p class="precio"><span class="sr-only">Precio: </span>${{ r.precio|floatformat:0 }}</p>
     <p class="por-unidad">${{ r.precio_unitario|floatformat:0 }} por {{ r.unidad_base }}</p>
     <div class="pie-tile">
       {% if r.es_promocion %}<span class="chip chip-promo">Promoción</span>{% endif %}
       <span class="chip {% if r.confianza == 'baja' %}chip-alerta{% endif %}">Confiabilidad {{ r.confianza }}{% if r.confianza == "baja" %} · verificar{% endif %}</span>
-      <span class="chip"><time datetime="{{ r.fecha_observacion|date:'c' }}">hace {{ r.fecha_observacion|timesince }}</time></span>
+      <span class="chip"><time datetime="{{ r.fecha_observacion|date:'c' }}">visto hace {{ r.fecha_observacion|timesince }}</time></span>
+      {% if fila.ultima_confirmacion %}<span class="chip chip-positivo"><time datetime="{{ fila.ultima_confirmacion|date:'c' }}">confirmado hace {{ fila.ultima_confirmacion|timesince }}</time></span>{% endif %}
     </div>
+    {% if user.is_authenticated and fila.reporte_id not in propios %}
+    <div class="acciones-fila">
+      {% include "precios/partials/_sigue_igual.html" with reporte_id=fila.reporte_id confirmado=False mensaje="" %}
+    </div>
+    {% endif %}
   </li>
   {% if forloop.first %}
   <li class="tile tile-2 tile-marca">
@@ -28,21 +35,22 @@
     {% endif %}
   </li>
   {% endif %}
-  {% endfor %}
+  {% endwith %}{% endfor %}
 
   <li class="tile tile-6 tile-tenue criterio">
     <svg class="ico" aria-hidden="true" style="color:var(--marca);margin-top:.2rem"><use href="#i-info"/></svg>
     {# Criterio de orden explícito para el usuario (neutralidad, EC-06) #}
-    <p><strong>Orden:</strong> {{ criterio }} <span class="suave">Las promociones se señalan, pero no cambian la posición.</span></p>
+    <p><strong>Orden:</strong> {{ criterio }} <span class="suave">Las promociones se señalan, pero no cambian la posición.{% if filtro.activo %} Los filtros solo ocultan resultados; no cambian el orden.{% endif %}</span></p>
   </li>
 </ol>
 {% else %}
 <div class="bento">
   <section class="tile tile-6 tile-marca vacio-estado">
     <span class="icono-caja" aria-hidden="true" style="background:var(--superficie)"><svg class="ico"><use href="#i-search"/></svg></span>
-    <h2>Aún no hay precios vigentes para este producto</h2>
-    <p class="suave">Si lo viste en alguna tienda, tu reporte ayuda a que otras personas comparen.</p>
+    <h2>{% if filtro.activo %}No hay precios vigentes con esos filtros{% else %}Aún no hay precios vigentes para este producto{% endif %}</h2>
+    <p class="suave">{% if filtro.activo %}Quita algún filtro para ver más establecimientos. {% endif %}Si lo viste en alguna tienda, tu reporte ayuda a que otras personas comparen.</p>
     <a class="btn" href="{% url 'precios:registrar' %}">¿Lo viste en alguna tienda?</a>
   </section>
+  <p class="tile tile-6 tile-tenue criterio"><strong>Orden:</strong>&nbsp;{{ criterio }}</p>
 </div>
 {% endif %}

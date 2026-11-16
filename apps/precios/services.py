@@ -9,7 +9,7 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.utils import timezone
 
 from apps.catalogo.models import Presentacion
@@ -19,7 +19,7 @@ from core.cache import invalidar_comparacion
 from .domain.confianza import es_anomalo
 from .domain.validaciones import FechaObservacionInvalidaError, normalizar_fecha_observacion
 from .domain.vigencia import Fuente, ventana_vigencia
-from .models import ReportePrecio
+from .models import ConfirmacionPrecio, ReportePrecio
 from .selectors import politica_vigencia
 
 TOLERANCIA_RELOJ = timedelta(minutes=5)  # relojes de celular desfasados
@@ -146,3 +146,45 @@ def cargar_reporte_historico(
     producto_id = reporte.presentacion.producto_id
     transaction.on_commit(lambda: invalidar_comparacion(producto_id))
     return reporte
+
+
+class LimiteDeConfirmacionesExcedidoError(Exception):
+    """RN-10 aplicado a «Sigue igual»: máximo de confirmaciones por hora por usuario."""
+
+
+def confirmar_precio(*, usuario, reporte_id: int) -> tuple[ConfirmacionPrecio, bool]:
+    """RF-14: idempotente por usuario, reporte y día; devuelve (confirmación, creada)."""
+    reporte = (
+        ReportePrecio.objects.select_related("presentacion")
+        .filter(pk=reporte_id, estado=ReportePrecio.Estado.PUBLICADO)
+        .first()
+    )
+    if reporte is None:
+        raise ValidationError("El precio no existe o no está publicado.")
+    if reporte.autor_id == usuario.pk:
+        raise ValidationError("No puedes confirmar un precio que reportaste tú.")
+    hoy = timezone.localdate()
+    existente = ConfirmacionPrecio.objects.filter(
+        reporte=reporte, usuario=usuario, fecha=hoy
+    ).first()
+    if existente is not None:
+        return existente, False  # reenvío del mismo día: no consume cupo
+    ahora = timezone.now()
+    limite = settings.PRECIOS["LIMITE_REPORTES_HORA"]
+    recientes = ConfirmacionPrecio.objects.filter(
+        usuario=usuario, creado_en__gte=ahora - timedelta(hours=1)
+    ).count()
+    if recientes >= limite:
+        raise LimiteDeConfirmacionesExcedidoError(
+            f"Alcanzaste el límite de {limite} confirmaciones por hora. Intenta más tarde."
+        )
+    try:
+        with transaction.atomic():
+            confirmacion = ConfirmacionPrecio.objects.create(
+                reporte=reporte, usuario=usuario, fecha=hoy
+            )
+    except IntegrityError:  # doble clic simultáneo: la otra petición ya la creó
+        return ConfirmacionPrecio.objects.get(reporte=reporte, usuario=usuario, fecha=hoy), False
+    producto_id = reporte.presentacion.producto_id
+    transaction.on_commit(lambda: invalidar_comparacion(producto_id))
+    return confirmacion, True
