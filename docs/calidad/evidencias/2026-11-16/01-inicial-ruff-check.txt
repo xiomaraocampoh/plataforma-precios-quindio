@@ -1,0 +1,7 @@
+# ruff check .
+# Fecha: 2026-11-16 10:39:21 -0500 · rama feat/cierre-corte-2 @ 56ced8e
+# BD de pruebas: SQLite en memoria (sin Docker/PostgreSQL en este equipo)
+
+All checks passed!
+
+# código de salida: 0
