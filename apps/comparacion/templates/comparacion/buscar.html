@@ -3,7 +3,7 @@
 {% block titulo %}AhorraPues · Compara precios en Armenia y el Quindío{% endblock %}
 {% block head %}<link rel="preload" as="image" href="{% static 'img/hero-supermercado.webp' %}" media="(min-width: 900px)" fetchpriority="high">
 <script src="{% static 'js/hero.js' %}?v=3" defer></script>
-<script src="{% static 'js/escanear.js' %}?v=9" defer></script>{% endblock %}
+<script src="{% static 'js/escanear.js' %}?v=11" defer></script>{% endblock %}
 {% block hero %}
 <div class="hero-fondo">
 <div class="hero-contenedor">
@@ -82,6 +82,13 @@
       <button type="button" class="btn btn-sec btn-bloque" data-otra>Escanear otra vez</button>
     </div>
   </dialog>
+  <div class="adjunto" data-adjunto hidden>
+    <img alt="Miniatura de la foto pegada" width="56" height="56">
+    <p>Foto lista. Pulsa <kbd>Enter</kbd> para identificar el producto.</p>
+    <button type="button" class="btn" data-buscar-adjunto>Buscar</button>
+    <button type="button" class="adjunto-quitar" data-quitar-adjunto aria-label="Quitar la foto"><svg class="ico" aria-hidden="true"><use href="#i-x"/></svg></button>
+  </div>
+  <div class="resultado-pagina" data-pagina-resultado role="status" aria-live="polite" hidden></div>
   <ul id="sugerencias" class="sugerencias" aria-label="Sugerencias de productos" aria-live="polite"></ul>
 
   {% if destacados %}

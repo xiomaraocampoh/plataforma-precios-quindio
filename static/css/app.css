@@ -399,3 +399,19 @@ textarea { width: 100%; min-height: 90px; padding: .6rem .95rem; font: inherit; 
 .foto-candidatos { list-style: none; padding: 0; margin: .5rem 0; display: grid; gap: .5rem; }
 .escaner[data-sincamara] .esc-marco { display: none; }
 .esc-vacio p { margin: 0; max-width: 26ch; }
+
+/* Foto pegada en la página (miniatura + resultado) */
+.adjunto { display: flex; align-items: center; gap: .75rem; margin-top: .75rem; padding: .5rem .5rem .5rem .5rem; background: #fff; border: 1px solid var(--borde); border-radius: 18px; box-shadow: 0 4px 24px -10px rgb(0 0 0 / .2); text-align: left; }
+.adjunto[hidden], .resultado-pagina[hidden] { display: none; }
+.adjunto img { width: 56px; height: 56px; object-fit: cover; border-radius: 12px; flex: none; background: #eee; }
+.adjunto p { margin: 0; flex: 1; font-size: .95rem; }
+.adjunto kbd { padding: .05rem .4rem; border: 1px solid var(--borde); border-radius: 6px; background: var(--superficie); font: inherit; font-size: .85rem; }
+.adjunto .btn { min-height: 44px; padding: 0 1.1rem; }
+.adjunto-quitar { width: 44px; height: 44px; border: 0; border-radius: 50%; background: transparent; color: var(--texto-suave); display: grid; place-items: center; cursor: pointer; flex: none; }
+.adjunto-quitar:hover { background: var(--marca-suave); }
+.adjunto-quitar:focus-visible { outline: 3px solid var(--marca); outline-offset: 2px; }
+.resultado-pagina { margin-top: .75rem; padding: 1rem 1.25rem; background: #fff; border: 1px solid var(--borde); border-radius: 20px; box-shadow: 0 8px 32px -12px rgb(0 0 0 / .25); text-align: left; color: var(--texto); }
+.resultado-pagina .btn { margin-top: .25rem; }
+.foto-aun { background: var(--marca-suave); border-radius: 12px; padding: .75rem 1rem; margin: .5rem 0; }
+@media (max-width: 480px) { .adjunto p { font-size: .85rem; } }
+.hero > .adjunto, .hero > .resultado-pagina { animation: none; }

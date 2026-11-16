@@ -115,14 +115,14 @@
       }).catch(function () { decir("No pudimos cargar el lector. Toma una foto o escribe el código."); });
     }
   }
-  function leerCodigoDeArchivo(archivo) {
-    decir("Leyendo la imagen…");
+  function leerCodigoDeArchivo(archivo, alNoEncontrar) {
     var url = URL.createObjectURL(archivo);
     var fin = function () { URL.revokeObjectURL(url); };
-    var noLeido = function () {
+    var noLeido = alNoEncontrar || function () {
       textoGuia();
       mostrarHoja("No encontramos un código de barras en la imagen. Acércate, mejora la luz o escribe el número.");
     };
+    if (!alNoEncontrar) decir("Leyendo la imagen…");
     if ("BarcodeDetector" in window) {
       var d = new window.BarcodeDetector({ formats: formatos });
       createImageBitmap(archivo).then(function (b) { return d.detect(b); }).then(function (r) {
@@ -197,13 +197,70 @@
     var lista = t && t.files ? Array.prototype.slice.call(t.files) : [];
     return lista.filter(function (a) { return /^image\//.test(a.type); })[0] || null;
   }
+  /* Foto pegada en la página: miniatura junto al buscador; Enter (o «Buscar») la identifica ahí mismo. */
+  var buscador = document.getElementById("q");
+  var chip = document.querySelector("[data-adjunto]");
+  var panel = document.querySelector("[data-pagina-resultado]");
+  var adjunto = null, urlMiniatura = "";
+  function ponerPanel(html, esHtml) {
+    if (!panel) return;
+    if (esHtml) panel.innerHTML = html; else panel.textContent = html; // html: fragmento propio
+    panel.hidden = !panel.textContent.trim() && !panel.children.length;
+    if (esHtml && !panel.hidden) panel.scrollIntoView({ block: "nearest" });
+  }
+  function quitarAdjunto() {
+    adjunto = null;
+    if (urlMiniatura) { URL.revokeObjectURL(urlMiniatura); urlMiniatura = ""; }
+    if (chip) chip.hidden = true;
+  }
+  function adjuntar(archivo) {
+    quitarAdjunto();
+    adjunto = archivo;
+    urlMiniatura = URL.createObjectURL(archivo);
+    chip.querySelector("img").src = urlMiniatura;
+    chip.hidden = false;
+    ponerPanel("");
+    if (buscador) buscador.focus();
+  }
+  function buscarAdjunto() {
+    if (!adjunto) return;
+    var archivo = adjunto;
+    ponerPanel("Identificando el producto…");
+    if (hayIA) {
+      createImageBitmap(archivo).then(function (b) { return reducir(b, b.width, b.height); })
+        .then(function (blob) {
+          var datos = new FormData();
+          datos.append("foto", blob, "foto.jpg");
+          return fetch(urlIA, { method: "POST", body: datos, headers: { "X-CSRFToken": csrf() }, credentials: "same-origin" });
+        }).then(function (r) { return r.text(); })
+        .then(function (html) { ponerPanel(html, true); })
+        .catch(function () { ponerPanel("No pudimos enviar la foto. Busca por nombre o con el código de barras."); });
+    } else {
+      leerCodigoDeArchivo(archivo, function () {
+        ponerPanel("No encontramos un código de barras en la imagen. Escribe el nombre del producto o prueba otra foto.");
+      });
+    }
+  }
+  if (chip) {
+    chip.querySelector("[data-buscar-adjunto]").addEventListener("click", buscarAdjunto);
+    chip.querySelector("[data-quitar-adjunto]").addEventListener("click", function () {
+      quitarAdjunto(); ponerPanel(""); if (buscador) buscador.focus();
+    });
+  }
+  if (buscador) {
+    buscador.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" && adjunto) { e.preventDefault(); buscarAdjunto(); }
+    });
+    buscador.addEventListener("input", function () { if (panel && buscador.value) ponerPanel(""); });
+  }
+
   document.addEventListener("paste", function (e) {
-    var enBuscador = document.activeElement && document.activeElement.id === "q";
-    if (!dlg.open && !enBuscador) return;
     var archivo = imagenDe(e.clipboardData);
     if (!archivo) return; // texto: comportamiento normal
-    e.preventDefault();
-    procesarArchivo(archivo);
+    if (dlg.open) { e.preventDefault(); procesarArchivo(archivo); return; }
+    var activo = document.activeElement;
+    var libre = !activo || activo === document.body || activo.id === "q";
+    if (chip && libre) { e.preventDefault(); adjuntar(archivo); }
   });
   ["dragover", "drop"].forEach(function (tipo) {
     dlg.addEventListener(tipo, function (e) {

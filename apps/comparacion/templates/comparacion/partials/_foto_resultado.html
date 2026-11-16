@@ -10,7 +10,7 @@
       {% for p in candidatos %}<li><a class="btn btn-sec btn-bloque" href="{% url 'comparacion:comparar' p.pk %}">{{ p }}</a></li>{% endfor %}
     </ul>
   {% else %}
-    <p class="suave">Aún no está en el catálogo.</p>
+    <p class="foto-aun"><strong>Aún no está en nuestro catálogo.</strong> Todavía no tenemos precios de este producto, pero puedes pedir que lo agreguemos.</p>
     <p><a class="btn btn-bloque" href="{% url 'catalogo:solicitar' %}?nombre={{ pista.nombre|urlencode }}&marca={{ pista.marca|urlencode }}&codigo_barras={{ pista.codigo_barras|urlencode }}">Solicitar este producto</a></p>
   {% endif %}
   <p class="suave">Revisa que sea el producto correcto: la lectura por foto puede equivocarse.</p>
