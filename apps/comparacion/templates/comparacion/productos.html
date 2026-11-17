@@ -34,5 +34,6 @@
     <a class="btn btn-sec" href="{% url 'comparacion:productos' %}">Limpiar</a>
   </div>
 </form>
+{% if user.is_authenticated %}<p class="sr-only" id="ayuda-sigue-igual">Confirma que el precio no ha cambiado desde que se reportó. Renueva su vigencia.</p>{% endif %}
 <div id="lista-productos" aria-live="polite">{% include "comparacion/partials/_productos.html" %}</div>
 {% endblock %}
