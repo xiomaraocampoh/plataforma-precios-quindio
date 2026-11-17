@@ -13,6 +13,9 @@ CACHES = {"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"
 
 # Las pruebas y el CI nunca salen a la red: el correo queda en django.core.mail.outbox
 EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+BREVO_API_KEY = ""  # aunque el .env tenga una clave real, las pruebas nunca la usan
+ANYMAIL = {}
+CORREO_CRON_TOKEN = ""
 EMAIL_HOST = ""
 EMAIL_HOST_PASSWORD = ""
 SITIO_URL = "http://testserver"

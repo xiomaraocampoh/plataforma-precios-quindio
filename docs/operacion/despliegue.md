@@ -123,6 +123,8 @@ sitio redirige a HTTPS; para comprobar por HTTP en local pon `FORZAR_HTTPS=False
 | `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD` | Para enviar correo | Login y **clave SMTP** de Brevo. Solo como secreto del proveedor, nunca en el repositorio |
 | `DEFAULT_FROM_EMAIL`, `EMAIL_REPLY_TO` | Para enviar correo | Remitente verificado en Brevo y dirección de respuesta |
 | `EMAIL_TIMEOUT` | No (`10`) | Segundos máximos por conexión SMTP |
+| `BREVO_API_KEY` | En Render, sí | Clave de **API** de Brevo (`xkeysib-`): el correo sale por HTTPS. Ver 6.2 |
+| `CORREO_CRON_TOKEN` | Para reintentos en Render | Token de `POST /interno/correos/procesar/` (cron de GitHub Actions) |
 | `SITIO_URL` | Sí, en producción | `https://tu-dominio`: base de los enlaces de los correos (no se toma de la cabecera Host) |
 
 ### 6.1 Correo con Brevo (ADR-021)
@@ -142,9 +144,64 @@ sitio redirige a HTTPS; para comprobar por HTTP en local pon `FORZAR_HTTPS=False
    minuto; revisa también la carpeta de spam (ver ADR-021, remitente `@gmail.com`).
 6. **Reintentos:** deja corriendo `python manage.py enviar_correos --continuo`, o prográmalo cada
    minuto, para reenviar lo que falló.
-7. **En el PaaS:** carga las mismas variables como secretos y agrega un segundo proceso
-   `python manage.py enviar_correos --continuo`, o un cron cada minuto. Sin él solo existe el primer
-   intento de cada correo.
+7. **En el PaaS:** carga las variables como secretos. Si el PaaS bloquea SMTP (Render gratuito lo
+   hace), usa la API de Brevo: ver la sección 6.2.
+
+### 6.2 Correo en Render
+
+**Causa del problema.** Render gratuito bloquea las conexiones salientes a los puertos SMTP 25, 465 y
+587. El envío por SMTP a `smtp-relay.brevo.com:587` se queda esperando y ningún correo sale. Por eso,
+en producción el correo va por la **API HTTPS de Brevo** (puerto 443), con `django-anymail`. Con
+`BREVO_API_KEY` definida, la aplicación usa la API sola, aunque también existan `EMAIL_BACKEND` o
+`EMAIL_HOST` (`core/correo.py`). SMTP sigue disponible para trabajar en local.
+
+**En Brevo:**
+
+1. *Settings → SMTP & API →* pestaña **API keys** → *Generate a new API key*. Ponle de nombre
+   «AhorraPues Render». Copia la clave, que empieza por `xkeysib-`. Es distinta de la clave SMTP
+   (`xsmtpsib-`) y Brevo la muestra una sola vez.
+2. *Security → Authorized IPs*. Render no tiene una IP fija de salida, así que **desactiva el bloqueo
+   por IP** o déjalo sin restricción. Si queda activo, Brevo responde `401 unrecognised IP address`.
+3. *Senders, Domains & Dedicated IPs → Senders*: el remitente de `DEFAULT_FROM_EMAIL` debe estar
+   verificado.
+
+**En Render → tu servicio → Environment** (como variables o secretos, nunca en el repositorio):
+
+| Variable | Valor |
+|---|---|
+| `BREVO_API_KEY` | La clave `xkeysib-…` del paso 1 |
+| `DEFAULT_FROM_EMAIL` | `AhorraPues <ahorrapuescolombia@gmail.com>` (el remitente verificado) |
+| `EMAIL_REPLY_TO` | `ahorrapuescolombia@gmail.com` |
+| `SITIO_URL` | `https://plataforma-precios-quindio.onrender.com` |
+| `CORREO_CRON_TOKEN` | Un valor aleatorio: `python -c "import secrets; print(secrets.token_urlsafe(32))"` |
+
+Puedes borrar `EMAIL_HOST`, `EMAIL_HOST_USER` y `EMAIL_HOST_PASSWORD` de Render, porque ya no se usan.
+Guarda los cambios: Render vuelve a desplegar. Si `SITIO_URL` contiene `localhost`, el arranque
+avisa en los logs, porque los enlaces de los correos no funcionarían.
+
+**Reintentos sin worker.** Render gratuito no tiene procesos en segundo plano. El workflow
+`.github/workflows/procesar-correos.yml` llama cada 10 minutos a `POST /interno/correos/procesar/`
+con `Authorization: Bearer <CORREO_CRON_TOKEN>`. El endpoint hace una pasada de `enviar_correos`
+(máximo 50 correos) y devuelve solo conteos. Sin el token, o con uno errado, responde 403, y tiene
+un límite de 30 llamadas por hora. La misma llamada despierta el servicio si estaba dormido. En
+GitHub, *Settings → Secrets and variables → Actions → New repository secret*, crea:
+
+- `PROD_URL` = `https://plataforma-precios-quindio.onrender.com` (sin `/` al final);
+- `CORREO_CRON_TOKEN` = el mismo valor que pusiste en Render.
+
+Para probarlo sin esperar: *Actions → procesar-correos → Run workflow*. GitHub puede retrasar los
+`schedule` varios minutos.
+
+**Cómo probar el envío:** *Render → Shell*:
+
+```bash
+python manage.py diagnostico_correo                      # backend, variables (sí/no), cola, último error
+python manage.py diagnostico_correo --enviar tu-correo@ejemplo.com
+```
+
+El diagnóstico nunca imprime claves. Debe decir «Backend: API HTTPS de Brevo (django-anymail)». Si
+el correo de prueba falla, el mensaje dice por qué; por ejemplo, `AnymailAPIError … 401` indica
+una clave errada o el bloqueo por IP activo.
 
 
 ## 7. Llevarlo a un PaaS de contenedores (pendiente de proveedor)

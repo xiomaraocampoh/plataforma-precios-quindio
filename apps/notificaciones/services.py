@@ -20,7 +20,7 @@ from urllib.parse import urlsplit
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.db import transaction
-from django.db.models import F
+from django.db.models import Count, F
 from django.template.loader import render_to_string
 from django.utils import timezone
 
@@ -190,8 +190,16 @@ def _datos_secretos(correo: CorreoPendiente, efimero: dict | None) -> dict | Non
     return regenerar(correo) if regenerar else None
 
 
+def _sin_secretos(texto: str) -> str:
+    """Quita las credenciales de correo de un texto (un error de anymail o SMTP)."""
+    for secreto in (getattr(settings, "BREVO_API_KEY", ""), settings.EMAIL_HOST_PASSWORD):
+        if secreto:
+            texto = texto.replace(secreto, "[clave]")
+    return texto
+
+
 def _sin_correos(texto: str) -> str:
-    return _CORREO.sub("[correo]", texto)[:300]
+    return _CORREO.sub("[correo]", _sin_secretos(texto))[:300]
 
 
 def _terminar(correo: CorreoPendiente, estado: str, error: str = "") -> None:
@@ -218,7 +226,7 @@ def enviar(correo_id: int, *, efimero: dict | None = None) -> bool:
         return False
     try:
         _mensaje(correo, {**correo.contexto, **secretos}).send(fail_silently=False)
-    except Exception as exc:  # SMTP, red, TLS: se reintenta más tarde
+    except Exception as exc:  # SMTP, red, TLS o AnymailError (API de Brevo): se reintenta
         agotado = correo.intentos >= MAX_INTENTOS
         siguiente = Estado.FALLIDO if agotado else Estado.PENDIENTE
         _terminar(correo, siguiente, f"{type(exc).__name__}: {exc}")
@@ -238,14 +246,17 @@ def enviar(correo_id: int, *, efimero: dict | None = None) -> bool:
     return True
 
 
-def enviar_pendientes(ahora=None) -> dict[str, int]:
-    """Reintenta lo pendiente que ya esperó lo suficiente. Lo usa `manage.py enviar_correos`."""
+def enviar_pendientes(ahora=None, *, limite: int | None = None) -> dict[str, int]:
+    """Reintenta lo pendiente que ya esperó lo suficiente. Lo usan `manage.py enviar_correos` y
+    POST /interno/correos/procesar/ (con `limite`, para no pasar del tiempo de la petición)."""
     ahora = ahora or timezone.now()
     inciertos = CorreoPendiente.objects.filter(
         estado=Estado.ENVIANDO, ultimo_intento__lt=ahora - ENVIANDO_INCIERTO
     ).update(estado=Estado.FALLIDO, error="Estado incierto: no se reintenta para no duplicarlo.")
     enviados = fallidos = 0
     for correo in CorreoPendiente.objects.filter(estado=Estado.PENDIENTE).order_by("pk"):
+        if limite is not None and enviados + fallidos >= limite:
+            break
         if not puede_reintentar(
             intentos=correo.intentos, ultimo_intento=correo.ultimo_intento, ahora=ahora
         ):
@@ -255,3 +266,35 @@ def enviar_pendientes(ahora=None) -> dict[str, int]:
         else:
             fallidos += 1
     return {"enviados": enviados, "fallidos": fallidos, "inciertos": inciertos}
+
+
+# ---------- Diagnóstico (manage.py diagnostico_correo) ----------
+
+
+def resumen_cola() -> dict:
+    """Cuántos correos hay por estado y el último error, ya sin correos ni claves."""
+    por_estado = {e: 0 for e in Estado.values}
+    for fila in CorreoPendiente.objects.values("estado").annotate(n=Count("id")):
+        por_estado[fila["estado"]] = fila["n"]
+    ultimo = CorreoPendiente.objects.exclude(error="").order_by("-ultimo_intento", "-pk").first()
+    error = ""
+    if ultimo is not None:
+        error = f"#{ultimo.pk} {ultimo.tipo}: {_sin_correos(ultimo.error)[:160]}"
+    return {"por_estado": por_estado, "ultimo_error": error}
+
+
+def enviar_prueba(destinatario: str) -> str:
+    """Envía un correo de prueba directo (sin la cola). Devuelve "" si salió o el error limpio."""
+    mensaje = EmailMultiAlternatives(
+        subject="AhorraPues: correo de prueba",
+        body="Si lees esto, el envío de correo de AhorraPues funciona.",
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[destinatario],
+        reply_to=[settings.EMAIL_REPLY_TO] if settings.EMAIL_REPLY_TO else None,
+        headers={"Message-ID": make_msgid(idstring="prueba", domain=_host_del_sitio())},
+    )
+    try:
+        mensaje.send(fail_silently=False)
+    except Exception as exc:  # se informa sin la clave ni direcciones
+        return _sin_correos(f"{type(exc).__name__}: {exc}")
+    return ""
