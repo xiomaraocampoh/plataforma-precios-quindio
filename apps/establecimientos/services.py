@@ -39,6 +39,19 @@ def sugerir_establecimiento(
     )
 
 
+def asegurar_establecimiento(
+    *, nombre: str, tipo: str, direccion: str, barrio: str, municipio: str
+) -> tuple[Establecimiento, bool]:
+    """Establecimiento aprobado por nombre y municipio (datos de prueba); no pisa ediciones."""
+    if tipo not in Establecimiento.Tipo.values:
+        raise ValidationError({"tipo": f"El tipo «{tipo}» no existe."})
+    return Establecimiento.objects.get_or_create(
+        nombre=nombre,
+        municipio=municipio,
+        defaults={"tipo": tipo, "direccion": direccion, "barrio": barrio},
+    )
+
+
 @transaction.atomic
 def aprobar_establecimiento(*, establecimiento_id: int, moderador) -> Establecimiento:
     return _revisar(establecimiento_id, moderador, Establecimiento.Estado.APROBADO, activo=True)

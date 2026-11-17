@@ -9,8 +9,8 @@ from django.utils import timezone
 from core.cache import invalidar_comparacion
 from core.errores import EnUsoError
 
-from .domain.duplicados import normalizar_nombre
-from .models import Marca, Presentacion, Producto, SolicitudCatalogo
+from .domain.duplicados import normalizar_nombre, son_posibles_duplicados
+from .models import Categoria, Marca, Presentacion, Producto, SolicitudCatalogo
 
 
 def solicitar_producto(
@@ -44,6 +44,48 @@ def marca_por_nombre(nombre: str) -> Marca | None:
         return None
     marca = Marca.objects.filter(nombre_normalizado=normal).first()
     return marca or Marca.objects.create(nombre=nombre)
+
+
+def asegurar_categoria(*, nombre: str, perecedera: bool) -> tuple[Categoria, bool]:
+    """Categoría por nombre exacto; si existe se conserva tal cual (no se pisan cambios)."""
+    return Categoria.objects.get_or_create(nombre=nombre, defaults={"perecedera": perecedera})
+
+
+class PosibleDuplicadoError(ValueError):
+    """D-05: ya hay un producto de la misma marca con un nombre casi igual."""
+
+
+def asegurar_producto(
+    *, nombre: str, marca: Marca | None, categoria: Categoria
+) -> tuple[Producto, bool]:
+    """Producto por nombre normalizado y marca (D-05). Si solo hay uno PARECIDO de la misma
+    marca, no se crea otro: la decisión es humana (PosibleDuplicadoError)."""
+    normal = normalizar_nombre(nombre)
+    existente = Producto.objects.filter(nombre_normalizado=normal, marca=marca).first()
+    if existente is not None:
+        return existente, False
+    for otro in Producto.objects.filter(marca=marca).only("id", "nombre"):
+        if son_posibles_duplicados(nombre, otro.nombre):
+            raise PosibleDuplicadoError(f"«{nombre}» se parece a «{otro.nombre}» ({marca}).")
+    return Producto.objects.create(nombre=nombre, marca=marca, categoria=categoria), True
+
+
+def asegurar_presentacion(
+    *, producto: Producto, cantidad: Decimal, unidad: str, codigo_barras: str = ""
+) -> tuple[Presentacion, bool]:
+    """Presentación única por producto, cantidad y unidad. Completa el código si faltaba."""
+    presentacion, creada = Presentacion.objects.get_or_create(
+        producto=producto,
+        cantidad=cantidad,
+        unidad=unidad,
+        defaults={"codigo_barras": codigo_barras},
+    )
+    if not creada and codigo_barras and not presentacion.codigo_barras:
+        presentacion.codigo_barras = codigo_barras
+        presentacion.save(update_fields=["codigo_barras"])
+    if creada:
+        transaction.on_commit(lambda: invalidar_comparacion(producto.pk))
+    return presentacion, creada
 
 
 def existe_presentacion(*, nombre: str, marca: str, cantidad: Decimal, unidad: str) -> bool:
@@ -135,3 +177,13 @@ def eliminar(objeto) -> None:
             objeto.delete()
     except (ProtectedError, RestrictedError) as exc:
         raise EnUsoError("Tiene reportes u otros registros asociados.") from exc
+
+
+def borrar_solicitudes_pendientes(*, marcador: str) -> int:
+    """Borra las solicitudes PENDIENTES cuyo detalle empieza con `marcador` (datos de prueba)."""
+    if not marcador:
+        raise ValueError("Se necesita un marcador para no borrar solicitudes reales.")
+    total, _ = SolicitudCatalogo.objects.filter(
+        estado=SolicitudCatalogo.Estado.PENDIENTE, detalle__startswith=marcador
+    ).delete()
+    return total
