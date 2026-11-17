@@ -652,3 +652,31 @@ select:disabled { cursor: not-allowed; opacity: .6; }
 
 /* Celular: el titular baja para dejar ver la imagen completa del hero encima (alto de la imagen = ancho / 2). */
 @media (max-width: 599px) { .hero-fondo .hero { padding-top: calc(50vw + 1.25rem); } }
+
+/* ---------- Cabecera en celular y tablet: una sola fila + menú de hamburguesa ----------
+   «Ingresar» y «Crear cuenta» siempre visibles; los enlaces principales van en un panel. */
+.menu-boton { display: none; }
+@media (max-width: 1023px) {
+  .cabecera-in { flex-wrap: nowrap; gap: .5rem; position: relative; }
+  .acciones { flex-wrap: nowrap; gap: .4rem; }
+  .acciones .btn { min-height: 40px; padding: 0 .9rem; font-size: .9rem; white-space: nowrap; }
+  .js .menu-boton { display: inline-grid; place-items: center; width: 44px; height: 44px; flex: none; border-radius: 50%; border: 0;
+    background: transparent; color: var(--texto); cursor: pointer; }
+  .js .menu-boton:hover, .js .cabecera.menu-abierto .menu-boton { background: color-mix(in srgb, var(--texto) 9%, transparent); }
+  .js .menu-boton .ico { width: 1.45em; height: 1.45em; }
+  /* Panel de enlaces */
+  .js .nav { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; flex-wrap: nowrap; gap: 0;
+    padding: .35rem var(--gap) .9rem; background: var(--superficie); border-bottom: 1px solid var(--borde);
+    box-shadow: 0 20px 40px -20px rgb(0 0 0 / .3); max-height: calc(100dvh - 4.5rem); overflow-y: auto; }
+  .js .cabecera.menu-abierto .nav { display: flex; }
+  .js .nav a { min-height: 52px; padding: 0 .25rem; border-radius: 0; font-size: 1.05rem; border-bottom: 1px solid var(--borde); }
+  .js .nav a:last-child { border-bottom: 0; }
+  .js .nav a[aria-current="page"] { color: var(--marca-enlace); }
+}
+/* Teléfonos angostos: el nombre se oculta a la vista (el logo queda y el nombre sigue en el HTML) para que
+   quepan los dos botones y la hamburguesa. */
+@media (max-width: 439px) {
+  .marca-nombre { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .acciones .btn { padding: 0 .75rem; font-size: .85rem; }
+  .menu-cuenta summary { padding-inline: .6rem; }
+}
