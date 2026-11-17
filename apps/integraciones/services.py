@@ -2,6 +2,7 @@
 
 import hashlib
 from dataclasses import dataclass, field
+from decimal import Decimal
 
 from django.conf import settings
 from django.core.cache import cache
@@ -9,6 +10,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from apps.catalogo import selectors as catalogo
+from apps.catalogo import services as catalogo_servicios
 
 from .clients.sipsa import PrecioExterno
 from .clients.vision import (  # noqa: F401  (se reexporta para las vistas)
@@ -25,18 +27,43 @@ class ResumenImportacion:
     creados: int = 0
     actualizados: int = 0
     sin_producto: list[str] = field(default_factory=list)
+    productos_creados: list[str] = field(default_factory=list)
+
+
+CATEGORIA_FRESCOS = "Frutas y verduras"
+
+
+def _crear_fresco(nombre: str):
+    """--crear-faltantes: un producto fresco sin marca, con presentación de 1 kg (por servicios
+    del catálogo, con su regla de duplicados D-05). None si se parece a uno existente."""
+    categoria, _ = catalogo_servicios.asegurar_categoria(nombre=CATEGORIA_FRESCOS, perecedera=True)
+    try:
+        producto, _ = catalogo_servicios.asegurar_producto(
+            nombre=nombre, marca=None, categoria=categoria
+        )
+    except catalogo_servicios.PosibleDuplicadoError:
+        return None
+    catalogo_servicios.asegurar_presentacion(producto=producto, cantidad=Decimal(1), unidad="kg")
+    return producto
 
 
 @transaction.atomic
-def importar_referencias(precios: list[PrecioExterno]) -> ResumenImportacion:
+def importar_referencias(
+    precios: list[PrecioExterno], *, crear_faltantes: bool = False
+) -> ResumenImportacion:
     """Asocia cada fila a un producto del catálogo y la guarda con fuente «sipsa».
 
-    Idempotente: reimportar el archivo actualiza (producto, mercado, fecha) sin duplicar.
-    Las filas cuyo producto no está en el catálogo se informan y no se guardan.
+    Idempotente: reimportar actualiza (producto, mercado, fecha) sin duplicar.
+    Las filas cuyo producto no está en el catálogo se informan y no se guardan, salvo con
+    `crear_faltantes`, que crea el producto fresco (sin marca, 1 kg).
     """
     resumen = ResumenImportacion()
     for p in precios:
         producto = catalogo.producto_por_nombre(p.producto)
+        if producto is None and crear_faltantes:
+            producto = _crear_fresco(p.producto)
+            if producto is not None:
+                resumen.productos_creados.append(p.producto)
         if producto is None:
             resumen.sin_producto.append(p.producto)
             continue

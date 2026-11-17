@@ -204,6 +204,8 @@ POLITICA_DATOS = {
 INTEGRACIONES = {
     "SIPSA_BASE_URL": env.str("SIPSA_BASE_URL", default=""),
     "SIPSA_TIMEOUT_S": env.int("SIPSA_TIMEOUT_S", default=5),
+    # promediosSipsaCiudad trae ~120 MB (todas las ciudades e historial): tarda ~1 min
+    "SIPSA_SOAP_TIMEOUT_S": env.int("SIPSA_SOAP_TIMEOUT_S", default=180),
     # Reconocimiento de productos por foto (ADR-022). Sin clave, la función queda apagada.
     "ANTHROPIC_API_KEY": env.str("ANTHROPIC_API_KEY", default=""),
     "RECONOCIMIENTO_MODELO": env.str("RECONOCIMIENTO_MODELO", default="claude-opus-5-5"),
