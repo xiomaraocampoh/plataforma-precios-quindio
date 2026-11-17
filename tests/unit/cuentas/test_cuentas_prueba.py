@@ -1,5 +1,7 @@
 """Cuentas de prueba por rol y la excepción local al segundo factor. Dominio puro."""
 
+import secrets
+
 import pytest
 
 from apps.cuentas.domain.cuentas_prueba import (
@@ -57,7 +59,8 @@ class TestCatalogoDeCuentas:
 
 class TestContrasena:
     def test_se_usa_la_variable_de_entorno(self):
-        assert exigir_contrasena_de_prueba("una-clave-larga") == "una-clave-larga"
+        valor = secrets.token_urlsafe(16)  # nunca un literal en el código
+        assert exigir_contrasena_de_prueba(valor) == valor
 
     @pytest.mark.parametrize("valor", [None, "", "   "])
     def test_sin_variable_se_detiene_sin_generar_nada(self, valor):
