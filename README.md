@@ -26,6 +26,10 @@ python manage.py runserver
 - App: http://localhost:8000 · API docs (OpenAPI): http://localhost:8000/api/docs/
 - Salud: http://localhost:8000/healthz/ (PostgreSQL y caché)
 - Datos de ejemplo: `python manage.py cargar_demo` (catálogo, tiendas y precios; idempotente)
+- Datos de prueba con marcas reales y sedes del Quindío: `python manage.py cargar_datos_prueba`
+  (`--limpiar`, `--solo-catalogo`; fuentes en [data/demo/README.md](data/demo/README.md))
+- Cuentas de prueba por rol: `python manage.py crear_cuentas_prueba` con
+  `CUENTAS_PRUEBA_PASSWORD` en el `.env` ([docs/nucleo/cuentas-de-prueba.md](docs/nucleo/cuentas-de-prueba.md))
 
 Sin Docker, el proyecto arranca con SQLite y caché en memoria. En `.env` usa
 `DATABASE_URL=sqlite:///db.sqlite3` y deja `REDIS_URL` vacío.
