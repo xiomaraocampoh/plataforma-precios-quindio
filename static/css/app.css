@@ -680,3 +680,30 @@ select:disabled { cursor: not-allowed; opacity: .6; }
   .acciones .btn { padding: 0 .75rem; font-size: .85rem; }
   .menu-cuenta summary { padding-inline: .6rem; }
 }
+/* ---------- Tarjeta de precio (RF-16): comparación y listado de productos ----------
+   Orden: producto y marca · presentación · precio total · precio por unidad · comercio ·
+   fuente, antigüedad y confianza (con texto, no solo color: 1.4.1) · acciones. */
+.tp-producto { font-size: 1.15rem; font-weight: 650; letter-spacing: -.015em; line-height: 1.25; margin: 0; }
+.tile-oscuro .tp-producto { font-size: clamp(1.25rem, 2.6vw, 1.5rem); }
+.tp-marca { font-weight: 500; color: var(--texto-suave); }
+.tile-oscuro .tp-marca, .tile-oscuro .tp-ayuda, .tile-oscuro .tp-tipo, .tile-oscuro .tp-direccion,
+.tile-oscuro .tp-explicacion { color: var(--sobre-oscura-suave); }
+.tp-presentacion { font-weight: 600; font-variant-numeric: tabular-nums; }
+.tp-unidad { display: flex; flex-wrap: wrap; align-items: baseline; gap: .15rem .5rem; }
+.tp-ayuda { font-size: .85rem; color: var(--texto-suave); }
+.tp-comercio { display: flex; flex-direction: column; gap: .1rem; padding-top: .6rem; border-top: 1px solid var(--borde); }
+.tile-oscuro .tp-comercio { border-top-color: rgb(255 255 255 / .16); }
+.tp-tipo { font-size: .875rem; font-weight: 600; color: var(--texto-suave); }
+.tp-direccion { font-style: normal; font-size: .9rem; color: var(--texto-suave); }
+.tp-mapa { display: inline-flex; align-items: center; min-height: 44px; font-weight: 500; color: var(--marca-enlace); }
+.tp-mapa::after { content: " ›"; white-space: pre; }
+.tp-datos { list-style: none; margin: 0; padding: .6rem 0 0; }
+.tp-datos .ico { width: 1em; height: 1em; }
+.tp-explicacion { font-size: .85rem; color: var(--texto-suave); }
+.tarjetas-precio { list-style: none; padding: 0; margin: 0; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); }
+.tarjeta.tarjeta-precio { gap: .5rem; min-height: 0; }
+.tarjeta.tarjeta-precio:hover { background: var(--superficie); transform: none; }
+.tarjeta-precio .precio { font-size: clamp(1.9rem, 4.6vw, 2.4rem); }
+.tarjeta-precio .acciones-fila { align-items: center; }
+.tarjeta-precio .ir { margin-top: auto; padding-top: .4rem; display: inline-flex; align-items: center; min-height: 44px; }
+.equivale { margin-top: .35rem; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--texto); min-height: 1.4em; }

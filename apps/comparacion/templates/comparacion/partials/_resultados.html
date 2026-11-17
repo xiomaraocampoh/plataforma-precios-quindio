@@ -5,36 +5,8 @@
 {% if filas %}
 <ol class="bento" style="padding:0" aria-label="Precios vigentes por establecimiento, en orden">
   {% for fila in filas %}{% with r=fila.resultado %}
-  <li class="tile {% if forloop.first %}tile-oscuro tile-4{% else %}tile-2{% endif %}">
-    <span class="{% if forloop.first %}etiqueta{% else %}puesto{% endif %}">
-      {% if forloop.first %}Primero en el orden · menor precio por unidad{% else %}N.º {{ forloop.counter }}{% endif %}
-    </span>
-    <p class="nombre-tienda">{{ r.establecimiento }}</p>
-    <p class="suave">{{ r.presentacion }}{% if fila.barrio %} · {{ fila.barrio }}{% endif %}{% if fila.municipio %}, {{ fila.municipio }}{% endif %}</p>
-    <p class="precio"><span class="sr-only">Precio: </span>${{ r.precio|floatformat:0 }}</p>
-    <p class="por-unidad">${{ r.precio_unitario|floatformat:0 }} por {{ r.unidad_base }}</p>
-    <div class="pie-tile">
-      {% if r.es_promocion %}<span class="chip chip-promo">Promoción</span>{% endif %}
-      <span class="chip {% if r.confianza == 'baja' %}chip-alerta{% endif %}">Confiabilidad {{ r.confianza }}{% if r.confianza == "baja" %} · verificar{% endif %}</span>
-      <span class="chip"><time datetime="{{ r.fecha_observacion|date:'c' }}">visto hace {{ r.fecha_observacion|hace }}</time></span>
-      {% if fila.ultima_confirmacion %}<span class="chip chip-positivo"><time datetime="{{ fila.ultima_confirmacion|date:'c' }}">confirmado hace {{ fila.ultima_confirmacion|hace }}</time></span>{% endif %}
-    </div>
-    {% if user.is_authenticated and fila.reporte_id not in propios %}
-    <div class="acciones-fila">
-      {% include "precios/partials/_sigue_igual.html" with reporte_id=fila.reporte_id confirmado=False mensaje="" %}
-    </div>
-    {% if fila.reporte_id in denunciados %}
-    <p class="suave">Ya denunciaste este precio; moderación lo revisará.</p>
-    {% else %}
-    <details class="panel-plegable">
-      <summary>Denunciar<span class="sr-only"> el precio de {{ r.establecimiento }}</span></summary>
-      {% url 'moderacion:denunciar' fila.reporte_id as url_denuncia %}
-      <div hx-get="{{ url_denuncia }}" hx-trigger="toggle from:closest details once" hx-swap="innerHTML">
-        <a href="{{ url_denuncia }}">Abrir el formulario de denuncia</a>
-      </div>
-    </details>
-    {% endif %}
-    {% endif %}
+  <li class="tile tarjeta-precio {% if forloop.first %}tile-oscuro tile-4{% else %}tile-2{% endif %}" aria-labelledby="tp-{{ fila.reporte_id }}">
+    {% include "comparacion/partials/_tarjeta_precio.html" with destacada=forloop.first numero=forloop.counter %}
   </li>
   {% if forloop.first %}
   <li class="tile tile-2 tile-marca">

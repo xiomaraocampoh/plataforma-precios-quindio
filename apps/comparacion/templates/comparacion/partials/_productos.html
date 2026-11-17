@@ -1,15 +1,20 @@
-<p class="suave" role="status">{{ pagina.paginator.count }} producto{{ pagina.paginator.count|pluralize }}{% if q or marca or categoria_id %} con los filtros aplicados{% endif %}. Orden alfabético.</p>
-{% if pagina.object_list %}
-<div class="tarjetas">
-  {% for p in pagina.object_list %}
-  <a class="tarjeta" href="{% url 'comparacion:comparar' p.pk %}">
-    <span class="meta">{{ p.categoria }}{% if p.marca %} · {{ p.marca }}{% endif %}</span>
-    <span class="nombre">{{ p }}</span>
-    <span class="meta">{% for pr in p.presentaciones.all %}{{ pr.cantidad|floatformat:"-3" }} {{ pr.unidad }}{% if not forloop.last %} · {% endif %}{% endfor %}</span>
-    <span class="ir">Comparar</span>
-  </a>
+<p class="suave" role="status">{{ pagina.paginator.count }} producto{{ pagina.paginator.count|pluralize }}{% if q or marca or categoria_id %} con los filtros aplicados{% endif %}. Orden alfabético; en cada tarjeta, el primer precio en el orden neutral (menor precio por unidad).</p>
+{% if tarjetas %}
+<ul class="tarjetas tarjetas-precio" aria-label="Productos">
+  {% for p, fila in tarjetas %}
+  <li class="tarjeta tarjeta-precio" aria-labelledby="{% if fila %}tp-{{ fila.reporte_id }}{% else %}tp-sin-{{ p.pk }}{% endif %}">
+    {% if fila %}
+      {% include "comparacion/partials/_tarjeta_precio.html" with destacada=False etiqueta=p.categoria.nombre %}
+    {% else %}
+      <span class="puesto">{{ p.categoria }}</span>
+      <h2 class="tp-producto" id="tp-sin-{{ p.pk }}">{{ p.nombre }}{% if p.marca %} <span class="tp-marca">{{ p.marca }}</span>{% endif %}</h2>
+      <p class="tp-presentacion"><span class="sr-only">Presentaciones: </span>{% for pr in p.presentaciones.all %}{{ pr.cantidad|floatformat:"-3" }} {{ pr.unidad }}{% if not forloop.last %} · {% endif %}{% endfor %}</p>
+      <p class="suave">Aún no hay precios vigentes.</p>
+    {% endif %}
+    <a class="ir" href="{% url 'comparacion:comparar' p.pk %}">{% if fila %}Ver todos los precios{% else %}Ver el producto{% endif %}<span class="sr-only"> de {{ p }}</span></a>
+  </li>
   {% endfor %}
-</div>
+</ul>
 {% include "partials/_paginacion.html" %}
 {% else %}
 <section class="tile tile-marca vacio-estado">

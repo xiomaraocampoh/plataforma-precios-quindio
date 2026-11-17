@@ -9,6 +9,8 @@
       {{ campo.label_tag }}
       {{ campo }}
       {% if campo.help_text %}<p class="ayuda" id="{{ campo.auto_id }}_helptext">{{ campo.help_text }}</p>{% endif %}
+      {# RF-16: «Equivale a $X por kg» mientras se escribe (precio-unidad.js); solo informativo #}
+      {% if campo.name == "precio" %}<p class="equivale" id="precio-equivale" aria-live="polite" aria-atomic="true" data-equivale></p>{% endif %}
       {# el id coincide con el aria-describedby que genera Django (1.3.1) #}
       {% if campo.errors %}<span class="error" id="{{ campo.auto_id }}_error" role="alert">{{ campo.errors|join:", " }}</span>{% endif %}
     </div>
