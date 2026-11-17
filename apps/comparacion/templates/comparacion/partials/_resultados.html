@@ -1,3 +1,4 @@
+{% load tiempo %}
 {# El orden viene del selector (neutralidad, EC-06): aquí solo se presenta. Los filtros solo reducen. #}
 {% if error_precio %}<p class="error" role="alert" id="error-precio">{{ error_precio }}</p>{% endif %}
 {% if filtro.activo or filtro_precio.activo %}<p class="suave" role="status">Mostrando {{ filas|length }} resultado{{ filas|length|pluralize }}{% if filtro.municipio %} en {{ filtro.municipio }}{% endif %}{% if filtro.barrio %}{% if filtro.municipio %}, {% else %} en el {% endif %}barrio {{ filtro.barrio }}{% endif %}{% if filtro_precio.activo %}{% if filtro.activo %}, {% else %} {% endif %}{% if filtro_precio.minimo is not None and filtro_precio.maximo is not None %}entre ${{ filtro_precio.minimo|floatformat:0 }} y ${{ filtro_precio.maximo|floatformat:0 }}{% elif filtro_precio.minimo is not None %}desde ${{ filtro_precio.minimo|floatformat:0 }}{% else %}hasta ${{ filtro_precio.maximo|floatformat:0 }}{% endif %}{% endif %}.</p>{% endif %}

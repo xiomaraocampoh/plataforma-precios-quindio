@@ -1,25 +1,21 @@
 {% extends "base.html" %}
+{% load static %}
 {% block titulo %}Ingresar · AhorraPues{% endblock %}
+{% block head %}<script src="{% static 'js/cuentas.js' %}?v=1" defer></script>{% endblock %}
 {% block contenido %}
 <div class="auth bento">
   <section class="tile tile-3" aria-labelledby="t-ingresar">
     <h1 id="t-ingresar">Ingresar</h1>
     <p class="suave" style="margin-bottom:.6rem">Necesitas una cuenta solo para registrar precios. Consultar es libre.</p>
-    <form method="post" novalidate>
+    {% include "partials/_resumen_errores.html" with recuperar=True %}
+    <form method="post" novalidate data-una-vez>
       {% csrf_token %}
       <input type="hidden" name="next" value="{{ next }}">
-      {% if form.non_field_errors %}<div class="campo" role="alert">{% for e in form.non_field_errors %}<span class="error">{{ e }}</span>{% endfor %}</div>{% endif %}
-      {# Django agrega aria-invalid y aria-describedby; los errores por campo se muestran (3.3.1) #}
-      {% for campo in form %}
-      <div class="campo">
-        <label for="{{ campo.id_for_label }}">{% if campo.name == "username" %}Nombre de usuario{% else %}Contraseña{% endif %}</label>
-        {{ campo }}
-        {% if campo.errors %}<span class="error" id="{{ campo.auto_id }}_error" role="alert">{{ campo.errors|join:" " }}</span>{% endif %}
-      </div>
-      {% endfor %}
-      <button class="btn btn-bloque" type="submit">Ingresar</button>
+      {% include "partials/_campo.html" with campo=form.username sin_alerta=True %}
+      {% include "partials/_campo_clave.html" with campo=form.password sin_alerta=True %}
+      <p class="ayuda-clave"><a href="{% url 'cuentas:recuperar' %}">¿Olvidaste tu contraseña?</a></p>
+      <button class="btn btn-bloque" type="submit" data-enviando="Ingresando…">Ingresar</button>
     </form>
-    <p class="enlace-pie"><a href="{% url 'cuentas:recuperar' %}">¿Olvidaste tu contraseña?</a></p>
     <p class="enlace-pie">¿No tienes cuenta? <a href="{% url 'cuentas:registro' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Crear cuenta</a></p>
   </section>
 

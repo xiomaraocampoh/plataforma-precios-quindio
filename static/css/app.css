@@ -239,6 +239,12 @@ a.chip:hover { text-decoration: none; background: var(--borde); }
   -webkit-mask-image: linear-gradient(#000 86%, transparent); mask-image: linear-gradient(#000 86%, transparent);
   pointer-events: none;
 }
+/* Celular y tablet: la imagen se muestra COMPLETA (el carrito a un lado y los productos al otro) en lugar de
+   recortarla por el centro, que es la parte vacía. En celular el titular baja para no pasar por encima. */
+@media (max-width: 899px) {
+  .hero-fondo::before { height: auto; aspect-ratio: 2 / 1; background-size: 100% auto; background-position: center top;
+    -webkit-mask-image: linear-gradient(#000 72%, transparent); mask-image: linear-gradient(#000 72%, transparent); }
+}
 @media (min-width: 900px) {
   .hero-fondo { --alto-fondo: 700px; }
   .hero-fondo::before { background-image: url("../img/hero-supermercado.webp"); }
@@ -294,7 +300,11 @@ a.chip:hover { text-decoration: none; background: var(--borde); }
 .tile-oscuro .barra-relleno { background: rgb(255 255 255 / .35); }
 .tile-oscuro .barra-fila.es-primero .barra-relleno { background: #2997ff; }
 
-.tarjetas { display: grid; gap: var(--gap); grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); }
+.tarjetas { --cols: 1; display: flex; flex-wrap: wrap; justify-content: center; gap: var(--gap); }
+.tarjetas > * { flex: 0 0 calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols)); min-width: 0; }
+@media (min-width: 520px) { .tarjetas { --cols: 2; } }
+@media (min-width: 820px) { .tarjetas { --cols: 3; } }
+@media (min-width: 1100px) { .tarjetas { --cols: 4; } }
 .tarjeta { display: flex; flex-direction: column; gap: .35rem; background: var(--superficie); border-radius: 22px; padding: 1.4rem; color: var(--texto); min-height: 150px; }
 .tarjeta:hover { text-decoration: none; background: var(--marca-suave); }
 .tarjeta .nombre { font-size: 1.15rem; font-weight: 650; letter-spacing: -.02em; }
@@ -506,6 +516,170 @@ textarea { width: 100%; min-height: 90px; padding: .6rem .95rem; font: inherit; 
 .codigos-respaldo li { background: var(--superficie-2); border-radius: 10px; padding: .6rem .8rem; font-size: 1.05rem; text-align: center; }
 .aviso-pendientes form { margin: 0; }
 
+/* Fondos ilustrados entre secciones (mismo lenguaje del hero): capa decorativa a todo el ancho, de ALTO
+   FIJO (no depende del contenido, así no se deforma), que arranca en el espacio entre secciones y queda
+   detrás del título. Alternan el lado del carrito: hero a la izquierda, luego derecha, luego izquierda.
+   Se funden con el fondo de la página por arriba y por abajo; en modo oscuro no se muestran. */
+.fondo-der, .fondo-izq { position: relative; isolation: isolate; }
+.fondo-der { --img: url("../img/banda-carrito-der-960.webp"); --img-grande: url("../img/banda-carrito-der.webp"); --pos: right top; }
+.fondo-izq { --img: url("../img/banda-carrito-izq-960.webp"); --img-grande: url("../img/banda-carrito-izq.webp"); --pos: left top; }
+.fondo-der::before, .fondo-izq::before { content: ""; position: absolute; z-index: -1; pointer-events: none;
+  left: 50%; width: 100vw; transform: translateX(-50%);
+  top: calc(-1 * clamp(3.5rem, 9vw, 6.5rem)); height: clamp(18rem, 32vw, 30rem);
+  background: var(--img) no-repeat var(--pos) / cover;
+  -webkit-mask-image: linear-gradient(transparent, #000 22%, #000 58%, transparent);
+  mask-image: linear-gradient(transparent, #000 22%, #000 58%, transparent); }
+/* Pantallas angostas: el título ocupa todo el ancho, así que la imagen queda como una franja ARRIBA
+   del título (con su propio espacio) y nunca pasa por detrás del texto. */
+@media (max-width: 1199px) {
+  .fondo-der, .fondo-izq { padding-top: 6.5rem; }
+  .fondo-der::before, .fondo-izq::before { height: calc(clamp(3.5rem, 9vw, 6.5rem) + 8.5rem);
+    -webkit-mask-image: linear-gradient(transparent, #000 18%, #000 72%, transparent);
+    mask-image: linear-gradient(transparent, #000 18%, #000 72%, transparent); }
+}
+@media (min-width: 900px) { .fondo-der::before, .fondo-izq::before { background-image: var(--img-grande); background-position: center top; } }
+@media (prefers-color-scheme: dark) { .fondo-der::before, .fondo-izq::before { display: none; } }
+@media print { .fondo-der::before, .fondo-izq::before { display: none; } }
+body { overflow-x: clip; } /* las capas de fondo a todo el ancho nunca generan scroll horizontal */
+/* ---------- Formularios de cuenta: errores a la vista y ayudas ---------- */
+.resumen-errores { background: var(--error-fondo); border: 1px solid var(--error); border-radius: 16px; padding: 1rem 1.2rem; margin: .4rem 0 1.2rem; }
+.resumen-errores:focus { outline: 3px solid var(--error); outline-offset: 3px; }
+.resumen-errores .resumen-titulo { font-weight: 700; color: var(--error); margin-bottom: .45rem; }
+.resumen-errores ul { margin: 0; padding-left: 1.15rem; display: grid; gap: .3rem; }
+.resumen-errores a { color: var(--texto); text-decoration: underline; text-underline-offset: 3px; }
+.resumen-errores .resumen-ayuda a { color: var(--marca-enlace); }
+.resumen-errores .resumen-ayuda { margin-top: .7rem; font-weight: 600; }
+input[aria-invalid="true"], select[aria-invalid="true"] { border-color: var(--error); border-width: 2px; }
+
+.clave { position: relative; }
+.clave input { padding-right: 5.6rem; }
+.clave .ver { position: absolute; right: .4rem; top: 50%; transform: translateY(-50%); min-height: 36px; padding: 0 .85rem; border: 0; border-radius: 999px; background: var(--superficie-2); color: var(--texto); font-weight: 600; font-size: .875rem; cursor: pointer; }
+.clave .ver[hidden] { display: none; }
+.clave .ver:hover { background: var(--borde); }
+.ayuda-clave { margin: -.35rem 0 1rem; font-size: .925rem; }
+
+.reglas { list-style: none; margin: -.4rem 0 1.05rem; padding: 0; display: grid; gap: .2rem; font-size: .875rem; color: var(--texto-suave); }
+.reglas li { display: flex; align-items: center; gap: .5rem; }
+.reglas .marca { width: 1.05rem; height: 1.05rem; border-radius: 50%; border: 2px solid var(--borde-fuerte); flex: none; }
+.reglas li.cumple { color: var(--positivo); font-weight: 600; }
+.reglas li.cumple .marca { background: var(--positivo); border-color: var(--positivo); box-shadow: inset 0 0 0 3px var(--superficie); }
+.btn:disabled { opacity: .7; cursor: progress; }
+
+/* Pantallas de cuenta de UNA sola tarjeta: centradas (antes quedaban pegadas a la izquierda con el
+   resto vacío) y con el mismo fondo ilustrado que el resto del sitio. Las de dos columnas (ingreso,
+   registro…) llevan el fondo con el carrito a la izquierda; las de una tarjeta, a la derecha. */
+@media (min-width: 900px) { .auth > .tile:only-child { grid-column: 2 / span 4; } }
+.auth { position: relative; isolation: isolate; --img: url("../img/banda-carrito-izq-960.webp"); --img-grande: url("../img/banda-carrito-izq.webp"); --pos: left top; }
+.auth:has(> .tile:only-child) { --img: url("../img/banda-carrito-der-960.webp"); --img-grande: url("../img/banda-carrito-der.webp"); --pos: right top; }
+@media (min-width: 900px) {
+  .auth::before { content: ""; position: absolute; z-index: -1; pointer-events: none; left: 50%; width: 100vw; transform: translateX(-50%);
+    top: -3rem; height: clamp(22rem, 34vw, 32rem); background: var(--img-grande) no-repeat center top / cover;
+    -webkit-mask-image: linear-gradient(transparent, #000 20%, #000 55%, transparent); mask-image: linear-gradient(transparent, #000 20%, #000 55%, transparent); }
+}
+@media (prefers-color-scheme: dark) { .auth::before { display: none; } }
+
+/* Equilibrio de espacios ------------------------------------------------------------------
+   1) Pantallas de cuenta: las tarjetas claras no se estiran (antes quedaban con mucho vacío por
+      dentro); los paneles oscuros sí, para acompañar la altura del formulario. */
+.auth > .tile { align-self: start; }
+.auth > .tile-oscuro { align-self: stretch; }
+/* 2) Notas laterales agrupadas junto a un formulario (columna de 2 de 6). */
+.lateral { grid-column: 1 / -1; display: grid; gap: var(--gap); align-content: start; }
+@media (min-width: 900px) { .lateral { grid-column: span 2; } }
+/* 3) Comparación: la última fila no queda con huecos. Si la última tarjeta quedó sola en su fila ocupa
+   toda la fila; si quedó con una compañera, ocupa el resto. Solo cambia el ancho, nunca el orden. */
+@media (min-width: 900px) {
+  ol.bento > li.tile-2:nth-child(3n):nth-last-child(2) { grid-column: span 6; }
+  ol.bento > li.tile-2:nth-child(3n+1):nth-last-child(2) { grid-column: span 4; }
+}
+
+/* Selectores desplegables: flecha propia con margen (la nativa quedaba pegada al borde derecho). */
+select:not([multiple]) {
+  -webkit-appearance: none; appearance: none; cursor: pointer;
+  padding-right: 2.9rem; text-overflow: ellipsis;
+  background-color: var(--superficie);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5.5 7.75 10 12.25l4.5-4.5' fill='none' stroke='%2355555a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 1.05rem center; background-size: 1.15rem;
+}
+select:not([multiple]):focus-visible { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5.5 7.75 10 12.25l4.5-4.5' fill='none' stroke='%230071e3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+select:disabled { cursor: not-allowed; opacity: .6; }
+
+/* Fondo ilustrado detrás del encabezado de las pantallas de listado (Productos: carrito a la derecha;
+   Establecimientos: a la izquierda). Capa de alto fijo a todo el ancho que se funde con la página; en
+   celular queda como franja sobre el título para no pasar por detrás del texto. */
+.con-fondo { position: relative; isolation: isolate; }
+.con-fondo-der { --img: url("../img/banda-carrito-der-960.webp"); --img-grande: url("../img/banda-carrito-der.webp"); --pos: right top; }
+.con-fondo-izq { --img: url("../img/banda-carrito-izq-960.webp"); --img-grande: url("../img/banda-carrito-izq.webp"); --pos: left top; }
+.con-fondo::before { content: ""; position: absolute; z-index: -1; pointer-events: none; left: 50%; width: 100vw; transform: translateX(-50%);
+  top: -1.5rem; height: 7.5rem; background: var(--img) no-repeat var(--pos) / cover;
+  -webkit-mask-image: linear-gradient(#000 55%, transparent); mask-image: linear-gradient(#000 55%, transparent); }
+@media (max-width: 899px) { .con-fondo { padding-top: 5.5rem; } }
+/* Lo que sigue al encabezado va por encima del fondo (si no, el fondo desteñía filtros y tarjetas). */
+.con-fondo ~ * { position: relative; z-index: 1; }
+@media (min-width: 900px) {
+  .con-fondo { margin-bottom: 3.25rem; }
+  .con-fondo::before { top: -2.5rem; height: clamp(20rem, 30vw, 27rem); background-image: var(--img-grande); background-position: center top;
+    -webkit-mask-image: linear-gradient(transparent, #000 14%, #000 52%, transparent); mask-image: linear-gradient(transparent, #000 14%, #000 52%, transparent); }
+}
+@media (prefers-color-scheme: dark) { .con-fondo::before { display: none; } }
+@media print { .con-fondo::before { display: none; } }
+.migas { position: relative; z-index: 1; } /* las migas quedan por encima del fondo del encabezado */
+
+/* Tarjetas oscuras: los azules de marca (#0071e3 / #0066cc) dan 3,6:1 y 3,0:1 sobre #1d1d1f, por debajo
+   del 4,5:1 de WCAG 1.4.3. Aquí los botones y enlaces usan blanco o el azul claro (7,8:1). */
+.tile-oscuro .btn-sec { color: #fff; border-color: rgb(255 255 255 / .6); background: transparent; }
+.tile-oscuro .btn-sec:hover { color: #fff; border-color: #fff; background: rgb(255 255 255 / .14); }
+.tile-oscuro .panel-plegable summary { color: #6cb6ff; }
+.tile-oscuro .btn-texto { color: #d2d2d7; }
+.tile-oscuro .btn-texto:hover { color: #fff; }
+.tile-oscuro .error { color: #ff9d94; }
+.tile-oscuro :focus-visible { outline-color: #fff; }
+
+/* Formularios con nota lateral: mismo ancho cómodo y centrado que las pantallas de cuenta (940 px), para que las
+   tarjetas no queden pegadas a los bordes del contenido. */
+.angosto { max-width: 940px; margin-inline: auto; }
+
+/* El aviso de correo y los mensajes toman el mismo ancho que las tarjetas de debajo (940 px) cuando la
+   pantalla es angosta y centrada, para que los bordes alineen. */
+:is(.aviso-pendientes, .mensajes):is(:has(~ .auth), :has(~ .angosto)) { max-width: 940px; margin-inline: auto; }
+
+/* Las tarjetas centradas no quedan pegadas bajo el menú: aire arriba proporcional a la altura de la
+   pantalla (en escritorio), para que se vean centradas y no al borde. */
+@media (min-width: 900px) {
+  .auth, .angosto { --aire: clamp(1.5rem, 8vh, 5rem); margin-top: var(--aire); margin-bottom: calc(var(--aire) * .6); }
+  .auth::before { top: calc(-1 * (var(--aire) + 1.5rem)); }
+}
+
+/* Celular: el titular baja para dejar ver la imagen completa del hero encima (alto de la imagen = ancho / 2). */
+@media (max-width: 599px) { .hero-fondo .hero { padding-top: calc(50vw + 1.25rem); } }
+
+/* ---------- Cabecera en celular y tablet: una sola fila + menú de hamburguesa ----------
+   «Ingresar» y «Crear cuenta» siempre visibles; los enlaces principales van en un panel. */
+.menu-boton { display: none; }
+@media (max-width: 1023px) {
+  .cabecera-in { flex-wrap: nowrap; gap: .5rem; position: relative; }
+  .acciones { flex-wrap: nowrap; gap: .4rem; }
+  .acciones .btn { min-height: 40px; padding: 0 .9rem; font-size: .9rem; white-space: nowrap; }
+  .js .menu-boton { display: inline-grid; place-items: center; width: 44px; height: 44px; flex: none; border-radius: 50%; border: 0;
+    background: transparent; color: var(--texto); cursor: pointer; }
+  .js .menu-boton:hover, .js .cabecera.menu-abierto .menu-boton { background: color-mix(in srgb, var(--texto) 9%, transparent); }
+  .js .menu-boton .ico { width: 1.45em; height: 1.45em; }
+  /* Panel de enlaces */
+  .js .nav { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; flex-wrap: nowrap; gap: 0;
+    padding: .35rem var(--gap) .9rem; background: var(--superficie); border-bottom: 1px solid var(--borde);
+    box-shadow: 0 20px 40px -20px rgb(0 0 0 / .3); max-height: calc(100dvh - 4.5rem); overflow-y: auto; }
+  .js .cabecera.menu-abierto .nav { display: flex; }
+  .js .nav a { min-height: 52px; padding: 0 .25rem; border-radius: 0; font-size: 1.05rem; border-bottom: 1px solid var(--borde); }
+  .js .nav a:last-child { border-bottom: 0; }
+  .js .nav a[aria-current="page"] { color: var(--marca-enlace); }
+}
+/* Teléfonos angostos: el nombre se oculta a la vista (el logo queda y el nombre sigue en el HTML) para que
+   quepan los dos botones y la hamburguesa. */
+@media (max-width: 439px) {
+  .marca-nombre { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .acciones .btn { padding: 0 .75rem; font-size: .85rem; }
+  .menu-cuenta summary { padding-inline: .6rem; }
+}
 /* ---------- Tarjeta de precio (RF-16): comparación y listado de productos ----------
    Orden: producto y marca · presentación · precio total · precio por unidad · comercio ·
    fuente, antigüedad y confianza (con texto, no solo color: 1.4.1) · acciones. */
@@ -532,7 +706,4 @@ textarea { width: 100%; min-height: 90px; padding: .6rem .95rem; font: inherit; 
 .tarjeta-precio .precio { font-size: clamp(1.9rem, 4.6vw, 2.4rem); }
 .tarjeta-precio .acciones-fila { align-items: center; }
 .tarjeta-precio .ir { margin-top: auto; padding-top: .4rem; display: inline-flex; align-items: center; min-height: 44px; }
-.tile-oscuro .btn-sec { color: #6cb6ff; border-color: #6cb6ff; }  /* 1.4.3: ≥ 4.5:1 sobre el tile oscuro */
-.tile-oscuro .btn-sec:hover { background: rgb(255 255 255 / .1); color: #a9d4ff; border-color: #a9d4ff; }
-.tile-oscuro .panel-plegable summary { color: #6cb6ff; }
 .equivale { margin-top: .35rem; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--texto); min-height: 1.4em; }

@@ -2,7 +2,7 @@
 {% load static %}
 {% block titulo %}AhorraPues · Compara precios en Armenia y el Quindío{% endblock %}
 {% block head %}<link rel="preload" as="image" href="{% static 'img/hero-supermercado.webp' %}" media="(min-width: 900px)" fetchpriority="high">
-<script src="{% static 'js/hero.js' %}?v=5" defer></script>
+<script src="{% static 'js/hero.js' %}?v=7" defer></script>
 <script src="{% static 'js/escanear.js' %}?v=15" defer></script>{% endblock %}
 {% block hero %}
 <div class="hero-fondo">
@@ -106,8 +106,6 @@
       <a class="btn btn-grande" href="{% url 'cuentas:registro' %}">Crear cuenta gratis</a>
     {% endif %}
     <a class="enlace-flecha" href="#como-funciona">Cómo funciona</a>
-    {# WCAG 2.2.2: la rotación del titular se puede detener; hero.js lo muestra solo si anima #}
-    <button type="button" class="btn-texto" id="pausar-rotacion" hidden>Pausar animación</button>
   </div>
 </section>
 
@@ -174,8 +172,9 @@
   </div>
 </section>
 
+
 {% if destacados %}
-<section class="seccion" aria-labelledby="t-populares">
+<section class="seccion fondo-der" aria-labelledby="t-populares">
   <div class="seccion-cabecera">
     <h2 id="t-populares">Productos con más precios.</h2>
     <p>Empieza por lo que más se consulta en la comunidad.</p>
@@ -191,9 +190,10 @@
     {% endfor %}
   </div>
 </section>
+
 {% endif %}
 
-<section class="seccion" aria-labelledby="t-pasos">
+<section class="seccion fondo-izq" aria-labelledby="t-pasos">
   <div class="seccion-cabecera">
     <h2 id="t-pasos">Tan simple como tres pasos.</h2>
   </div>

@@ -1,31 +1,27 @@
 {% extends "base.html" %}
+{% load static %}
 {% block titulo %}Crear cuenta · AhorraPues{% endblock %}
+{% block head %}<script src="{% static 'js/cuentas.js' %}?v=1" defer></script>{% endblock %}
 {% block contenido %}
 <div class="auth bento">
   <section class="tile tile-3" aria-labelledby="t-registro">
     <h1 id="t-registro">Crear cuenta</h1>
     <p class="suave" style="margin-bottom:.6rem">Toma un minuto. Solo necesitas un nombre de usuario y una contraseña.</p>
-    <form method="post" novalidate>
+    {% include "partials/_resumen_errores.html" %}
+    <form method="post" novalidate data-una-vez>
       {% csrf_token %}
       <input type="hidden" name="next" value="{{ next }}">
-      {% if form.non_field_errors %}<div class="campo" role="alert">{% for e in form.non_field_errors %}<span class="error">{{ e }}</span>{% endfor %}</div>{% endif %}
-      {% for campo in form %}
-        {% if campo.name == "acepto_tratamiento_datos" %}
-        <div class="campo">
-          <div class="check">{{ campo }}<label for="{{ campo.id_for_label }}">{{ campo.label }}</label></div>
-          {% if campo.errors %}<span class="error" id="{{ campo.auto_id }}_error" role="alert">{{ campo.errors|join:", " }}</span>{% endif %}
-        </div>
-        {% else %}
-        <div class="campo">
-          {{ campo.label_tag }}
-          {{ campo }}
-          {# los id coinciden con el aria-describedby que genera Django (1.3.1) #}
-          {% if campo.help_text %}<p class="ayuda" id="{{ campo.auto_id }}_helptext">{{ campo.help_text }}</p>{% endif %}
-          {% if campo.errors %}<span class="error" id="{{ campo.auto_id }}_error" role="alert">{{ campo.errors|join:" " }}</span>{% endif %}
-        </div>
-        {% endif %}
-      {% endfor %}
-      <button class="btn btn-bloque" type="submit">Crear cuenta</button>
+      {% include "partials/_campo.html" with campo=form.username sin_alerta=True %}
+      {% include "partials/_campo.html" with campo=form.email sin_alerta=True %}
+      {% include "partials/_campo_clave.html" with campo=form.password1 sin_alerta=True %}
+      <ul class="reglas" id="reglas-clave" aria-label="Requisitos de la contraseña">
+        <li data-regla="largo"><span class="marca" aria-hidden="true"></span>8 caracteres o más<span class="sr-only estado"> (pendiente)</span></li>
+        <li data-regla="no-numerica"><span class="marca" aria-hidden="true"></span>No solo números<span class="sr-only estado"> (pendiente)</span></li>
+        <li data-regla="coinciden"><span class="marca" aria-hidden="true"></span>Las dos contraseñas coinciden<span class="sr-only estado"> (pendiente)</span></li>
+      </ul>
+      {% include "partials/_campo_clave.html" with campo=form.password2 sin_alerta=True %}
+      {% include "partials/_campo.html" with campo=form.acepto_tratamiento_datos sin_alerta=True %}
+      <button class="btn btn-bloque" type="submit" data-enviando="Creando cuenta…">Crear cuenta</button>
     </form>
     <p class="enlace-pie">¿Ya tienes cuenta? <a href="{% url 'cuentas:ingresar' %}">Ingresar</a></p>
   </section>

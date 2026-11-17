@@ -12,7 +12,8 @@ from django.urls import reverse
 from django.utils.http import urlencode
 
 from .domain.segundo_factor import segundo_factor_obligatorio
-from .views.ingreso import FLAG
+from .services import segundo_factor
+from .views.ingreso import FLAG, PRUEBA_LOCAL
 
 
 class SegundoFactorMiddleware:
@@ -37,4 +38,9 @@ class SegundoFactorMiddleware:
             es_staff=usuario.is_staff,
             es_superusuario=usuario.is_superuser,
         )
-        return obligatorio and request.session.get(FLAG) != "verificado"
+        if not obligatorio:
+            return False
+        marca = request.session.get(FLAG)
+        if marca == PRUEBA_LOCAL:  # se revisa en cada petición: con DEBUG=False deja de valer
+            return not segundo_factor.exento_por_prueba(usuario)
+        return marca != "verificado"

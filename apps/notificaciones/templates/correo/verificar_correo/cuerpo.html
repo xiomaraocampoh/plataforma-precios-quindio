@@ -1,6 +1,5 @@
 {% extends "correo/base.html" %}
 {% block preheader %}Un clic para confirmar tu correo. El enlace vence en 24 horas.{% endblock %}
-{% block chip %}{% include 'correo/_chip.html' with tono='pendiente' texto='Falta confirmar' %}{% endblock %}
 {% block titulo %}Confirma tu correo{% endblock %}
 {% block cuerpo %}<p style="margin:0 0 16px 0;font-size:16px;line-height:1.5;color:#5f5f64;">Hola {{ nombre }}, confirma que este es tu correo para recibir los avisos de seguridad de tu cuenta.</p><p style="margin:0 0 16px 0;font-size:16px;line-height:1.5;color:#5f5f64;">El enlace vence en 24 horas y sirve una sola vez.</p>{% endblock %}
 {% block accion %}{% include 'correo/_boton.html' with url=enlace texto='Confirmar mi correo' %}{% endblock %}

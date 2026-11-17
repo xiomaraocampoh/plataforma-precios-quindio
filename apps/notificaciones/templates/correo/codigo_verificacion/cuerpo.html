@@ -1,6 +1,5 @@
 {% extends "correo/base.html" %}
 {% block preheader %}Tu código para la verificación en dos pasos. Vence en 10 minutos.{% endblock %}
-{% block chip %}{% include 'correo/_chip.html' with tono='seguridad' texto='Verificación en dos pasos' %}{% endblock %}
 {% block titulo %}Tu código de verificación{% endblock %}
 {% block cuerpo %}<p style="margin:0 0 16px 0;font-size:32px;line-height:1.2;font-weight:700;letter-spacing:6px;color:#1d1d1f;font-family:Menlo,Consolas,monospace;">{{ codigo }}</p><p style="margin:0 0 16px 0;font-size:16px;line-height:1.5;color:#5f5f64;">Escríbelo en AhorraPues para {{ proposito }}. Vence en 10 minutos.</p><p style="margin:0 0 16px 0;font-size:16px;line-height:1.5;color:#5f5f64;">Nunca te lo pediremos por teléfono ni por chat. Si no intentaste ingresar, cambia tu contraseña.</p>{% endblock %}
 {% block motivo %}se pidió un código para tu cuenta{% endblock %}

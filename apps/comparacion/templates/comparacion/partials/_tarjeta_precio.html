@@ -1,3 +1,4 @@
+{% load tiempo %}
 {% comment %}
 Tarjeta de un precio (RF-16). Orden fijo: producto y marca · presentación · precio total · precio
 por unidad · comercio · fuente, antigüedad y confianza · acciones. Solo presentación: los textos
@@ -24,7 +25,7 @@ Parámetros: fila, destacada, numero (puesto en el orden), etiqueta (opcional), 
     <svg class="ico" aria-hidden="true"><use href="#{% if r.confianza == 'alta' %}i-check{% elif r.confianza == 'baja' %}i-info{% else %}i-shield{% endif %}"/></svg>{{ fila.confianza.0 }}
   </li>
   {% if r.es_promocion %}<li class="chip chip-promo">Promoción</li>{% endif %}
-  {% if fila.ultima_confirmacion %}<li class="chip chip-positivo"><time datetime="{{ fila.ultima_confirmacion|date:'c' }}">confirmado hace {{ fila.ultima_confirmacion|timesince }}</time></li>{% endif %}
+  {% if fila.ultima_confirmacion %}<li class="chip chip-positivo"><time datetime="{{ fila.ultima_confirmacion|date:'c' }}">confirmado hace {{ fila.ultima_confirmacion|hace }}</time></li>{% endif %}
 </ul>
 <p class="tp-explicacion">{{ fila.confianza.1 }}</p>
 <div class="acciones-fila">

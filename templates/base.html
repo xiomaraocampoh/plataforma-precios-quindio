@@ -6,11 +6,13 @@
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="Compara y comparte precios de la canasta familiar en Armenia y el Quindío.">
   <title>{% block titulo %}AhorraPues{% endblock %}</title>
-  <link rel="stylesheet" href="{% static 'css/app.css' %}?v=2026-11-16t">
+  <script>document.documentElement.classList.add("js")</script>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}?v=2026-11-16-merge">
   {% block head %}{% endblock %}
   {# htmx servido localmente (sin CDN): funciona con red móvil limitada y sin terceros #}
   <script src="{% static 'vendor/htmx.min.js' %}" defer></script>
   <script src="{% static 'js/accesibilidad.js' %}?v=2" defer></script>
+  <script src="{% static 'js/menu.js' %}?v=2" defer></script>
   {% if user.is_authenticated %}
   {# RF-12 / ADR-009: cola de registros sin conexión. Solo con sesión: el reenvío se atribuye (M-14) #}
   <script src="{% static 'js/cola-registros.js' %}?v=1" defer
@@ -25,10 +27,10 @@
     <div class="cabecera-in">
       <a class="marca" href="{% url 'comparacion:inicio' %}">
         <span class="marca-logo" aria-hidden="true"><svg class="ico"><use href="#i-tag"/></svg></span>
-        AhorraPues
+        <span class="marca-nombre">AhorraPues</span>
       </a>
       {% with ruta=request.resolver_match %}
-      <nav class="nav" aria-label="Principal">
+      <nav class="nav" id="nav-principal" aria-label="Principal">
         <a href="{% url 'comparacion:inicio' %}"
            {% if ruta.app_name == 'comparacion' and ruta.url_name != 'productos' %}aria-current="page"{% endif %}>Comparar</a>
         <a href="{% url 'comparacion:productos' %}"
@@ -56,6 +58,9 @@
           <a class="btn btn-sec" href="{% url 'cuentas:ingresar' %}">Ingresar</a>
           <a class="btn" href="{% url 'cuentas:registro' %}">Crear cuenta</a>
         {% endif %}
+        <button type="button" class="menu-boton" aria-expanded="false" aria-controls="nav-principal">
+          <svg class="ico" aria-hidden="true"><use href="#i-menu"/></svg><span class="sr-only">Menú</span>
+        </button>
       </div>
     </div>
   </header>

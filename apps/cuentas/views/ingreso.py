@@ -18,12 +18,13 @@ from core.limites import ip_de, permitir
 
 from .. import services
 from ..domain.segundo_factor import Resultado
-from ..forms import CodigoForm, PrimerCodigoAppForm
+from ..forms import CodigoForm, IngresarForm, PrimerCodigoAppForm
 from ..models import SegundoFactor, Usuario
 
 sf = services.segundo_factor
 PENDIENTE = "ap_ingreso_pendiente"
-FLAG = "ap_segundo_factor"  # "verificado" | "no_requerido" (lo revisa el middleware)
+FLAG = "ap_segundo_factor"  # "verificado" | "no_requerido" | "prueba_local" (middleware)
+PRUEBA_LOCAL = "prueba_local"
 VIGENCIA_PENDIENTE_S = 10 * 60
 MENSAJES = {
     Resultado.INCORRECTO: "El código no es correcto. Revísalo e inténtalo de nuevo.",
@@ -32,11 +33,13 @@ MENSAJES = {
 }
 
 
-def completar_ingreso(request, usuario, *, verificado: bool, siguiente: str, confiar=False):
+def completar_ingreso(
+    request, usuario, *, verificado: bool, siguiente: str, confiar=False, marca: str = ""
+):
     """Abre la sesión, marca el segundo factor y avisa si es un dispositivo nuevo (RF-25)."""
     auth_login(request, usuario, backend="django.contrib.auth.backends.ModelBackend")
     request.session.pop(PENDIENTE, None)
-    request.session[FLAG] = "verificado" if verificado else "no_requerido"
+    request.session[FLAG] = marca or ("verificado" if verificado else "no_requerido")
     services.correo.registrar_dispositivo(
         usuario, user_agent=request.META.get("HTTP_USER_AGENT", "")[:400], ip=ip_de(request)
     )
@@ -54,6 +57,7 @@ def completar_ingreso(request, usuario, *, verificado: bool, siguiente: str, con
 
 
 class IngresarView(LoginView):
+    authentication_form = IngresarForm  # mensajes claros y cuenta desactivada (UX de ingreso)
     template_name = "cuentas/ingresar.html"
     redirect_authenticated_user = True
 
@@ -61,6 +65,10 @@ class IngresarView(LoginView):
         usuario = form.get_user()
         siguiente = self.get_success_url()
         cookie = self.request.COOKIES.get(sf.COOKIE_CONFIANZA)
+        if sf.exento_por_prueba(usuario):  # solo DEBUG + ajuste + cuenta de prueba
+            return completar_ingreso(
+                self.request, usuario, verificado=False, siguiente=siguiente, marca=PRUEBA_LOCAL
+            )
         if not sf.pide_segundo_paso(usuario, cookie):
             de_confianza = sf.es_de_confianza(usuario, cookie)
             return completar_ingreso(

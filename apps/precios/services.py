@@ -129,6 +129,9 @@ def cargar_reporte_historico(
     precio: Decimal,
     fecha_observacion: datetime,
     fuente: Fuente = Fuente.REPORTANTE,
+    es_demo: bool = False,
+    id_cliente: uuid.UUID | None = None,
+    revisar_anomalia: bool = False,
 ) -> ReportePrecio:
     """Crea un reporte con una fecha pasada arbitraria, sin RN-08 ni RN-10.
 
@@ -136,7 +139,24 @@ def cargar_reporte_historico(
     usuarios pasan siempre por `registrar_reporte`. Es una carga histórica: el registro queda
     fechado cuando se observó el precio (`creado_en`), de modo que no consume el cupo por hora
     de nadie (RN-10).
+
+    Con `id_cliente` es idempotente (cargar_datos_prueba usa un UUID fijo por fila del CSV). Con
+    `revisar_anomalia` aplica la misma regla de EC-03 que `registrar_reporte`: lejos de la mediana
+    reciente, queda «en revisión».
     """
+    if id_cliente is not None:
+        existente = ReportePrecio.objects.filter(id_cliente=id_cliente).first()
+        if existente is not None:
+            return existente
+    estado = ReportePrecio.Estado.PUBLICADO
+    if revisar_anomalia:
+        recientes = _precios_recientes(
+            presentacion_id,
+            establecimiento_id,
+            desde=fecha_observacion - timedelta(days=settings.PRECIOS["VIGENCIA_REPORTE_DIAS"]),
+        )
+        if es_anomalo(precio, recientes, Decimal(settings.PRECIOS["TOLERANCIA_ANOMALIA"])):
+            estado = ReportePrecio.Estado.EN_REVISION
     reporte = ReportePrecio.objects.create(
         autor=autor,
         presentacion_id=presentacion_id,
@@ -144,6 +164,9 @@ def cargar_reporte_historico(
         precio=precio,
         fecha_observacion=fecha_observacion,
         fuente=fuente.value,
+        estado=estado,
+        es_demo=es_demo,
+        id_cliente=id_cliente,
     )
     # `creado_en` es auto_now_add: se fecha después de crear para que sea histórico
     ReportePrecio.objects.filter(pk=reporte.pk).update(creado_en=fecha_observacion)
@@ -221,3 +244,14 @@ def retirar_reporte(*, reporte_id: int) -> ReportePrecio:
     producto_id = reporte.presentacion.producto_id
     transaction.on_commit(lambda: invalidar_comparacion(producto_id))
     return reporte
+
+
+@transaction.atomic
+def borrar_reportes_demo() -> int:
+    """Borra los reportes de prueba (es_demo) con sus confirmaciones y denuncias (cascada)."""
+    demo = ReportePrecio.objects.filter(es_demo=True)
+    productos = set(demo.values_list("presentacion__producto_id", flat=True))
+    total, _ = demo.delete()
+    for producto_id in productos:
+        transaction.on_commit(lambda pid=producto_id: invalidar_comparacion(pid))
+    return total

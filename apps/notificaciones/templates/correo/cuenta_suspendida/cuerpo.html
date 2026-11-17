@@ -1,6 +1,5 @@
 {% extends "correo/base.html" %}
 {% block preheader %}Tu cuenta quedó suspendida. Tus aportes se conservan.{% endblock %}
-{% block chip %}{% include 'correo/_chip.html' with tono='rechazado' texto='Cuenta suspendida' %}{% endblock %}
 {% block titulo %}Suspendimos tu cuenta{% endblock %}
 {% block cuerpo %}<p style="margin:0 0 16px 0;font-size:16px;line-height:1.5;color:#5f5f64;">Hola {{ nombre }}, tu cuenta fue suspendida por no cumplir las reglas de la plataforma. Mientras siga así no podrás ingresar ni registrar precios.</p><p style="margin:0 0 16px 0;font-size:16px;line-height:1.5;color:#5f5f64;">Tus aportes anteriores se conservan para auditoría. Si crees que es un error, responde a este correo.</p>{% endblock %}
 {% block motivo %}tienes una cuenta en AhorraPues{% endblock %}

@@ -30,6 +30,8 @@ class ReportePrecio(models.Model):
     estado = models.CharField(max_length=12, choices=Estado.choices, default=Estado.PUBLICADO)
     # Idempotencia para registros hechos sin señal y sincronizados después (M-22)
     id_cliente = models.UUIDField(null=True, blank=True, unique=True)
+    # Datos de prueba (cargar_datos_prueba): se pueden borrar con --limpiar. Nunca va a la API.
+    es_demo = models.BooleanField(default=False)
 
     class Meta:
         constraints = [

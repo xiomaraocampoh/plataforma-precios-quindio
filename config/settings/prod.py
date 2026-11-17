@@ -3,6 +3,8 @@ from django.core.exceptions import ImproperlyConfigured
 from .base import *
 
 DEBUG = False
+# Nunca se omite el 2FA en producción, diga lo que diga el entorno
+PERMITIR_PRUEBA_SIN_2FA = False
 if SECRET_KEY == "insegura-solo-desarrollo":
     raise ImproperlyConfigured("Defina SECRET_KEY en producción.")
 
