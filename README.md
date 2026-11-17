@@ -12,6 +12,10 @@ Corporación Universitaria Empresarial Alexander von Humboldt
 
 ## Arranque local
 
+> **Guía paso a paso para el equipo (Windows/PowerShell), con datos y cuentas de prueba:**
+> [docs/operacion/arranque-local-equipo.md](docs/operacion/arranque-local-equipo.md). Cada persona
+> tiene su propia base local; los datos de prueba se cargan con un comando.
+
 ```bash
 python -m venv .venv && source .venv/bin/activate     # Windows: .venv\Scripts\activate
 pip install -r requirements/dev.txt
