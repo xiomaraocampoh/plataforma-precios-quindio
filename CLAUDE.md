@@ -53,7 +53,8 @@ Reglas de dependencia:
 - `domain` no importa nada de Django ni de otras capas.
 - `views`/`api` llaman a `services`/`selectors`; **no** escriben con el ORM directamente.
 - Entre apps solo se importa `services`, `selectors`, `domain` o `models` (para FK). Nunca
-  `views` de otra app.
+  `views` de otra app. Excepción: `semilla` (datos de prueba, ADR-0023), que recibe `apps` y
+  nunca importa modelos ni servicios. La usan las migraciones de siembra y `cargar_datos_prueba`.
 - Lógica en plantillas: solo presentación (`if`, `for`, filtros). Cálculos van al selector.
 
 Módulos (apps):
