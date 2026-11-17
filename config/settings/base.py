@@ -4,6 +4,8 @@ from pathlib import Path
 
 import environ
 
+from core.correo import elegir_backend_correo
+
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 env = environ.Env(DEBUG=(bool, False))
@@ -70,13 +72,18 @@ EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
 EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
 EMAIL_TIMEOUT = env.int("EMAIL_TIMEOUT", default=10)
-_CONSOLA = "django.core.mail.backends.console.EmailBackend"
-EMAIL_BACKEND = env(
-    "EMAIL_BACKEND",
-    default="django.core.mail.backends.smtp.EmailBackend" if EMAIL_HOST else _CONSOLA,
+# Con BREVO_API_KEY el correo sale por la API HTTPS de Brevo (puerto 443): Render gratuito bloquea
+# los puertos SMTP. Sin ella, SMTP si hay EMAIL_HOST; si no, la consola (core/correo.py).
+BREVO_API_KEY = env("BREVO_API_KEY", default="")
+EMAIL_BACKEND = elegir_backend_correo(
+    brevo_api_key=BREVO_API_KEY,
+    email_host=EMAIL_HOST,
+    explicito=env("EMAIL_BACKEND", default=""),
 )
-if not EMAIL_HOST and EMAIL_BACKEND.endswith("smtp.EmailBackend"):
-    EMAIL_BACKEND = _CONSOLA
+ANYMAIL = {"BREVO_API_KEY": BREVO_API_KEY} if BREVO_API_KEY else {}
+# Reintentos sin worker: un cron externo llama POST /interno/correos/procesar/ con este token
+CORREO_CRON_TOKEN = env("CORREO_CRON_TOKEN", default="")
+CORREOS_POR_PASADA = env.int("CORREOS_POR_PASADA", default=50)
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="AhorraPues <no-responder@localhost>")
 EMAIL_REPLY_TO = env("EMAIL_REPLY_TO", default="")
 # Dirección pública del sitio para los enlaces de los correos (no se toma del Host de la petición)
@@ -153,6 +160,7 @@ REST_FRAMEWORK = {
         "sugerencias": "10/hour",  # RF-10
         "denuncias": "20/hour",  # RF-20
         "moderacion": "600/hour",  # RF-21
+        "correos_cron": "30/hour",  # POST /interno/correos/procesar/ (cron cada 10 min)
     },
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,

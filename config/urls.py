@@ -3,6 +3,7 @@ from django.urls import include, path
 from django.views.generic import RedirectView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
+from apps.notificaciones.interno import procesar_correos
 from core.views import healthz
 
 api_v1 = [
@@ -26,6 +27,7 @@ urlpatterns = [
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="api-docs"),
     path("healthz/", healthz, name="healthz"),
+    path("interno/correos/procesar/", procesar_correos, name="procesar_correos"),
     path("cuentas/", include("apps.cuentas.urls")),
     path("precios/", include("apps.precios.urls")),
     path("catalogo/", include("apps.catalogo.urls")),

@@ -1,4 +1,4 @@
-# ADR-021: Correo transaccional con Brevo (SMTP), outbox y verificación en dos pasos
+# ADR-021: Correo transaccional con Brevo (API HTTPS o SMTP), outbox y verificación en dos pasos
 
 - **Estado:** Propuesto
 - **Fecha:** 2026-11-16
@@ -89,3 +89,32 @@ web en un PaaS (ADR-017).
 - (−) Quien debe usar 2FA y no tiene correo ni app la configura al ingresar, justo después de la
   contraseña. Es lo habitual, pero alguien con esa contraseña podría inscribir su propia app. Se
   mitiga pidiendo un correo confirmado a moderadores y administradores.
+
+## Actualización 2026-11-17: API HTTPS de Brevo en Render
+
+- **Problema:** en producción (Render gratuito) no salía ningún correo. Render bloquea las conexiones
+  salientes a los puertos SMTP 25, 465 y 587, y el envío a `smtp-relay.brevo.com:587` se quedaba sin
+  conexión.
+- **Cambio:**
+  - Con `BREVO_API_KEY` definida, el correo sale por la API HTTPS de Brevo (puerto 443) con
+    `django-anymail[brevo]` (`anymail.backends.brevo.EmailBackend`). Esa clave tiene prioridad
+    sobre `EMAIL_BACKEND` y `EMAIL_HOST`.
+  - Sin ella, se usa SMTP si hay `EMAIL_HOST` y, si no, la consola (`core/correo.py`). SMTP queda
+    para trabajar en local.
+  - El outbox, los reintentos, Reply-To, Message-ID y List-Unsubscribe no cambian: anymail pasa
+    las cabeceras extra en `headers`.
+  - Un `AnymailError` cuenta como un intento fallido. La clave se borra del texto del error antes
+    de guardarlo o registrarlo.
+- **Reintentos sin worker:** Render gratuito no tiene procesos en segundo plano. Un cron de GitHub
+  Actions (cada 10 min) llama a `POST /interno/correos/procesar/`. El endpoint compara el token con
+  `hmac.compare_digest`, no usa sesión ni CSRF, tiene throttle de 30 llamadas por hora, procesa
+  como máximo 50 correos por pasada y responde solo conteos.
+- **Diagnóstico:** `manage.py diagnostico_correo [--enviar correo]` muestra el backend, qué
+  variables existen (sí/no), la cola y el último error, sin secretos. El arranque avisa si
+  `SITIO_URL` apunta a localhost.
+- **Consecuencias:**
+  - (+) El correo funciona en el plan gratuito sin cambiar de proveedor.
+  - (−) Depende de la API propietaria de Brevo; cambiar de proveedor implica cambiar el backend de
+    anymail, aunque el código de la aplicación no cambia.
+  - (−) Los reintentos dependen de que GitHub Actions corra el cron. Si se retrasa, el primer
+    intento ya ocurrió al encolar.

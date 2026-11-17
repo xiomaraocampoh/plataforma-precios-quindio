@@ -1,0 +1,33 @@
+# Reintentos del correo en Render gratuito, que no tiene procesos en segundo plano (ADR-021).
+# Cada 10 minutos llama POST /interno/correos/procesar/ con el token. La llamada también despierta
+# el servicio si está dormido (la primera respuesta puede tardar ~1 min).
+# Secrets (Settings → Secrets and variables → Actions → New repository secret):
+#   PROD_URL           https://plataforma-precios-quindio.onrender.com   (sin «/» al final)
+#   CORREO_CRON_TOKEN  el mismo valor que CORREO_CRON_TOKEN en Render → Environment
+name: procesar-correos
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  procesar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Procesar la cola de correo
+        env:
+          PROD_URL: ${{ secrets.PROD_URL }}
+          CORREO_CRON_TOKEN: ${{ secrets.CORREO_CRON_TOKEN }}
+        run: |
+          if [ -z "$PROD_URL" ] || [ -z "$CORREO_CRON_TOKEN" ]; then
+            echo "Faltan los secrets PROD_URL o CORREO_CRON_TOKEN; no se hace nada."
+            exit 0
+          fi
+          curl --fail-with-body --silent --show-error --max-time 120 \
+            --retry 3 --retry-delay 20 --retry-all-errors \
+            -X POST -H "Authorization: Bearer ${CORREO_CRON_TOKEN}" \
+            "${PROD_URL}/interno/correos/procesar/"
