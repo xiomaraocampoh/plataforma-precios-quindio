@@ -1,0 +1,7 @@
+Entorno de la medición (2026-11-16, 20:09)
+- Equipo: Apple M5, 10 núcleos, 16 GB de RAM
+- macOS 26.6.2, Docker 29.6.2, memoria de Docker: 7 GB
+- Aplicación: imagen ahorrapues:prod (commit d3ec8bf), gunicorn con 3 procesos, PostgreSQL 16, Redis 7 (docker-compose.prod.yml)
+- k6 v2.4.0, ejecutado en el MISMO equipo que la aplicación (carga local, no en la nube)
+- Límites de lectura por IP subidos solo para esta prueba (LIMITE_ANONIMO/LIMITE_USUARIO=1000000/min): k6 simula 500 personas desde una sola IP
+- Datos: demo (cargar_demo), 9 productos con precios; endpoint probado: GET /api/v1/comparacion/<id>/

@@ -105,7 +105,9 @@ TEMPLATES = [
 ]
 
 DATABASES = {
-    "default": env.db("DATABASE_URL", default="postgres://precios:precios@localhost:5432/precios"),
+    # Obligatoria: el secreto vive solo en el entorno (.env, .env.prod o el proveedor). Sin ella el
+    # arranque falla con «Set the DATABASE_URL environment variable». Ver .env.example.
+    "default": env.db("DATABASE_URL"),
 }
 DATABASES["default"]["CONN_MAX_AGE"] = env.int("CONN_MAX_AGE", default=60)
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

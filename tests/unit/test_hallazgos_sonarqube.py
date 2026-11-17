@@ -12,10 +12,12 @@ import pytest
 pytestmark = pytest.mark.unit
 
 RAIZ = Path(__file__).resolve().parents[2]
+# El .env local no debe «rescatar» la variable que la prueba quita del entorno
+SIN_ENV_FILE = "import environ; environ.Env.read_env = lambda *a, **k: None; "
 
 
 def test_la_redaccion_de_correos_no_se_vuelve_cuadratica_con_texto_largo():
-    # python:S8786 — un texto largo sin «@» hacía que la expresión se reintentara desde cada posición.
+    # python:S8786 — un texto largo sin «@» reintentaba la expresión desde cada posición.
     from apps.notificaciones.services import _CORREO
 
     texto = "a" * 60_000
@@ -41,7 +43,7 @@ def test_el_qr_solo_contiene_svg_y_trazados_aunque_el_texto_sea_hostil():
 
 
 def test_la_configuracion_base_no_trae_la_contrasena_de_la_base_de_datos_en_el_codigo():
-    # secrets:S6698 — los secretos van solo por variables de entorno (CLAUDE.md, checklist de seguridad)
+    # secrets:S6698 — los secretos van solo por variables de entorno (CLAUDE.md, seguridad)
     fuente = (RAIZ / "config/settings/base.py").read_text(encoding="utf-8")
     assert "postgres://precios:precios@" not in fuente
 
@@ -49,9 +51,8 @@ def test_la_configuracion_base_no_trae_la_contrasena_de_la_base_de_datos_en_el_c
 def test_sin_database_url_el_arranque_falla_con_un_mensaje_claro():
     entorno = {k: v for k, v in os.environ.items() if k != "DATABASE_URL"}
     entorno.update(DJANGO_SETTINGS_MODULE="config.settings.base", SECRET_KEY="solo-esta-prueba")
-    entorno["DJANGO_READ_DOT_ENV_FILE"] = "False"
     salida = subprocess.run(  # noqa: S603
-        [sys.executable, "-c", "import config.settings.base"],
+        [sys.executable, "-c", SIN_ENV_FILE + "import config.settings.base"],
         capture_output=True,
         text=True,
         cwd=RAIZ,
