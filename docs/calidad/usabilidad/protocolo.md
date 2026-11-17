@@ -42,8 +42,8 @@ Comprobar con personas reales que:
      llama «3G». Revisa que siga activo antes de cada tarea, porque se desactiva al cerrar DevTools.
 3. **Cuentas:** el participante crea su propia cuenta en T3 y la usa en T2. Al terminar la jornada,
    el equipo puede borrar esas cuentas desde `/admin/`.
-4. **Material:** cronómetro (o el del celular del moderador), `registro.csv` abierto, el formato de
-   consentimiento impreso o en pantalla, y `sus.md`.
+4. **Material:** cronómetro (o el del celular del moderador), `registro.csv` abierto, la hoja de
+   [consentimiento](consentimiento.md) impresa o en pantalla, y `sus.md`.
 5. **Roles:** una persona **modera**, es decir, lee el guion y no ayuda. Otra **observa y registra**:
    tiempos, errores y observaciones.
 
@@ -149,9 +149,8 @@ Anota las respuestas en `observaciones`.
 
 ## 7. Riesgos conocidos antes de la prueba
 
-Hallazgos de la auditoría del 2026-11-16 que pueden afectar los resultados:
-
-- **M-02:** las presentaciones se muestran como «5E+2 g» por `Decimal.normalize()`. Conviene
-  corregirlo antes de la prueba; si no, se medirá un defecto conocido y no el diseño.
 - **M-01:** un solo selector lista todas las presentaciones de todos los productos, y el
-  establecimiento hay que elegirlo de nuevo en cada registro.
+  establecimiento hay que elegirlo de nuevo en cada registro. Si cuesta tiempo, anótalo en
+  `observaciones`: es un hallazgo, no un error de la prueba.
+- **Servicio en la nube:** si el despliegue estaba dormido, la primera carga es lenta. Ábrelo antes de
+  cada sesión para que no afecte el cronómetro de T2.
