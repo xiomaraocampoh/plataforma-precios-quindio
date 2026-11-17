@@ -23,6 +23,9 @@ class Usuario(AbstractUser):
     email_verificado_en = models.DateTimeField(null=True, blank=True)
     # RF-27 / Ley 1581: los correos informativos se pueden apagar; los de seguridad, no
     correos_informativos = models.BooleanField(default=True)
+    # crear_cuentas_prueba: solo estas cuentas pueden omitir el 2FA, y solo con DEBUG=True y
+    # PERMITIR_PRUEBA_SIN_2FA (nunca en producción)
+    es_cuenta_prueba = models.BooleanField(default=False)
 
     class Meta:
         permissions = [("gestionar_cuentas", "Asignar roles y activar o suspender cuentas")]

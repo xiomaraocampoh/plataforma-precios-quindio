@@ -96,6 +96,16 @@ def segundo_factor_obligatorio(*, rol: str, es_staff: bool, es_superusuario: boo
     return es_staff or es_superusuario or rol in ROLES_CON_2FA_OBLIGATORIA
 
 
+def omitir_segundo_factor_de_prueba(
+    *, permitido: bool, debug: bool, es_cuenta_de_prueba: bool
+) -> bool:
+    """Solo en local: el ajuste PERMITIR_PRUEBA_SIN_2FA, DEBUG y una cuenta de prueba, los tres.
+
+    En producción DEBUG es False y prod.py fija el ajuste en False: ninguna cuenta se lo salta.
+    """
+    return permitido and debug and es_cuenta_de_prueba
+
+
 def pedir_segundo_factor(
     *, obligatorio: bool, activado: bool, dispositivo_de_confianza: bool
 ) -> bool:
