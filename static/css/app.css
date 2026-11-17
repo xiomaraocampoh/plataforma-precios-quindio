@@ -239,6 +239,12 @@ a.chip:hover { text-decoration: none; background: var(--borde); }
   -webkit-mask-image: linear-gradient(#000 86%, transparent); mask-image: linear-gradient(#000 86%, transparent);
   pointer-events: none;
 }
+/* Celular y tablet: la imagen se muestra COMPLETA (el carrito a un lado y los productos al otro) en lugar de
+   recortarla por el centro, que es la parte vacía. En celular el titular baja para no pasar por encima. */
+@media (max-width: 899px) {
+  .hero-fondo::before { height: auto; aspect-ratio: 2 / 1; background-size: 100% auto; background-position: center top;
+    -webkit-mask-image: linear-gradient(#000 72%, transparent); mask-image: linear-gradient(#000 72%, transparent); }
+}
 @media (min-width: 900px) {
   .hero-fondo { --alto-fondo: 700px; }
   .hero-fondo::before { background-image: url("../img/hero-supermercado.webp"); }
@@ -643,3 +649,6 @@ select:disabled { cursor: not-allowed; opacity: .6; }
   .auth, .angosto { --aire: clamp(1.5rem, 8vh, 5rem); margin-top: var(--aire); margin-bottom: calc(var(--aire) * .6); }
   .auth::before { top: calc(-1 * (var(--aire) + 1.5rem)); }
 }
+
+/* Celular: el titular baja para dejar ver la imagen completa del hero encima (alto de la imagen = ancho / 2). */
+@media (max-width: 599px) { .hero-fondo .hero { padding-top: calc(50vw + 1.25rem); } }
