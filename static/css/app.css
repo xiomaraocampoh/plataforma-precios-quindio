@@ -617,3 +617,4 @@ select:disabled { cursor: not-allowed; opacity: .6; }
 }
 @media (prefers-color-scheme: dark) { .con-fondo::before { display: none; } }
 @media print { .con-fondo::before { display: none; } }
+.migas { position: relative; z-index: 1; } /* las migas quedan por encima del fondo del encabezado */
