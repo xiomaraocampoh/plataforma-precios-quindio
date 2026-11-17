@@ -31,6 +31,7 @@ from ..domain.segundo_factor import (
     generar_codigo,
     generar_codigos_respaldo,
     hash_codigo,
+    omitir_segundo_factor_de_prueba,
     pedir_segundo_factor,
     segundo_factor_obligatorio,
 )
@@ -54,6 +55,15 @@ def de(usuario: Usuario) -> SegundoFactor:
 def obligatorio(usuario: Usuario) -> bool:
     return segundo_factor_obligatorio(
         rol=usuario.rol, es_staff=usuario.is_staff, es_superusuario=usuario.is_superuser
+    )
+
+
+def exento_por_prueba(usuario: Usuario) -> bool:
+    """Cuenta de prueba en local con PERMITIR_PRUEBA_SIN_2FA y DEBUG=True (nunca en producción)."""
+    return omitir_segundo_factor_de_prueba(
+        permitido=getattr(settings, "PERMITIR_PRUEBA_SIN_2FA", False),
+        debug=settings.DEBUG,
+        es_cuenta_de_prueba=getattr(usuario, "es_cuenta_prueba", False),
     )
 
 
