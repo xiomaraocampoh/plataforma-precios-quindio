@@ -29,6 +29,7 @@ from .selectors import (
     estado_del_usuario,
     productos_destacados,
     resumen_plataforma,
+    tarjetas_de_productos,
     ubicaciones_de,
 )
 
@@ -161,8 +162,12 @@ def productos(request):
     categoria_id = int(categoria) if categoria.isdigit() else None
     lista = catalogo.listar_productos(texto=texto, marca=marca, categoria_id=categoria_id)
     pagina = Paginator(lista, 24).get_page(request.GET.get("pagina"))
+    tarjetas = tarjetas_de_productos(pagina.object_list)  # un lote: sin N+1
+    ids = [fila.reporte_id for _, fila in tarjetas if fila is not None]
     contexto = {
         "pagina": pagina,
+        "tarjetas": tarjetas,
+        **estado_del_usuario(request.user, ids),
         "q": texto,
         "marca": marca,
         "categoria_id": categoria_id,

@@ -7,13 +7,15 @@ materializada / tabla de lectura alimentada por los servicios de escritura (ver 
 
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from decimal import Decimal
 
 from django.core.cache import cache
 from django.db.models import Count, Q
 from django.utils import timezone
 
 from apps.catalogo import selectors as catalogo
-from apps.catalogo.domain.normalizacion import precio_por_unidad
+from apps.catalogo.domain.normalizacion import formatear_cantidad, precio_por_unidad
+from apps.establecimientos.domain.mapas import enlace_mapa
 from apps.establecimientos.models import Establecimiento
 from apps.moderacion.selectors import denunciados_por
 from apps.precios.domain.confianza import nivel_confianza
@@ -30,6 +32,14 @@ from core.cache import clave_comparacion, clave_resumen, ttl_comparacion
 from .domain.filtros import FiltroPrecio, FiltroUbicacion, filtrar, filtrar_por_precio
 from .domain.ranking import ResultadoComparacion, ordenar_neutral
 from .domain.resumen import ResumenComparacion, resumir_precios
+from .domain.tarjeta import (
+    AYUDA_POR_UNIDAD,
+    antiguedad,
+    etiqueta_fuente,
+    formatear_pesos,
+    texto_confianza,
+    texto_por_unidad,
+)
 
 MIN_CARACTERES_BUSQUEDA = catalogo.MIN_CARACTERES_BUSQUEDA  # una sola fuente: el catálogo (RF-04)
 MIN_FILAS_EJEMPLO = 2  # el gráfico de la portada necesita al menos dos precios que comparar
@@ -42,10 +52,11 @@ def buscar_productos(texto: str, limite: int = 10):
 
 @dataclass(frozen=True)
 class FilaComparacion:
-    """Un resultado de la comparación y los datos que la interfaz necesita a su lado.
+    """Un resultado de la comparación y los datos que la tarjeta necesita a su lado (RF-16).
 
     El orden lo fija SOLO `ordenar_neutral` sobre los `ResultadoComparacion` (EC-06); estos datos
-    extra (reporte, ubicación, última confirmación) nunca entran en la clave de orden.
+    extra (producto, comercio, dirección, mapa, confirmación) nunca entran en la clave de orden.
+    Del autor no hay nada: ni nombre, ni usuario, ni ubicación (M-15, EC-07).
     """
 
     resultado: ResultadoComparacion
@@ -53,14 +64,50 @@ class FilaComparacion:
     municipio: str
     barrio: str
     ultima_confirmacion: datetime | None
+    producto: str = ""
+    marca: str = ""
+    cantidad: Decimal = Decimal("0")
+    unidad: str = ""
+    tipo: str = ""
+    direccion: str = ""
+    enlace_mapa: str | None = None
+
+    # ---- textos de la tarjeta (dominio puro; la plantilla solo los muestra) ----
+    @property
+    def presentacion_texto(self) -> str:
+        return f"{formatear_cantidad(self.cantidad)} {self.unidad}" if self.unidad else ""
+
+    @property
+    def precio_texto(self) -> str:
+        return formatear_pesos(self.resultado.precio)
+
+    @property
+    def por_unidad_texto(self) -> str:
+        return texto_por_unidad(self.resultado.precio_unitario, self.resultado.unidad_base)
+
+    @property
+    def ayuda_por_unidad(self) -> str:
+        return AYUDA_POR_UNIDAD
+
+    @property
+    def fuente_texto(self) -> str:
+        return etiqueta_fuente(self.resultado.fuente)
+
+    @property
+    def confianza(self) -> tuple[str, str]:
+        return texto_confianza(self.resultado.confianza)
+
+    @property
+    def antiguedad(self) -> str:  # se calcula al mostrar: la fila puede venir de la caché
+        return antiguedad(self.resultado.fecha_observacion, timezone.now())
 
 
-def _reportes_candidatos(producto_id: int, desde: datetime):
+def _reportes_candidatos(producto_ids: list[int], desde: datetime):
     # Un reporte viejo confirmado hace poco con «Sigue igual» sigue siendo candidato (RF-14)
     return (
         ReportePrecio.objects.filter(
             Q(fecha_observacion__gte=desde) | Q(confirmaciones__creado_en__gte=desde),
-            presentacion__producto_id=producto_id,
+            presentacion__producto_id__in=producto_ids,
             presentacion__activa=True,  # una presentación retirada del catálogo no se compara
             estado=ReportePrecio.Estado.PUBLICADO,
             establecimiento__activo=True,
@@ -73,23 +120,70 @@ def _reportes_candidatos(producto_id: int, desde: datetime):
     )
 
 
-def _calcular_filas(producto_id: int) -> list[FilaComparacion]:
-    ahora = timezone.now()
-    politica = politica_vigencia()
-    desde = ahora - timedelta(days=max(politica.dias_reporte, politica.dias_oficial))
-
+def _ultimos_por_par(producto_ids: list[int], desde: datetime):
+    """El reporte más reciente por (local, presentación) y cuántos anteriores dicen lo mismo."""
     ultimos: dict[tuple[int, int], ReportePrecio] = {}
     iguales: dict[tuple[int, int], int] = {}
-    for r in _reportes_candidatos(producto_id, desde):  # un solo query; agrupación en memoria
+    for r in _reportes_candidatos(producto_ids, desde):  # un solo query; agrupación en memoria
         clave = (r.establecimiento_id, r.presentacion_id)
         if clave not in ultimos:
             ultimos[clave] = r
             iguales[clave] = 0
         elif r.precio == ultimos[clave].precio:
             iguales[clave] += 1
+    return ultimos, iguales
+
+
+def _fila(r: ReportePrecio, resultado: ResultadoComparacion, ultima) -> FilaComparacion:
+    local, presentacion = r.establecimiento, r.presentacion
+    return FilaComparacion(
+        resultado=resultado,
+        reporte_id=r.pk,
+        municipio=local.municipio,
+        barrio=local.barrio,
+        ultima_confirmacion=ultima,
+        producto=presentacion.producto.nombre,
+        marca=presentacion.producto.marca.nombre if presentacion.producto.marca else "",
+        cantidad=presentacion.cantidad,
+        unidad=presentacion.unidad,
+        tipo=local.get_tipo_display(),
+        direccion=local.direccion,
+        enlace_mapa=enlace_mapa(
+            local.latitud,
+            local.longitud,
+            direccion=local.direccion,
+            barrio=local.barrio,
+            municipio=local.municipio,
+        ),
+    )
+
+
+def _resultado(r: ReportePrecio, n_iguales: int) -> ResultadoComparacion:
+    unitario, base = precio_por_unidad(r.precio, r.presentacion.cantidad, r.presentacion.unidad)
+    return ResultadoComparacion(
+        establecimiento_id=r.establecimiento_id,
+        establecimiento=r.establecimiento.nombre,
+        presentacion=str(r.presentacion),
+        precio=r.precio,
+        precio_unitario=unitario,
+        unidad_base=base.value,
+        fuente=r.fuente,
+        confianza=nivel_confianza(Fuente(r.fuente), n_iguales, False).value,
+        fecha_observacion=r.fecha_observacion,
+    )
+
+
+def _calcular_filas_de(producto_ids: list[int]) -> dict[int, list[FilaComparacion]]:
+    """Filas vigentes de varios productos con un número constante de queries (sin N+1)."""
+    ahora = timezone.now()
+    politica = politica_vigencia()
+    desde = ahora - timedelta(days=max(politica.dias_reporte, politica.dias_oficial))
+    ultimos, iguales = _ultimos_por_par(producto_ids, desde)
     confirmaciones = confirmaciones_por_reporte([r.pk for r in ultimos.values()])
 
-    extras: dict[ResultadoComparacion, tuple] = {}
+    por_producto: dict[int, dict[ResultadoComparacion, FilaComparacion]] = {
+        pid: {} for pid in producto_ids
+    }
     for clave, r in ultimos.items():
         n_conf, ultima = confirmaciones.get(r.pk, (0, None))
         referencia = fecha_de_referencia(r.fecha_observacion, [ultima] if ultima else [])
@@ -102,20 +196,16 @@ def _calcular_filas(producto_id: int) -> list[FilaComparacion]:
             politica=politica,
         ):
             continue
-        unitario, base = precio_por_unidad(r.precio, r.presentacion.cantidad, r.presentacion.unidad)
-        resultado = ResultadoComparacion(
-            establecimiento_id=r.establecimiento_id,
-            establecimiento=r.establecimiento.nombre,
-            presentacion=str(r.presentacion),
-            precio=r.precio,
-            precio_unitario=unitario,
-            unidad_base=base.value,
-            fuente=r.fuente,
-            confianza=nivel_confianza(Fuente(r.fuente), iguales[clave] + n_conf, False).value,
-            fecha_observacion=r.fecha_observacion,
-        )
-        extras[resultado] = (r.pk, r.establecimiento.municipio, r.establecimiento.barrio, ultima)
-    return [FilaComparacion(r, *extras[r]) for r in ordenar_neutral(list(extras))]
+        resultado = _resultado(r, iguales[clave] + n_conf)
+        por_producto[r.presentacion.producto_id][resultado] = _fila(r, resultado, ultima)
+    return {
+        pid: [filas[r] for r in ordenar_neutral(list(filas))]  # EC-06: solo el orden neutral
+        for pid, filas in por_producto.items()
+    }
+
+
+def _calcular_filas(producto_id: int) -> list[FilaComparacion]:
+    return _calcular_filas_de([producto_id])[producto_id]
 
 
 def comparar_filas(producto_id: int) -> list[FilaComparacion]:
@@ -125,6 +215,31 @@ def comparar_filas(producto_id: int) -> list[FilaComparacion]:
         lambda: _calcular_filas(producto_id),
         ttl_comparacion(),
     )
+
+
+def primeras_filas(producto_ids: list[int]) -> dict[int, FilaComparacion | None]:
+    """Listado de productos: la primera fila en el orden neutral de cada uno (o None).
+
+    Usa la misma caché por producto que la comparación y calcula las que faltan en un solo lote.
+    """
+    claves = {clave_comparacion(pid): pid for pid in producto_ids}
+    en_cache = cache.get_many(list(claves))
+    faltan = [pid for clave, pid in claves.items() if clave not in en_cache]
+    calculadas = _calcular_filas_de(faltan) if faltan else {}
+    if calculadas:
+        cache.set_many(
+            {clave_comparacion(pid): filas for pid, filas in calculadas.items()},
+            ttl_comparacion(),
+        )
+    todas = {pid: en_cache.get(clave, calculadas.get(pid)) for clave, pid in claves.items()}
+    return {pid: (filas[0] if filas else None) for pid, filas in todas.items()}
+
+
+def tarjetas_de_productos(productos) -> list[tuple]:
+    """(producto, primera fila o None) para el listado, en el orden en que llegan (alfabético)."""
+    productos = list(productos)
+    primeras = primeras_filas([p.pk for p in productos])
+    return [(p, primeras[p.pk]) for p in productos]
 
 
 def comparar_producto(producto_id: int) -> list[ResultadoComparacion]:
