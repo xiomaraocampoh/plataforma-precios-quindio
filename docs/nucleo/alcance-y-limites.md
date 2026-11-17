@@ -61,6 +61,14 @@ de 2026; en `docs/adr/` aún no coincide del todo (decisión D-1 pendiente del e
 | SonarQube | Configurado, aún no ejecutado |
 | Prueba de usabilidad con 5 personas (EC-01) | Pendiente; el kit de la prueba está listo |
 
+## 6. Accesibilidad: límite conocido (decisión del equipo, 2026-11-16)
+
+| Tema | Estado | Qué hay hoy | Por qué | Para cubrirlo |
+|---|---|---|---|---|
+| Pausar el titular animado (WCAG 2.2.2, nivel A) | **Límite conocido** | La palabra del titular de la portada rota **sin parar** y **no hay botón para pausarla**. Quien activa «reducir movimiento» en su sistema operativo no ve la animación (queda la palabra inicial) | El equipo prefirió el efecto continuo y una portada sin controles extra. La auditoría de accesibilidad (M-03) había exigido el botón, así que este criterio **queda sin cumplir** en la portada | Volver a poner el botón «Pausar animación» (existió y funcionó), o que la animación dure menos de 5 s y se detenga sola |
+
+*Para la sustentación:* es una decisión de diseño tomada con conocimiento del criterio; no es un descuido. La recarga automática de la comparación **sí** se puede pausar («Pausar actualización»).
+
 ## Cómo presentarlo en la sustentación
 
 Para cada límite conviene decir tres cosas: **qué no hace**, **por qué** (la decisión o el alcance) y

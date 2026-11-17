@@ -1,8 +1,10 @@
 """Accesibilidad WCAG 2.2 AA verificable en el HTML del servidor (M-03)."""
 
 import re
+from pathlib import Path
 
 import pytest
+from django.conf import settings
 from django.urls import reverse
 
 pytestmark = pytest.mark.integration
@@ -50,10 +52,14 @@ def test_ingreso_con_campos_vacios_muestra_un_error_por_campo(client):
     assert _referencias_rotas(html) == []
 
 
-def test_inicio_ofrece_control_para_pausar_la_rotacion_del_titular(client, db):
-    # M-03 · 2.2.2: el contenido en movimiento de más de 5 s debe poder detenerse
+def test_el_titular_rota_sin_boton_de_pausa_y_respeta_reducir_movimiento(client, db):
+    # Decisión del equipo (2026-11-16): movimiento continuo y SIN control de pausa. Es un límite
+    # conocido de WCAG 2.2.2 (docs/nucleo/alcance-y-limites.md). Mitigación: quien activa
+    # «reducir movimiento» en su sistema no ve la animación.
     html = client.get(reverse("comparacion:inicio")).content.decode()
-    assert re.search(r'<button type="button"[^>]*id="pausar-rotacion"', html)
+    assert "pausar-rotacion" not in html
+    fuente = (Path(settings.BASE_DIR) / "static/js/hero.js").read_text(encoding="utf-8")
+    assert "prefers-reduced-motion: reduce" in fuente
 
 
 def test_comparacion_permite_pausar_la_actualizacion_automatica(client, db, arroz):
