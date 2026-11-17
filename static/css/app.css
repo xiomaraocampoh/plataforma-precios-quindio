@@ -632,3 +632,7 @@ select:disabled { cursor: not-allowed; opacity: .6; }
 /* Formularios con nota lateral: mismo ancho cómodo y centrado que las pantallas de cuenta (940 px), para que las
    tarjetas no queden pegadas a los bordes del contenido. */
 .angosto { max-width: 940px; margin-inline: auto; }
+
+/* El aviso de correo y los mensajes toman el mismo ancho que las tarjetas de debajo (940 px) cuando la
+   pantalla es angosta y centrada, para que los bordes alineen. */
+:is(.aviso-pendientes, .mensajes):is(:has(~ .auth), :has(~ .angosto)) { max-width: 940px; margin-inline: auto; }
