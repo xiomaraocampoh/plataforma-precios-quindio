@@ -1,6 +1,7 @@
 from django.core.cache import cache
 from django.db import connection
 from django.http import JsonResponse
+from django.views.decorators.http import require_safe
 
 CLAVE_SALUD = "healthz:v1"
 
@@ -22,6 +23,7 @@ def _cache_ok() -> bool:
         return False
 
 
+@require_safe
 def healthz(request):
     """Health check para el monitor de disponibilidad (M-21): PostgreSQL y caché (Redis)."""
     bd, cache_ = _bd_ok(), _cache_ok()

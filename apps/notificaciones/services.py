@@ -47,7 +47,8 @@ ENVIANDO_INCIERTO = timedelta(minutes=10)
 
 _regeneradores: dict[str, Callable[[CorreoPendiente], dict]] = {}
 _enlace_baja: list[Callable[[object], str]] = []
-_CORREO = re.compile(r"[\w.+-]+@[\w-]+(\.[\w-]+)+")
+# Tamaños máximos de los RFC (local 64, etiqueta 63): acotan el reintento (sin costo cuadrático)
+_CORREO = re.compile(r"[\w.+-]{1,64}@[\w-]{1,63}(?:\.[\w-]{1,63})+")
 
 
 def registrar_regenerador(tipo: str, funcion: Callable[[CorreoPendiente], dict]) -> None:

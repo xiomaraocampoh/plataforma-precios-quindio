@@ -105,7 +105,9 @@ TEMPLATES = [
 ]
 
 DATABASES = {
-    "default": env.db("DATABASE_URL", default="postgres://precios:precios@localhost:5432/precios"),
+    # Obligatoria: el secreto vive solo en el entorno (.env, .env.prod o el proveedor). Sin ella el
+    # arranque falla con «Set the DATABASE_URL environment variable». Ver .env.example.
+    "default": env.db("DATABASE_URL"),
 }
 DATABASES["default"]["CONN_MAX_AGE"] = env.int("CONN_MAX_AGE", default=60)
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
@@ -143,8 +145,10 @@ REST_FRAMEWORK = {
     ],
     # Resistencia (M-16) ante reportes masivos / coordinados (EC-03)
     "DEFAULT_THROTTLE_RATES": {
-        "anon": "120/min",
-        "user": "240/min",
+        # Por IP. Solo se suben para la prueba de carga (k6 simula 500 personas desde UNA sola IP);
+        # en producción se dejan los valores por defecto.
+        "anon": env.str("LIMITE_ANONIMO", default="120/min"),
+        "user": env.str("LIMITE_USUARIO", default="240/min"),
         "reportes": "30/hour",
         "sugerencias": "10/hour",  # RF-10
         "denuncias": "20/hour",  # RF-20
