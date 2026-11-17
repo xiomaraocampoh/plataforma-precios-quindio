@@ -1,6 +1,5 @@
 {% extends "correo/base.html" %}
 {% block preheader %}Ingresaron a tu cuenta desde {{ navegador }}.{% endblock %}
-{% block chip %}{% include 'correo/_chip.html' with tono='seguridad' texto='Nuevo ingreso' %}{% endblock %}
 {% block titulo %}Ingresaste desde un dispositivo nuevo{% endblock %}
 {% block cuerpo %}<p style="margin:0 0 16px 0;font-size:16px;line-height:1.5;color:#5f5f64;">Hola {{ nombre }}, alguien ingresó a tu cuenta desde <strong>{{ navegador }}</strong> el {{ cuando }}.</p><p style="margin:0 0 16px 0;font-size:16px;line-height:1.5;color:#5f5f64;">Si fuiste tú, no tienes que hacer nada. Si no lo reconoces, cambia tu contraseña ya.</p>{% endblock %}
 {% block accion %}{% include 'correo/_boton.html' with url=enlace_recuperar texto='Cambiar mi contraseña' %}{% endblock %}

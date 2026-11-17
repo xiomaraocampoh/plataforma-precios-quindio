@@ -1,0 +1,17 @@
+{% comment %}
+Resumen de errores de un formulario (WCAG 3.3.1): arriba, con un enlace a cada campo, para que
+nadie tenga que buscar por qué «no pasó nada». Uso: include con form (y recuperar=True en el ingreso).
+Se anuncia una sola vez (role="alert"); los mensajes junto a cada campo no repiten el anuncio.
+{% endcomment %}
+{% if form.errors %}
+<div class="resumen-errores" id="resumen-errores" role="alert" tabindex="-1" aria-labelledby="resumen-titulo">
+  <p class="resumen-titulo" id="resumen-titulo">Revisa esto para continuar</p>
+  <ul>
+    {% for e in form.non_field_errors %}<li>{{ e }}</li>{% endfor %}
+    {% for campo in form %}{% if campo.errors %}
+    <li><a href="#{{ campo.id_for_label }}">{% if campo.field.widget.input_type != "checkbox" %}<strong>{{ campo.label }}:</strong> {% endif %}{{ campo.errors|join:" " }}</a></li>
+    {% endif %}{% endfor %}
+  </ul>
+  {% if recuperar and form.non_field_errors %}<p class="resumen-ayuda"><a href="{% url 'cuentas:recuperar' %}">¿Olvidaste tu contraseña?</a></p>{% endif %}
+</div>
+{% endif %}

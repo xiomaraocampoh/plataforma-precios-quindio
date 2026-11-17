@@ -11,7 +11,11 @@ from django.utils import timezone
 from apps.catalogo import selectors as catalogo
 
 from .clients.sipsa import PrecioExterno
-from .clients.vision import ReconocedorClaude, ReconocedorDeProductos
+from .clients.vision import (  # noqa: F401  (se reexporta para las vistas)
+    ReconocedorClaude,
+    ReconocedorDeProductos,
+    ReconocimientoNoDisponibleError,
+)
 from .domain.reconocimiento import PistaProducto, tipo_de_imagen
 from .models import PrecioReferencia
 

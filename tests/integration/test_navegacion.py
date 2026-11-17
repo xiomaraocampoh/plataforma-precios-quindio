@@ -1,5 +1,7 @@
 """Navegación del núcleo: enlaces visibles según la sesión y el rol."""
 
+import re
+
 import pytest
 from django.urls import reverse
 
@@ -50,3 +52,22 @@ def test_ningun_comentario_de_plantilla_se_muestra_en_la_pagina(client, reportan
     ):
         html = client.get(url).content.decode()
         assert "{#" not in html and "#}" not in html, url
+
+
+def test_cabecera_tiene_menu_de_hamburguesa_accesible_y_deja_los_botones_a_la_vista(client, db):
+    # En celular los enlaces van en un menú; «Ingresar» y «Crear cuenta» siguen visibles siempre.
+    html = client.get(reverse("comparacion:inicio")).content.decode()
+    assert 'id="nav-principal"' in html
+    assert re.search(r'<button[^>]*class="menu-boton"[^>]*aria-controls="nav-principal"', html)
+    assert 'aria-expanded="false"' in html
+    assert re.search(r'<a class="btn btn-sec" href="[^"]*ingresar/">Ingresar</a>', html)
+    assert re.search(r'<a class="btn" href="[^"]*registro/">Crear cuenta</a>', html)
+
+
+def test_el_menu_de_hamburguesa_tambien_esta_con_sesion_iniciada(client, django_user_model):
+    usuario = django_user_model.objects.create_user(
+        username="menu1", password="clave-segura-123", acepto_tratamiento_datos=True
+    )
+    client.force_login(usuario)
+    html = client.get(reverse("comparacion:inicio")).content.decode()
+    assert 'aria-controls="nav-principal"' in html and "menu-cuenta" in html

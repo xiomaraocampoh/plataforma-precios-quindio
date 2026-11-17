@@ -1,6 +1,7 @@
 /* Titular animado de la portada: rota la última palabra (sin dependencias).
    Mejora progresiva: sin JS o con "reducir movimiento" se queda con la palabra inicial.
-   WCAG 2.2.2: el botón #pausar-rotacion detiene y reanuda la animación.
+   Decisión del equipo: la rotación es continua y SIN botón de pausa (ver docs/nucleo/alcance-y-limites.md).
+   Quien tiene activado «reducir movimiento» en su sistema no ve la animación (ver más abajo).
    WCAG 1.4.12: si cambia el espaciado o el tamaño del texto, el ancho se recalcula y la palabra
    no se recorta. */
 (() => {
@@ -38,19 +39,5 @@
     observador.observe(actual);
     setTimeout(() => vieja.remove(), 700);
   };
-  let temporizador = setInterval(rotar, INTERVALO_MS);
-
-  const boton = document.getElementById("pausar-rotacion");
-  if (!boton) return;
-  boton.hidden = false;
-  boton.addEventListener("click", () => {
-    if (temporizador === null) {
-      temporizador = setInterval(rotar, INTERVALO_MS);
-      boton.textContent = "Pausar animación";
-    } else {
-      clearInterval(temporizador);
-      temporizador = null;
-      boton.textContent = "Reanudar animación";
-    }
-  });
+  setInterval(rotar, INTERVALO_MS);
 })();
