@@ -1,19 +1,17 @@
-/* Titular animado de la portada: cambia la última palabra unas cuantas veces y se detiene sola
-   en la palabra inicial (sin dependencias).
-   WCAG 2.2.2: el movimiento automático dura menos de 5 s, por eso no necesita un botón de pausa.
+/* Titular animado de la portada: rota la última palabra (sin dependencias).
    Mejora progresiva: sin JS o con "reducir movimiento" se queda con la palabra inicial.
+   WCAG 2.2.2: el botón #pausar-rotacion detiene y reanuda la animación.
    WCAG 1.4.12: si cambia el espaciado o el tamaño del texto, el ancho se recalcula y la palabra
    no se recorta. */
 (() => {
   const cont = document.querySelector(".rota");
   if (!cont || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-  // La lista termina en la palabra inicial: tras el último cambio el titular queda como empezó.
   const palabras = (cont.dataset.palabras || "").split(",").filter(Boolean);
   let actual = cont.querySelector(".rota-palabra");
   if (palabras.length < 2 || !actual) return;
 
-  const INTERVALO_MS = 1200;       // (cambios × intervalo) + 700 ms de transición ≤ 5 s
+  const INTERVALO_MS = 2600;
   const enEm = (px) => px / parseFloat(getComputedStyle(cont).fontSize);
   const fijarAncho = (el) => { cont.style.width = enEm(el.getBoundingClientRect().width) + "em"; };
   const observador = new ResizeObserver(() => fijarAncho(actual));
@@ -24,7 +22,8 @@
 
   let i = 0;
   const rotar = () => {
-    i += 1;
+    if (document.hidden) return;
+    i = (i + 1) % palabras.length;
     const siguiente = document.createElement("span");
     siguiente.className = "rota-palabra entra";
     siguiente.textContent = palabras[i];
@@ -38,7 +37,20 @@
     actual = siguiente;
     observador.observe(actual);
     setTimeout(() => vieja.remove(), 700);
-    if (i < palabras.length - 1) setTimeout(rotar, INTERVALO_MS);
   };
-  setTimeout(rotar, INTERVALO_MS);
+  let temporizador = setInterval(rotar, INTERVALO_MS);
+
+  const boton = document.getElementById("pausar-rotacion");
+  if (!boton) return;
+  boton.hidden = false;
+  boton.addEventListener("click", () => {
+    if (temporizador === null) {
+      temporizador = setInterval(rotar, INTERVALO_MS);
+      boton.textContent = "Pausar animación";
+    } else {
+      clearInterval(temporizador);
+      temporizador = null;
+      boton.textContent = "Reanudar animación";
+    }
+  });
 })();
