@@ -15,8 +15,8 @@ set -u
 
 BASE="${BASE_URL:-http://localhost:8000}"
 PRODUCTO="${PRODUCTO_ID:-1}"
-ENCABEZADO=()
-[ "${HTTPS_SIMULADO:-0}" = "1" ] && ENCABEZADO=(-H "X-Forwarded-Proto: https")
+ENCABEZADO=(-H "Referer: $BASE/")
+[ "${HTTPS_SIMULADO:-0}" = "1" ] && ENCABEZADO+=(-H "X-Forwarded-Proto: https")
 
 FALLAS=0
 JAR_USUARIO=$(mktemp); JAR_MODERADOR=$(mktemp)

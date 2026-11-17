@@ -12,6 +12,10 @@ Corporación Universitaria Empresarial Alexander von Humboldt
 
 ## Arranque local
 
+> **Guía paso a paso para el equipo (Windows/PowerShell), con datos y cuentas de prueba:**
+> [docs/operacion/arranque-local-equipo.md](docs/operacion/arranque-local-equipo.md). Cada persona
+> tiene su propia base local; `migrate` siembra los datos y las cuentas de prueba (ADR-0023).
+
 ### Primera vez
 
 ```bash
