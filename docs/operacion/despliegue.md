@@ -229,3 +229,9 @@ carga con k6 contra esa URL.
 - **Correo real** (SMTP) y **TLS real** de un navegador: solo se simuló con la cabecera del proxy.
 - **El filtro por rango de precio** está en otra rama (`feat/filtro-rango-precio`); se agrega a la
   prueba de humo cuando se fusione.
+
+> **Contra una URL con HTTPS real** (Render, Cloud Run…): Django rechaza con 403 un POST sin `Origin` ni `Referer`
+> («Referer checking failed - no Referer»). Los navegadores siempre envían `Origin`; `curl` no. Por eso el script
+> declara ambos encabezados en todas sus peticiones. Sin ellos, las comprobaciones de «crear cuenta», «registrar un
+> precio» y «ingreso como moderador» fallan con 403 aunque la aplicación esté bien (se reprodujo con
+> `HTTPS_SIMULADO=1`).

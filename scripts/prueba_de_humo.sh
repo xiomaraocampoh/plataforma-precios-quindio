@@ -8,6 +8,7 @@
 #   PRODUCTO_ID      Producto con precios cargados. Por defecto 1
 #   CLAVE_MODERADOR  Clave de moderador_demo (DEMO_ADMIN_PASSWORD). Si falta, se omite esa parte
 #   HTTPS_SIMULADO   1 = añade «X-Forwarded-Proto: https» (para probar con FORZAR_HTTPS=True)
+#                    Siempre se envían Origin y Referer: por HTTPS real Django exige uno de los dos en los POST
 #
 # Requiere los datos de ejemplo (`cargar_demo`). Crea UNA cuenta nueva y registra UN precio.
 # Termina con código distinto de cero si alguna comprobación falla.
@@ -15,7 +16,12 @@ set -u
 
 BASE="${BASE_URL:-http://localhost:8000}"
 PRODUCTO="${PRODUCTO_ID:-1}"
-ENCABEZADO=(-H "Referer: $BASE/")
+# Por HTTPS real (Render, Cloud Run…) Django rechaza con 403 un POST sin Origin ni Referer («Referer checking
+# failed - no Referer»). Los navegadores siempre envían Origin; curl no, así que el script lo declara.
+ORIGEN="$BASE"
+# Con HTTPS simulado Django espera un Origin «https://…» aunque la URL base sea http (en un despliegue real ya lo es)
+[ "${HTTPS_SIMULADO:-0}" = "1" ] && ORIGEN="https://${BASE#http://}"
+ENCABEZADO=(-H "Origin: ${ORIGEN}" -H "Referer: ${ORIGEN}/")
 [ "${HTTPS_SIMULADO:-0}" = "1" ] && ENCABEZADO+=(-H "X-Forwarded-Proto: https")
 
 FALLAS=0
