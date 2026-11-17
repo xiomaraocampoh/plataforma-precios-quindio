@@ -175,6 +175,9 @@ PERMITIR_PRUEBA_SIN_2FA = env.bool("PERMITIR_PRUEBA_SIN_2FA", default=False)
 SEMBRAR_DATOS_PRUEBA = env.bool("SEMBRAR_DATOS_PRUEBA", default=False)
 SEMBRAR_CUENTAS_PRUEBA = env.bool("SEMBRAR_CUENTAS_PRUEBA", default=False)
 
+# Búsqueda por foto: puntaje mínimo (0 a 1) para proponer un producto (catalogo/domain/coincidencia)
+UMBRAL_COINCIDENCIA_FOTO = env.float("UMBRAL_COINCIDENCIA_FOTO", default=0.45)
+
 # Reglas de negocio parametrizables (ver docs/adr/0003-vigencia-de-precios.md)
 PRECIOS = {
     "VIGENCIA_REPORTE_DIAS": env.int("VIGENCIA_REPORTE_DIAS", default=7),

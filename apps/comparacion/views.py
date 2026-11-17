@@ -91,10 +91,16 @@ def buscar_por_foto(request):
         )
     if pista is None:
         return _fragmento_foto(request, 200, no_reconocido=True)
-    candidatos = list(catalogo.buscar_productos(consulta_de_busqueda(pista), limite=5))
-    if pista.codigo_barras and not candidatos:
-        candidatos = list(catalogo.productos_por_codigo(pista.codigo_barras)[:5])
-    return _fragmento_foto(request, 200, pista=pista, candidatos=candidatos)
+    candidatos = catalogo.buscar_por_pista(
+        nombre=pista.nombre,
+        marca=pista.marca,
+        cantidad=pista.cantidad,
+        unidad=pista.unidad,
+        codigo=pista.codigo_barras,
+    )
+    return _fragmento_foto(
+        request, 200, pista=pista, candidatos=candidatos, buscamos=consulta_de_busqueda(pista)
+    )
 
 
 @require_GET

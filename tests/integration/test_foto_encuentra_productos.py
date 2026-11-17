@@ -109,7 +109,8 @@ def test_sin_marca_trae_spaghetti_de_varias_marcas(client, catalogo, falso):
 
 def test_una_marca_inexistente_no_filtra_los_atunes(client, catalogo, falso):
     productos, _ = _candidatos(client, falso, "Atún", "Marca inexistente")
-    assert _marcas(productos) == {"Van Camp's", "Isabel"}
+    assert len(_marcas(productos)) >= 3  # no se filtró por la marca que no existe
+    assert all("atun" in p.nombre_normalizado for p in productos)
 
 
 def test_sin_nada_parecido_no_hay_candidatos_y_ofrece_buscar_por_texto(client, catalogo, falso):

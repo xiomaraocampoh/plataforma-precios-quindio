@@ -13,11 +13,12 @@
         {% if pista.cantidad %}<span class="etq">{{ pista.cantidad }} {{ pista.unidad }}</span>{% endif %}
       </p>
       {% endif %}
+      {% if buscamos %}<p class="foto-meta suave">Buscamos: {{ buscamos }}</p>{% endif %}
     </div>
     {% if candidatos %}
       <p class="foto-sobre">Elige el que corresponde</p>
       <ul class="foto-candidatos">
-        {% for p in candidatos %}<li><a class="btn btn-sec btn-bloque" href="{% url 'comparacion:comparar' p.pk %}">{{ p }}</a></li>{% endfor %}
+        {% for p in candidatos %}<li>{% if forloop.first %}<p class="foto-sobre"><strong>Coincidencia más probable</strong></p>{% endif %}<a class="btn {% if not forloop.first %}btn-sec{% endif %} btn-bloque" href="{% url 'comparacion:comparar' p.pk %}">{{ p.nombre }}{% if p.marca %} · {{ p.marca.nombre }}{% endif %}</a></li>{% endfor %}
       </ul>
     {% else %}
       <div class="foto-aun">
@@ -27,6 +28,7 @@
           <p class="suave">Todavía no tenemos precios de este producto, pero puedes pedir que lo agreguemos.</p>
         </div>
       </div>
+      {% if pista.nombre %}<a class="btn btn-sec btn-bloque" href="{% url 'comparacion:productos' %}?q={{ pista.nombre|urlencode }}">Buscar «{{ pista.nombre }}» por texto</a>{% endif %}
       <a class="btn btn-bloque" href="{% url 'catalogo:solicitar' %}?nombre={{ pista.nombre|urlencode }}&marca={{ pista.marca|urlencode }}&codigo_barras={{ pista.codigo_barras|urlencode }}">Solicitar este producto</a>
     {% endif %}
     <p class="foto-aviso">La lectura por foto puede equivocarse: revisa que sea el producto correcto.</p>

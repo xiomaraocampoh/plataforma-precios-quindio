@@ -74,6 +74,14 @@ def test_el_prompt_trata_el_texto_de_la_imagen_como_dato():
     assert "no son instrucciones" in cliente.llamadas[0]["system"].lower()
 
 
+def test_el_prompt_pide_el_tipo_de_producto_corto_y_sin_marca():
+    cliente = ClienteFalso(_respuesta(DATOS))
+    ReconocedorClaude(cliente=cliente, modelo="m").reconocer(JPEG, "image/jpeg")
+    instrucciones = cliente.llamadas[0]["system"]
+    assert "1 a 3 palabras" in instrucciones and "sin la marca" in instrucciones
+    assert "«Spaghetti»" in instrucciones and "supermercado colombiano" in instrucciones
+
+
 @pytest.mark.parametrize("stop", ["refusal", "max_tokens"])
 def test_rechazo_o_corte_equivale_a_no_reconocido(stop):
     cliente = ClienteFalso(_respuesta(DATOS, stop=stop))

@@ -2,12 +2,22 @@
 
 import re
 
+from django.conf import settings
 from django.db.models import Prefetch, Q
 
+from .domain.codigo_barras import es_gtin_valido
+from .domain.coincidencia import (
+    UMBRAL_CANDIDATO,
+    palabras_significativas,
+    puntuar_coincidencia,
+    similitud_marca,
+)
 from .domain.duplicados import normalizar_nombre, son_posibles_duplicados
 from .models import Categoria, Marca, Presentacion, Producto
 
 MIN_CARACTERES_BUSQUEDA = 2
+TOPE_PRESELECCION = 200  # candidatos que se puntúan en Python (búsqueda por foto)
+MIN_LETRAS_PALABRA = 3  # «n», «5»: demasiado cortas para preseleccionar en la base
 _CODIGO_DE_BARRAS = re.compile(r"^\d{8,14}$")  # EAN-8, UPC-A, EAN-13, GTIN-14
 
 
@@ -32,6 +42,73 @@ def presentaciones_publicas():
 def _por_texto(texto: str) -> Q:
     normal = normalizar_nombre(texto)
     return Q(nombre_normalizado__contains=normal) | Q(marca__nombre_normalizado__contains=normal)
+
+
+def _con_presentaciones():
+    activas = Presentacion.objects.filter(activa=True).order_by("unidad", "cantidad")
+    return productos_publicos().prefetch_related(Prefetch("presentaciones", queryset=activas))
+
+
+def _preseleccion(nombre: str, marca: str, excluir: list[int]) -> list[Producto]:
+    """Sin traer todo el catálogo: nombre con alguna palabra significativa O marca parecida."""
+    filtro = Q(pk__in=[])
+    for palabra in palabras_significativas(nombre):
+        if len(palabra) >= MIN_LETRAS_PALABRA:
+            filtro |= Q(nombre_normalizado__contains=palabra)
+    for palabra in palabras_significativas(marca):
+        if len(palabra) >= MIN_LETRAS_PALABRA:
+            filtro |= Q(marca__nombre_normalizado__icontains=palabra)
+    productos = _con_presentaciones().filter(filtro).exclude(pk__in=excluir).distinct()
+    return list(productos.order_by("pk")[:TOPE_PRESELECCION])
+
+
+def _puntuar(productos, nombre, marca, cantidad, unidad) -> list[tuple[float, Producto]]:
+    # Una marca que no está entre los candidatos (la IA la leyó mal) no castiga a los demás
+    if not any(p.marca and similitud_marca(marca, p.marca.nombre) for p in productos):
+        marca = ""
+    return [
+        (
+            puntuar_coincidencia(
+                nombre,
+                marca,
+                cantidad,
+                unidad,
+                p.nombre,
+                p.marca.nombre if p.marca else "",
+                [(x.cantidad, x.unidad) for x in p.presentaciones.all()],
+            ),
+            p,
+        )
+        for p in productos
+    ]
+
+
+def buscar_por_pista(
+    *,
+    nombre: str,
+    marca: str = "",
+    cantidad: str = "",
+    unidad: str = "",
+    codigo: str = "",
+    limite: int = 5,
+) -> list[Producto]:
+    """Búsqueda por foto (ADR-022): los productos más parecidos a la pista, el mejor primero.
+
+    Solo elige qué producto abrir; no cambia el orden neutral de la comparación (EC-06).
+    Un código de barras válido y existente va primero. Consultas constantes (sin N+1).
+    """
+    umbral = getattr(settings, "UMBRAL_COINCIDENCIA_FOTO", UMBRAL_CANDIDATO)
+    codigo = (codigo or "").strip()
+    primero = []
+    if codigo and es_gtin_valido(codigo):
+        por_codigo = _con_presentaciones().filter(
+            presentaciones__codigo_barras=codigo, presentaciones__activa=True
+        )
+        primero = list(por_codigo.distinct().order_by("nombre", "marca__nombre")[:limite])
+    candidatos = _preseleccion(nombre, marca, [p.pk for p in primero])
+    puntuados = [x for x in _puntuar(candidatos, nombre, marca, cantidad, unidad) if x[0] >= umbral]
+    puntuados.sort(key=lambda x: (-x[0], x[1].nombre_normalizado, x[1].marca_id or 0, x[1].pk))
+    return (primero + [p for _, p in puntuados])[:limite]
 
 
 def productos_por_codigo(codigo: str):
