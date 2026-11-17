@@ -636,3 +636,10 @@ select:disabled { cursor: not-allowed; opacity: .6; }
 /* El aviso de correo y los mensajes toman el mismo ancho que las tarjetas de debajo (940 px) cuando la
    pantalla es angosta y centrada, para que los bordes alineen. */
 :is(.aviso-pendientes, .mensajes):is(:has(~ .auth), :has(~ .angosto)) { max-width: 940px; margin-inline: auto; }
+
+/* Las tarjetas centradas no quedan pegadas bajo el menú: aire arriba proporcional a la altura de la
+   pantalla (en escritorio), para que se vean centradas y no al borde. */
+@media (min-width: 900px) {
+  .auth, .angosto { --aire: clamp(1.5rem, 8vh, 5rem); margin-top: var(--aire); margin-bottom: calc(var(--aire) * .6); }
+  .auth::before { top: calc(-1 * (var(--aire) + 1.5rem)); }
+}
