@@ -23,3 +23,9 @@ def test_healthz_503_si_la_cache_no_responde(client, monkeypatch):
     respuesta = client.get(reverse("healthz"))
     assert respuesta.status_code == 503
     assert respuesta.json()["cache"] == "error"
+
+
+def test_healthz_solo_acepta_lectura(client):
+    # python:S3752 — el monitor solo lee; escribir en este endpoint no tiene sentido
+    assert client.post("/healthz/").status_code == 405
+    assert client.get("/healthz/").status_code in (200, 503)

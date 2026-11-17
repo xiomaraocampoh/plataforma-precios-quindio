@@ -1,5 +1,6 @@
 """RF-04: escanear un código de barras lleva a la comparación del producto."""
 
+import re
 from decimal import Decimal
 
 import pytest
@@ -82,3 +83,10 @@ def test_solicitar_precarga_el_codigo_de_barras(client, django_user_model):
     r = client.get(reverse("catalogo:solicitar"), {"codigo_barras": "96385074"})
     assert r.status_code == 200
     assert 'value="96385074"' in r.content.decode()
+
+
+def test_los_campos_de_archivo_ocultos_del_escaner_tienen_nombre_accesible(client, db):
+    # Web:InputWithoutLabelCheck — también el que abre la cámara del sistema
+    html = client.get(reverse("comparacion:inicio")).content.decode()
+    for campo in re.findall(r"<input[^>]*type=\"file\"[^>]*>", html):
+        assert "aria-label=" in campo, campo
