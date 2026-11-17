@@ -186,7 +186,7 @@ PRECIOS = {
 }
 
 # Política de tratamiento de datos (Ley 1581 de 2012, ADR-0008 y ADR-022): quién responde y por
-# dónde se consulta o reclama. El correo va por entorno; vacío = la página no muestra ninguno.
+# dónde se consulta o reclama. El correo se puede cambiar por entorno; vacío = no se muestra.
 POLITICA_DATOS = {
     "RESPONSABLE": env.str(
         "POLITICA_DATOS_RESPONSABLE",
@@ -195,7 +195,7 @@ POLITICA_DATOS = {
             "Corporación Universitaria Empresarial Alexander von Humboldt, Armenia, Quindío)"
         ),
     ),
-    "CORREO_CONTACTO": env.str("POLITICA_DATOS_CORREO", default=""),
+    "CORREO_CONTACTO": env.str("POLITICA_DATOS_CORREO", default="ahorrapuescolombia@gmail.com"),
 }
 
 INTEGRACIONES = {

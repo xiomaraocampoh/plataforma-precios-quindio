@@ -102,3 +102,8 @@ def test_el_pie_de_toda_pagina_enlaza_la_politica(client):
     html = client.get(reverse("comparacion:inicio")).content.decode()
     pie = html[html.index('<footer class="pie">') :]
     assert f'href="{reverse("cuentas:politica_datos")}"' in pie
+
+
+def test_por_defecto_la_politica_muestra_el_correo_del_proyecto(client):
+    html = _politica(client)
+    assert 'href="mailto:ahorrapuescolombia@gmail.com"' in html
