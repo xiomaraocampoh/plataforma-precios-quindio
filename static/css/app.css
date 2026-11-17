@@ -294,7 +294,11 @@ a.chip:hover { text-decoration: none; background: var(--borde); }
 .tile-oscuro .barra-relleno { background: rgb(255 255 255 / .35); }
 .tile-oscuro .barra-fila.es-primero .barra-relleno { background: #2997ff; }
 
-.tarjetas { display: grid; gap: var(--gap); grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); }
+.tarjetas { --cols: 1; display: flex; flex-wrap: wrap; justify-content: center; gap: var(--gap); }
+.tarjetas > * { flex: 0 0 calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols)); min-width: 0; }
+@media (min-width: 520px) { .tarjetas { --cols: 2; } }
+@media (min-width: 820px) { .tarjetas { --cols: 3; } }
+@media (min-width: 1100px) { .tarjetas { --cols: 4; } }
 .tarjeta { display: flex; flex-direction: column; gap: .35rem; background: var(--superficie); border-radius: 22px; padding: 1.4rem; color: var(--texto); min-height: 150px; }
 .tarjeta:hover { text-decoration: none; background: var(--marca-suave); }
 .tarjeta .nombre { font-size: 1.15rem; font-weight: 650; letter-spacing: -.02em; }
@@ -567,3 +571,29 @@ input[aria-invalid="true"], select[aria-invalid="true"] { border-color: var(--er
     -webkit-mask-image: linear-gradient(transparent, #000 20%, #000 55%, transparent); mask-image: linear-gradient(transparent, #000 20%, #000 55%, transparent); }
 }
 @media (prefers-color-scheme: dark) { .auth::before { display: none; } }
+
+/* Equilibrio de espacios ------------------------------------------------------------------
+   1) Pantallas de cuenta: las tarjetas claras no se estiran (antes quedaban con mucho vacío por
+      dentro); los paneles oscuros sí, para acompañar la altura del formulario. */
+.auth > .tile { align-self: start; }
+.auth > .tile-oscuro { align-self: stretch; }
+/* 2) Notas laterales agrupadas junto a un formulario (columna de 2 de 6). */
+.lateral { grid-column: 1 / -1; display: grid; gap: var(--gap); align-content: start; }
+@media (min-width: 900px) { .lateral { grid-column: span 2; } }
+/* 3) Comparación: la última fila no queda con huecos. Si la última tarjeta quedó sola en su fila ocupa
+   toda la fila; si quedó con una compañera, ocupa el resto. Solo cambia el ancho, nunca el orden. */
+@media (min-width: 900px) {
+  ol.bento > li.tile-2:nth-child(3n):nth-last-child(2) { grid-column: span 6; }
+  ol.bento > li.tile-2:nth-child(3n+1):nth-last-child(2) { grid-column: span 4; }
+}
+
+/* Selectores desplegables: flecha propia con margen (la nativa quedaba pegada al borde derecho). */
+select:not([multiple]) {
+  -webkit-appearance: none; appearance: none; cursor: pointer;
+  padding-right: 2.9rem; text-overflow: ellipsis;
+  background-color: var(--superficie);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5.5 7.75 10 12.25l4.5-4.5' fill='none' stroke='%2355555a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 1.05rem center; background-size: 1.15rem;
+}
+select:not([multiple]):focus-visible { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5.5 7.75 10 12.25l4.5-4.5' fill='none' stroke='%230071e3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+select:disabled { cursor: not-allowed; opacity: .6; }

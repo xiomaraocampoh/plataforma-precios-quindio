@@ -26,7 +26,9 @@
       {% include "partials/_campo.html" with campo=preferencias.correos_informativos %}
       <button class="btn btn-sec" type="submit">Guardar preferencias</button>
     </form>
-    <p class="enlace-pie"><a href="{% url 'cuentas:seguridad' %}">Seguridad: verificación en dos pasos y contraseña</a></p>
+    <h2>Seguridad</h2>
+    <p class="suave">Activa la verificación en dos pasos y cambia tu contraseña.</p>
+    <p><a class="btn btn-sec" href="{% url 'cuentas:seguridad' %}">Ir a seguridad</a></p>
     <h2>Suprimir la cuenta</h2>
     <p class="suave">Puedes pedir que borremos tus datos personales. Tus precios seguirán ayudando a otros, sin tu identidad.</p>
     <p><a class="btn btn-sec" href="{% url 'cuentas:suprimir' %}">Suprimir mi cuenta</a></p>
