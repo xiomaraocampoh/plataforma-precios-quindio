@@ -4,6 +4,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
+
 from apps.comparacion.domain.tarjeta import (
     AYUDA_POR_UNIDAD,
     antiguedad,

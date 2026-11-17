@@ -39,7 +39,7 @@ def test_el_zoom_es_parametrizable():
     )
 
 
-# ---------- «Ver en el mapa» en la tarjeta: coordenadas o, si faltan, búsqueda por dirección ----------
+# ---------- «Ver en el mapa»: coordenadas o, si faltan, búsqueda por dirección ----------
 
 
 def test_enlace_mapa_prefiere_las_coordenadas():
