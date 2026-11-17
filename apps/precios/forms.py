@@ -5,6 +5,22 @@ from apps.catalogo.models import Presentacion
 from apps.establecimientos.models import Establecimiento
 
 
+class SelectPresentacion(forms.Select):
+    """Cada opción lleva su cantidad y unidad para calcular en vivo el precio por unidad (RF-16).
+
+    Es solo una ayuda visual: el precio por unidad que se guarda y se compara lo calcula siempre
+    el dominio (`precio_por_unidad`) en el servidor.
+    """
+
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        opcion = super().create_option(name, value, label, selected, index, subindex, attrs)
+        instancia = getattr(value, "instance", None)
+        if instancia is not None:
+            opcion["attrs"]["data-cantidad"] = format(instancia.cantidad.normalize(), "f")
+            opcion["attrs"]["data-unidad"] = instancia.unidad
+        return opcion
+
+
 class RegistroPrecioForm(forms.Form):
     """Formulario mínimo para registrar en ≤ 15 s (EC-01). Validación también en servidor (M-02)."""
 
@@ -12,14 +28,19 @@ class RegistroPrecioForm(forms.Form):
         queryset=Establecimiento.objects.filter(activo=True), label="¿Dónde estás?"
     )
     presentacion = forms.ModelChoiceField(
-        queryset=Presentacion.objects.none(), label="Producto y presentación"
+        queryset=Presentacion.objects.none(),
+        label="Producto y presentación",
+        widget=SelectPresentacion,
     )
     precio = forms.DecimalField(
         min_value=1,
         max_digits=12,
         decimal_places=2,
-        label="Precio en góndola ($)",
-        widget=forms.NumberInput(attrs={"inputmode": "numeric", "autocomplete": "off"}),
+        label="Precio total del empaque ($)",
+        help_text="El precio que marca la etiqueta para esa presentación",
+        widget=forms.NumberInput(
+            attrs={"inputmode": "numeric", "autocomplete": "off", "data-precio-total": ""}
+        ),
     )
     # Registro sin conexión (ADR-009): la cola del navegador reenvía con el mismo id y la hora
     # en que se vio el precio; el servicio aplica RN-08 a esa fecha.
