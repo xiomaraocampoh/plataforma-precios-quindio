@@ -3,7 +3,6 @@
 {% block contenido %}
 <div class="auth bento">
   <section class="tile tile-3" aria-labelledby="t-resultado">
-    <p>{% if exito %}<span class="chip chip-positivo">Listo</span>{% else %}<span class="chip chip-alerta">No se pudo</span>{% endif %}</p>
     <h1 id="t-resultado">{{ titulo }}</h1>
     <p role="status">{{ mensaje }}</p>
     <p><a class="btn btn-sec" href="{% url 'comparacion:inicio' %}">Ir al inicio</a></p>

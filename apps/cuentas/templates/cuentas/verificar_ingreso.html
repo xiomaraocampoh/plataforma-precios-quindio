@@ -3,7 +3,6 @@
 {% block contenido %}
 <div class="auth bento">
   <section class="tile tile-3" aria-labelledby="t-2fa">
-    <p><span class="chip chip-alerta"><svg class="ico" aria-hidden="true"><use href="#i-shield"/></svg>Seguridad</span></p>
     <h1 id="t-2fa">Verificación en dos pasos</h1>
     <p class="suave" id="ayuda-2fa">{% if usa_app %}Escribe el código de 6 dígitos que muestra tu app autenticadora.{% elif correo_enmascarado %}Te enviamos un código de 6 dígitos a {{ correo_enmascarado }}. Vence en 10 minutos.{% else %}Escribe tu código de 6 dígitos.{% endif %}</p>
     <form method="post" novalidate hx-disabled-elt="find button[type=submit]">

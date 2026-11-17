@@ -1,3 +1,4 @@
+{% load tiempo %}
 {# El orden viene del selector (neutralidad, EC-06): aquí solo se presenta. Los filtros solo reducen. #}
 {% if error_precio %}<p class="error" role="alert" id="error-precio">{{ error_precio }}</p>{% endif %}
 {% if filtro.activo or filtro_precio.activo %}<p class="suave" role="status">Mostrando {{ filas|length }} resultado{{ filas|length|pluralize }}{% if filtro.municipio %} en {{ filtro.municipio }}{% endif %}{% if filtro.barrio %}{% if filtro.municipio %}, {% else %} en el {% endif %}barrio {{ filtro.barrio }}{% endif %}{% if filtro_precio.activo %}{% if filtro.activo %}, {% else %} {% endif %}{% if filtro_precio.minimo is not None and filtro_precio.maximo is not None %}entre ${{ filtro_precio.minimo|floatformat:0 }} y ${{ filtro_precio.maximo|floatformat:0 }}{% elif filtro_precio.minimo is not None %}desde ${{ filtro_precio.minimo|floatformat:0 }}{% else %}hasta ${{ filtro_precio.maximo|floatformat:0 }}{% endif %}{% endif %}.</p>{% endif %}
@@ -15,8 +16,8 @@
     <div class="pie-tile">
       {% if r.es_promocion %}<span class="chip chip-promo">Promoción</span>{% endif %}
       <span class="chip {% if r.confianza == 'baja' %}chip-alerta{% endif %}">Confiabilidad {{ r.confianza }}{% if r.confianza == "baja" %} · verificar{% endif %}</span>
-      <span class="chip"><time datetime="{{ r.fecha_observacion|date:'c' }}">visto hace {{ r.fecha_observacion|timesince }}</time></span>
-      {% if fila.ultima_confirmacion %}<span class="chip chip-positivo"><time datetime="{{ fila.ultima_confirmacion|date:'c' }}">confirmado hace {{ fila.ultima_confirmacion|timesince }}</time></span>{% endif %}
+      <span class="chip"><time datetime="{{ r.fecha_observacion|date:'c' }}">visto hace {{ r.fecha_observacion|hace }}</time></span>
+      {% if fila.ultima_confirmacion %}<span class="chip chip-positivo"><time datetime="{{ fila.ultima_confirmacion|date:'c' }}">confirmado hace {{ fila.ultima_confirmacion|hace }}</time></span>{% endif %}
     </div>
     {% if user.is_authenticated and fila.reporte_id not in propios %}
     <div class="acciones-fila">

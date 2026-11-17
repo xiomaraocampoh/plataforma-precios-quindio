@@ -554,3 +554,16 @@ input[aria-invalid="true"], select[aria-invalid="true"] { border-color: var(--er
 .reglas li.cumple { color: var(--positivo); font-weight: 600; }
 .reglas li.cumple .marca { background: var(--positivo); border-color: var(--positivo); box-shadow: inset 0 0 0 3px var(--superficie); }
 .btn:disabled { opacity: .7; cursor: progress; }
+
+/* Pantallas de cuenta de UNA sola tarjeta: centradas (antes quedaban pegadas a la izquierda con el
+   resto vacío) y con el mismo fondo ilustrado que el resto del sitio. Las de dos columnas (ingreso,
+   registro…) llevan el fondo con el carrito a la izquierda; las de una tarjeta, a la derecha. */
+@media (min-width: 900px) { .auth > .tile:only-child { grid-column: 2 / span 4; } }
+.auth { position: relative; isolation: isolate; --img: url("../img/banda-carrito-izq-960.webp"); --img-grande: url("../img/banda-carrito-izq.webp"); --pos: left top; }
+.auth:has(> .tile:only-child) { --img: url("../img/banda-carrito-der-960.webp"); --img-grande: url("../img/banda-carrito-der.webp"); --pos: right top; }
+@media (min-width: 900px) {
+  .auth::before { content: ""; position: absolute; z-index: -1; pointer-events: none; left: 50%; width: 100vw; transform: translateX(-50%);
+    top: -3rem; height: clamp(22rem, 34vw, 32rem); background: var(--img-grande) no-repeat center top / cover;
+    -webkit-mask-image: linear-gradient(transparent, #000 20%, #000 55%, transparent); mask-image: linear-gradient(transparent, #000 20%, #000 55%, transparent); }
+}
+@media (prefers-color-scheme: dark) { .auth::before { display: none; } }

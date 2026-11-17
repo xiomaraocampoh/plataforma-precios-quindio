@@ -17,7 +17,7 @@
     <h2 id="t-resumen">Tu cuenta</h2>
     <dl class="datos">
       <div><dt>Cuenta creada</dt><dd>{{ user.date_joined|date:"j \d\e F \d\e Y" }}</dd></div>
-      <div><dt>Autorización de datos (Ley 1581)</dt><dd>{% if user.acepto_tratamiento_datos %}Otorgada el {{ user.fecha_aceptacion_datos|date:"j \d\e F \d\e Y" }}{% else %}No registrada{% endif %}</dd></div>
+      <div><dt>Autorización de datos (Ley 1581)</dt><dd>{% if user.acepto_tratamiento_datos %}Otorgada{% if user.fecha_aceptacion_datos %} el {{ user.fecha_aceptacion_datos|date:"j \d\e F \d\e Y" }}{% endif %}{% else %}No registrada{% endif %}</dd></div>
       <div><dt>Precios aportados</dt><dd><a href="{% url 'precios:mis_aportes' %}">{{ aportes }} precio{{ aportes|pluralize }}</a></dd></div>
     </dl>
     <h2 id="preferencias">Correos que recibes</h2>
