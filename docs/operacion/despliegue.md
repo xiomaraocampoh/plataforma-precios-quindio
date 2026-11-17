@@ -57,15 +57,21 @@ export DC="docker compose -f docker-compose.prod.yml --env-file .env.prod"
    $DC ps          # web debe quedar «healthy»; migrar aparece «exited (0)»
    ```
 
-3. **Cargar datos de ejemplo (opcional):**
+3. **Datos de prueba (solo en un despliegue de demostración).** En producción, `migrate` **no**
+   siembra nada por defecto (ADR-0023). Para una demostración, define antes del primer arranque:
 
-   ```bash
-   $DC exec web python manage.py cargar_demo --con-vencidos
+   ```
+   SEMBRAR_DATOS_PRUEBA=True
+   SEMBRAR_CUENTAS_PRUEBA=True
+   CUENTAS_PRUEBA_PASSWORD=<secreto del proveedor, nunca en el repositorio>
    ```
 
-   Los usuarios `demo`, `demo_ana`, `demo_luis` y `demo_sofia` usan `DEMO_PASSWORD`; `admin` y
-   `moderador_demo` usan `DEMO_ADMIN_PASSWORD`. Si esas variables están vacías, el comando genera
-   una clave aleatoria y la muestra **una sola vez**.
+   Con esas variables, el servicio `migrar` crea los datos de `data/demo/` y las cuentas de
+   `docs/nucleo/cuentas-de-prueba.md`. `scripts/start.sh` (el arranque del PaaS) corre además
+   `refrescar_precios_prueba`, para que los precios no queden vencidos. Si la base ya estaba
+   migrada antes de este cambio, carga los datos con
+   `$DC exec web python manage.py cargar_datos_prueba` y activa las cuentas con
+   `crear_cuentas_prueba`. En una producción real, deja las dos variables en `False`.
 
 ## 4. Comprobaciones
 
@@ -109,7 +115,10 @@ sitio redirige a HTTPS; para comprobar por HTTP en local pon `FORZAR_HTTPS=False
 | `WEB_CONCURRENCY` | No (`3`) | Procesos de gunicorn |
 | `PORT` | No (`8000`) | Puerto interno; los PaaS lo inyectan |
 | `CACHE_COMPARACION_TTL`, `LIMITE_REPORTES_HORA` | No | Parámetros de negocio (60 s y 30 por hora) |
-| `DEMO_PASSWORD`, `DEMO_ADMIN_PASSWORD` | No | Claves de `cargar_demo` |
+| `DEMO_PASSWORD`, `DEMO_ADMIN_PASSWORD` | No | Claves de `cargar_demo` (conjunto antiguo; ya no se corre al iniciar) |
+| `SEMBRAR_DATOS_PRUEBA` | No (`False`) | `migrate` siembra los datos de `data/demo/` y el arranque los refresca (ADR-0023). Solo para demostración |
+| `SEMBRAR_CUENTAS_PRUEBA` | No (`False`) | `migrate` crea las cuentas de prueba. **En producción real, siempre `False`** |
+| `CUENTAS_PRUEBA_PASSWORD` | Si se siembran cuentas | Contraseña de las cuentas de prueba. Solo como secreto del proveedor |
 | `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USE_TLS` | Para enviar correo | Relé SMTP de Brevo: `smtp-relay.brevo.com`, `587` (o `2525`), `True`. Sin `EMAIL_HOST`, el correo va a la consola |
 | `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD` | Para enviar correo | Login y **clave SMTP** de Brevo. Solo como secreto del proveedor, nunca en el repositorio |
 | `DEFAULT_FROM_EMAIL`, `EMAIL_REPLY_TO` | Para enviar correo | Remitente verificado en Brevo y dirección de respuesta |

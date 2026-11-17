@@ -8,11 +8,17 @@ Fecha de consulta de las fuentes: **16 de noviembre de 2026**.
 
 ## Cómo cargarlos
 
+Con `DEBUG=True`, **`python manage.py migrate` ya los carga**, junto con las cuentas de prueba
+(ADR-0023). Ver la sección «Primera vez» de
+[docs/nucleo/cuentas-de-prueba.md](../../docs/nucleo/cuentas-de-prueba.md). Los comandos sirven para
+recargar, limpiar o renovar las fechas:
+
 ```bash
-python manage.py cargar_datos_prueba                  # todo (idempotente)
+python manage.py cargar_datos_prueba                  # recargar todo (idempotente; misma lógica que migrate)
 python manage.py cargar_datos_prueba --solo-catalogo  # sin precios ni escenarios
 python manage.py cargar_datos_prueba --limpiar        # borra los de prueba y vuelve a cargar
-CUENTAS_PRUEBA_PASSWORD=... python manage.py crear_cuentas_prueba   # para poder ingresar
+python manage.py refrescar_precios_prueba             # renueva las fechas relativas desde hoy
+python manage.py crear_cuentas_prueba                 # activa o cambia la contraseña (CUENTAS_PRUEBA_PASSWORD)
 ```
 
 Los precios quedan con `es_demo=True`. `--limpiar` borra solo eso. Si un dato real usa un

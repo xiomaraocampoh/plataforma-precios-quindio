@@ -12,10 +12,10 @@ Lo que sí se comparte por git es lo necesario para que todas tengan **los mismo
 
 | Qué | Dónde | Cómo llega a tu base |
 |---|---|---|
-| Catálogo, tiendas y precios de prueba | `data/demo/*.csv` | `python manage.py cargar_datos_prueba` |
-| Cuentas de prueba por rol | `apps/cuentas/domain/cuentas_prueba.py` | `python manage.py crear_cuentas_prueba` |
+| Catálogo, tiendas y precios de prueba | `data/demo/*.csv` | `python manage.py migrate` (ADR-0023) |
+| Cuentas de prueba por rol | `apps/cuentas/domain/cuentas_prueba.py` | `python manage.py migrate`, con `CUENTAS_PRUEBA_PASSWORD` en el `.env` |
 
-Con los dos comandos, cada persona obtiene en pocos segundos los mismos 70 productos, 13 locales,
+Con `migrate`, cada persona obtiene en pocos segundos los mismos 70 productos, 13 locales,
 438 precios y 8 cuentas. Las contraseñas no se comparten: **cada persona elige la suya** en su
 terminal.
 
@@ -75,33 +75,41 @@ Abre `.env` y revisa estas líneas:
 Comprueba que el `.env` no esté en git con `git ls-files .env`: no debe mostrar nada. **Nunca pegues
 el contenido del `.env` en el chat del grupo ni en un PR.**
 
-### 4. Base de datos y caché
+### 4. Base de datos, caché, datos y cuentas de prueba
+
+Antes de migrar, pon en tu `.env` la contraseña de las cuentas de prueba que el equipo comparte
+por privado: `CUENTAS_PRUEBA_PASSWORD=...` (nunca en el código ni en git).
 
 ```powershell
 docker compose up -d db redis
 python manage.py migrate
 ```
 
-### 5. Cargar los datos de prueba
+Con `DEBUG=True`, `migrate` siembra los datos de `data/demo/` y las cuentas de prueba (ADR-0023).
+Si migraste sin la variable, las cuentas quedan con contraseña inutilizable: defínela y corre
+`python manage.py crear_cuentas_prueba`.
+
+### 5. Recargar o renovar los datos de prueba (opcional)
 
 ```powershell
-python manage.py cargar_datos_prueba --limpiar
+python manage.py refrescar_precios_prueba      # renueva las fechas si los precios vencieron
+python manage.py cargar_datos_prueba --limpiar # borra los de prueba y los vuelve a cargar
 ```
 
-- Imprime un resumen: marcas, productos, presentaciones, establecimientos, precios, «Sigue
+- `cargar_datos_prueba` imprime un resumen: marcas, productos, presentaciones, establecimientos, precios, «Sigue
   igual», denuncias, solicitudes y sugeridos.
 - `--limpiar` borra solo los datos de prueba y los vuelve a cargar; lo que hayas creado a mano se
   conserva.
 - Es idempotente: si lo corres dos veces, no duplica nada.
 - Los precios se guardan como «hace N días» desde el momento de la carga. Si pasa una semana y
-  la comparación se ve vacía, vuelve a correr el comando.
+  la comparación se ve vacía, corre `refrescar_precios_prueba`.
 - Qué escenarios trae y de dónde salen los precios: [data/demo/README.md](../../data/demo/README.md).
   Son **datos de prueba**: pueden no coincidir con los precios actuales.
 
-### 6. Crear las cuentas de prueba
+### 6. Cambiar o activar la contraseña de las cuentas de prueba (opcional)
 
-Elige tú una contraseña de al menos 8 caracteres, que no sea común ni solo números, y defínela
-**en la terminal**, no en el código:
+`migrate` ya creó las cuentas. Para fijarles otra contraseña (al menos 8 caracteres, que no sea
+común ni solo números), defínela en el `.env` o en la terminal, nunca en el código:
 
 ```powershell
 $env:CUENTAS_PRUEBA_PASSWORD = "escribe-aqui-tu-contraseña"
@@ -156,7 +164,7 @@ CSS nuevo.
 | `crear_cuentas_prueba` dice que falta `CUENTAS_PRUEBA_PASSWORD` | Defínela en la terminal (paso 6) |
 | `crear_cuentas_prueba` rechaza la contraseña | Usa una más larga, que no sea común ni solo números |
 | Te pide el código de verificación en dos pasos | Revisa `DEBUG=True` y `PERMITIR_PRUEBA_SIN_2FA=True` en el `.env` y reinicia `runserver`. Solo funciona con las cuentas `*_prueba` |
-| La comparación aparece vacía | Los precios vencieron; corre `cargar_datos_prueba --limpiar` |
+| La comparación aparece vacía | Los precios vencieron; corre `refrescar_precios_prueba` |
 
 ## macOS y Linux
 

@@ -14,26 +14,52 @@ Corporación Universitaria Empresarial Alexander von Humboldt
 
 > **Guía paso a paso para el equipo (Windows/PowerShell), con datos y cuentas de prueba:**
 > [docs/operacion/arranque-local-equipo.md](docs/operacion/arranque-local-equipo.md). Cada persona
-> tiene su propia base local; los datos de prueba se cargan con un comando.
+> tiene su propia base local; `migrate` siembra los datos y las cuentas de prueba (ADR-0023).
+
+### Primera vez
 
 ```bash
+git pull
 python -m venv .venv && source .venv/bin/activate     # Windows: .venv\Scripts\activate
 pip install -r requirements/dev.txt
 cp .env.example .env
-# htmx 2.0.4 ya viene versionado en static/vendor/ (sin CDN; licencia 0BSD en htmx.LICENSE)
 docker compose up -d db redis
+# En el .env: CUENTAS_PRUEBA_PASSWORD=<la que comparte el equipo por privado>
 python manage.py migrate
-python manage.py createsuperuser
 python manage.py runserver
 ```
 
+`migrate` deja la base lista para probar, sin comandos aparte (ADR-0023). Siembra:
+
+- Los datos de [data/demo/](data/demo/README.md): 67 marcas, 14 categorías, 70 productos,
+  97 presentaciones, 12 establecimientos y 438 precios, con sus escenarios (un precio en revisión,
+  4 «Sigue igual», 2 denuncias, 2 solicitudes y 1 local sugerido).
+- Las cuentas de prueba de cada rol
+  ([docs/nucleo/cuentas-de-prueba.md](docs/nucleo/cuentas-de-prueba.md)), con la contraseña de
+  `CUENTAS_PRUEBA_PASSWORD`. Si la variable falta, las cuentas quedan con contraseña inutilizable:
+  defínela y corre `python manage.py crear_cuentas_prueba`.
+
+La siembra solo ocurre con `DEBUG=True`, como en el `.env` de ejemplo. En producción solo siembra si
+se activan `SEMBRAR_DATOS_PRUEBA` y `SEMBRAR_CUENTAS_PRUEBA`. Si ya tenías los datos de
+`cargar_datos_prueba`, `migrate` no los duplica.
+
+**Los precios envejecen.** Se fechan «hace N días» desde el momento en que migraste. Con el tiempo
+quedan vencidos y la comparación sale vacía. Para renovarlos:
+
+```bash
+python manage.py refrescar_precios_prueba
+```
+
+Cada precio vuelve a quedar a la misma distancia de hoy, y los escenarios vencidos (8, 4 y 31 días)
+siguen vencidos. Solo toca los precios de prueba (`es_demo=True`).
+
 - App: http://localhost:8000 · API docs (OpenAPI): http://localhost:8000/api/docs/
 - Salud: http://localhost:8000/healthz/ (PostgreSQL y caché)
-- Datos de ejemplo: `python manage.py cargar_demo` (catálogo, tiendas y precios; idempotente)
-- Datos de prueba con marcas reales y sedes del Quindío: `python manage.py cargar_datos_prueba`
-  (`--limpiar`, `--solo-catalogo`; fuentes en [data/demo/README.md](data/demo/README.md))
-- Cuentas de prueba por rol: `python manage.py crear_cuentas_prueba` con
-  `CUENTAS_PRUEBA_PASSWORD` en el `.env` ([docs/nucleo/cuentas-de-prueba.md](docs/nucleo/cuentas-de-prueba.md))
+- Recargar los datos de prueba: `python manage.py cargar_datos_prueba` (`--limpiar`,
+  `--solo-catalogo`). Usa la misma lógica que `migrate`.
+- Activar o cambiar la contraseña de las cuentas de prueba: `python manage.py crear_cuentas_prueba`.
+- Datos de ejemplo antiguos (otro conjunto, opcional): `python manage.py cargar_demo`.
+- htmx 2.0.4 ya viene versionado en `static/vendor/` (sin CDN; licencia 0BSD en `htmx.LICENSE`).
 
 Sin Docker, el proyecto arranca con SQLite y caché en memoria. En `.env` usa
 `DATABASE_URL=sqlite:///db.sqlite3` y deja `REDIS_URL` vacío.

@@ -21,3 +21,8 @@ DEFAULT_FROM_EMAIL = "AhorraPues <no-responder@ahorrapues.test>"
 # La transacción de cada prueba nunca se confirma: aquí el envío ocurre al encolar. El camino con
 # transaction.on_commit se prueba aparte (tests/integration/notificaciones/test_outbox.py).
 NOTIFICACIONES = {"ENVIAR_AL_CONFIRMAR": False}
+
+# La base de pruebas nace vacía aunque el .env active la siembra (ADR-0023): las pruebas de la
+# siembra la activan con override_settings.
+SEMBRAR_DATOS_PRUEBA = False
+SEMBRAR_CUENTAS_PRUEBA = False
