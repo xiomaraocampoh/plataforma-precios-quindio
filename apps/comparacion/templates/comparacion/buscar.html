@@ -2,27 +2,96 @@
 {% load static %}
 {% block titulo %}AhorraPues · Compara precios en Armenia y el Quindío{% endblock %}
 {% block head %}<link rel="preload" as="image" href="{% static 'img/hero-supermercado.webp' %}" media="(min-width: 900px)" fetchpriority="high">
-<script src="{% static 'js/hero.js' %}?v=5" defer></script>{% endblock %}
+<script src="{% static 'js/hero.js' %}?v=5" defer></script>
+<script src="{% static 'js/escanear.js' %}?v=15" defer></script>{% endblock %}
 {% block hero %}
 <div class="hero-fondo">
 <div class="hero-contenedor">
 <section class="hero" aria-labelledby="titulo-buscar">
   <p class="etiqueta">AhorraPues · Armenia y el Quindío</p>
-  <h1 id="titulo-buscar" aria-label="Ahorra en cada compra.">Ahorra en <span class="unidad">cada <span class="rota" data-palabras="compra,semana,quincena,tienda,visita,comida,mercado" aria-hidden="true"><span class="rota-palabra">compra</span></span>.</span></h1>
+  <h1 id="titulo-buscar" aria-label="Ahorra en cada compra."><span class="l1">Ahorra en</span> <span class="unidad">cada <span class="rota" data-palabras="compra,semana,quincena,tienda,visita,comida,mercado" aria-hidden="true"><span class="rota-palabra">compra</span></span>.</span></h1>
   <p class="bajada">Compara los precios de tu mercado entre tiendas, minimercados y supermercados, en segundos.</p>
 
   <div class="hero-buscador">
     <label for="q" class="sr-only">Nombre del producto</label>
-    <div class="buscador">
-      <svg class="ico" aria-hidden="true"><use href="#i-search"/></svg>
+    <div class="buscador" data-buscador>
+      <svg class="ico ico-lupa" aria-hidden="true"><use href="#i-search"/></svg>
+      <div class="adjunto" data-adjunto hidden>
+        <img alt="Miniatura de la foto pegada" width="40" height="40">
+        <button type="button" class="adjunto-quitar" data-quitar-adjunto aria-label="Quitar la foto"><svg class="ico" aria-hidden="true"><use href="#i-x"/></svg></button>
+      </div>
       <input id="q" name="q" type="search" autocomplete="off" placeholder="Busca arroz, leche, panela…"
              hx-get="{% url 'comparacion:sugerencias' %}"
              hx-trigger="input changed delay:300ms, search"
              hx-target="#sugerencias"
              aria-controls="sugerencias">
+      <button type="button" class="escanear" data-escanear
+              data-destino="{% url 'comparacion:escanear' %}"
+              data-zxing="{% static 'vendor/zxing/zxing-library.min.js' %}"
+              {% if foto_activa %}aria-label="Buscar un producto por foto" title="Buscar por foto"{% else %}aria-label="Buscar por código de barras" title="Buscar por código de barras"{% endif %}>
+        <svg class="ico" aria-hidden="true"><use href="{% if foto_activa %}#i-camara{% else %}#i-escanear{% endif %}"/></svg>
+      </button>
+      <button type="button" class="escanear identificar" data-buscar-adjunto hidden aria-label="Identificar el producto de la foto (Enter)" title="Identificar (Enter)">
+        <svg class="ico" aria-hidden="true"><use href="#i-arrow"/></svg>
+      </button>
     </div>
+    {# Flotan sobre la página: no empujan el contenido, así el fondo no se deforma #}
+    <div class="resultado-pagina" data-pagina-resultado role="status" aria-live="polite" hidden></div>
+    <ul id="sugerencias" class="sugerencias" aria-label="Sugerencias de productos" aria-live="polite"></ul>
   </div>
-  <ul id="sugerencias" class="sugerencias" aria-label="Sugerencias de productos" aria-live="polite"></ul>
+  <dialog id="escaner" class="escaner" aria-label="Escanear un producto"
+          data-login="{% url 'cuentas:ingresar' %}?next=/"
+          {% if foto_activa %}data-foto-url="{% url 'comparacion:buscar_por_foto' %}"{% endif %}>
+    <header class="esc-barra">
+      <button type="button" class="esc-icono" data-cerrar aria-label="Cerrar el escáner"><svg class="ico" aria-hidden="true"><use href="#i-x"/></svg></button>
+      <h2>Escanear</h2>
+      <span class="esc-icono esc-relleno" aria-hidden="true"></span>
+    </header>
+
+    <div class="esc-visor">
+      <video playsinline muted aria-label="Vista de la cámara"></video>
+      <div class="esc-vacio" data-vacio hidden>
+        <svg class="ico" aria-hidden="true"><use href="#i-camara"/></svg>
+        <p></p>
+      </div>
+      <div class="esc-marco" aria-hidden="true"><i></i><i></i><i></i><i></i><b class="esc-linea"></b></div>
+      <p class="esc-guia" data-estado role="status" aria-live="polite"></p>
+    </div>
+
+    <form method="get" action="{% url 'comparacion:escanear' %}" class="esc-manual" data-manual hidden>
+      <label for="codigo-manual">Número bajo las barras</label>
+      <div class="esc-manual-fila">
+        <input id="codigo-manual" name="codigo" inputmode="numeric" autocomplete="off" maxlength="20" required>
+        <button class="btn" type="submit">Buscar</button>
+      </div>
+    </form>
+
+    <div class="esc-controles">
+      {% if foto_activa %}
+      <div class="esc-modos" role="group" aria-label="Qué quieres escanear">
+        <button type="button" data-modo="producto" aria-pressed="true">Producto</button>
+        <button type="button" data-modo="codigo" aria-pressed="false">Código de barras</button>
+      </div>
+      {% endif %}
+      <div class="esc-acciones">
+        <label class="esc-lateral" title="Elegir una imagen">
+          <svg class="ico" aria-hidden="true"><use href="#i-imagen"/></svg><span>Galería</span>
+          <input type="file" accept="image/*" class="sr-only" data-galeria>
+        </label>
+        <button type="button" class="esc-disparador" data-disparar aria-label="Tomar la foto"><span></span></button>
+        <button type="button" class="esc-lateral" data-teclado aria-expanded="false">
+          <svg class="ico" aria-hidden="true"><use href="#i-teclado"/></svg><span>Escribir</span>
+        </button>
+      </div>
+      <input type="file" accept="image/*" capture="environment" class="sr-only" data-captura tabindex="-1" aria-hidden="true">
+      <p class="esc-nota" data-nota>{% if foto_activa %}También puedes pegar (Cmd/Ctrl+V) o arrastrar una imagen. {% endif %}{% if foto_activa %}Las fotos de producto se envían a Anthropic (IA) solo para identificarlo y no se guardan; el código de barras se lee en tu equipo.{% else %}La imagen se lee en tu equipo y no sale de él: solo se usan los números.{% endif %}</p>
+    </div>
+
+    <div class="esc-hoja" data-hoja hidden>
+      <div data-resultado role="status" aria-live="polite"></div>
+      <button type="button" class="btn btn-sec btn-bloque" data-otra>Escanear otra vez</button>
+    </div>
+  </dialog>
 
   {% if destacados %}
   <div class="chips hero-chips" role="group" aria-label="Productos frecuentes">

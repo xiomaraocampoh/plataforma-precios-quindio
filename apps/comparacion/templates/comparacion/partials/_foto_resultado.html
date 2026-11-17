@@ -1,0 +1,34 @@
+{% if error %}
+  <div class="foto-res"><p class="foto-error"><svg class="ico" aria-hidden="true"><use href="#i-info"/></svg><span>{{ error }}</span></p></div>
+{% elif no_reconocido %}
+  <div class="foto-res"><p class="foto-error"><svg class="ico" aria-hidden="true"><use href="#i-info"/></svg><span>No pudimos reconocer un producto en la foto. Acércate, mejora la luz o busca por nombre o código.</span></p></div>
+{% else %}
+  <div class="foto-res">
+    <div>
+      <p class="foto-sobre">Parece ser</p>
+      <h3 class="foto-nombre">{{ pista.nombre|default:"Producto sin nombre" }}</h3>
+      {% if pista.marca or pista.cantidad %}
+      <p class="foto-meta">
+        {% if pista.marca %}<span class="etq">{{ pista.marca }}</span>{% endif %}
+        {% if pista.cantidad %}<span class="etq">{{ pista.cantidad }} {{ pista.unidad }}</span>{% endif %}
+      </p>
+      {% endif %}
+    </div>
+    {% if candidatos %}
+      <p class="foto-sobre">Elige el que corresponde</p>
+      <ul class="foto-candidatos">
+        {% for p in candidatos %}<li><a class="btn btn-sec btn-bloque" href="{% url 'comparacion:comparar' p.pk %}">{{ p }}</a></li>{% endfor %}
+      </ul>
+    {% else %}
+      <div class="foto-aun">
+        <svg class="ico" aria-hidden="true"><use href="#i-info"/></svg>
+        <div>
+          <p><strong>Aún no está en nuestro catálogo</strong></p>
+          <p class="suave">Todavía no tenemos precios de este producto, pero puedes pedir que lo agreguemos.</p>
+        </div>
+      </div>
+      <a class="btn btn-bloque" href="{% url 'catalogo:solicitar' %}?nombre={{ pista.nombre|urlencode }}&marca={{ pista.marca|urlencode }}&codigo_barras={{ pista.codigo_barras|urlencode }}">Solicitar este producto</a>
+    {% endif %}
+    <p class="foto-aviso">La lectura por foto puede equivocarse: revisa que sea el producto correcto.</p>
+  </div>
+{% endif %}
