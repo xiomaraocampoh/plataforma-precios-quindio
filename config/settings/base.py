@@ -169,6 +169,12 @@ SPECTACULAR_SETTINGS = {
 # ajuste está activo. prod.py lo fija en False; el arranque avisa en consola (cuentas.W001).
 PERMITIR_PRUEBA_SIN_2FA = env.bool("PERMITIR_PRUEBA_SIN_2FA", default=False)
 
+# Siembra de datos de prueba al correr `migrate` (ADR-0023). Con DEBUG=True siempre se siembra;
+# con DEBUG=False (producción) solo si se pide explícitamente. Las cuentas van aparte porque son
+# cuentas con rol conocido y una contraseña compartida (CUENTAS_PRUEBA_PASSWORD).
+SEMBRAR_DATOS_PRUEBA = env.bool("SEMBRAR_DATOS_PRUEBA", default=False)
+SEMBRAR_CUENTAS_PRUEBA = env.bool("SEMBRAR_CUENTAS_PRUEBA", default=False)
+
 # Reglas de negocio parametrizables (ver docs/adr/0003-vigencia-de-precios.md)
 PRECIOS = {
     "VIGENCIA_REPORTE_DIAS": env.int("VIGENCIA_REPORTE_DIAS", default=7),

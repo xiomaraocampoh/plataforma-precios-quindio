@@ -83,8 +83,30 @@ layers =
     (forms)
     (api)
     (services) : (selectors)
+    (semilla)
     (models)
     (domain)
+
+[importlinter:contract:semilla-sin-modelos]
+name = La siembra (semilla.py) usa apps.get_model: no importa modelos ni servicios (ADR-0023)
+type = forbidden
+source_modules =
+    apps.catalogo.semilla
+    apps.establecimientos.semilla
+    apps.cuentas.semilla
+    apps.precios.semilla
+    core.semilla
+forbidden_modules =
+    apps.cuentas.models
+    apps.catalogo.models
+    apps.establecimientos.models
+    apps.precios.models
+    apps.moderacion.models
+    apps.cuentas.services
+    apps.catalogo.services
+    apps.establecimientos.services
+    apps.precios.services
+    apps.moderacion.services
 
 [importlinter:contract:interfaces-privadas-precios]
 name = Ningún otro módulo importa las interfaces de precios (views, api, forms, urls)
