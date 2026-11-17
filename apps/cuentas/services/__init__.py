@@ -3,9 +3,10 @@
 - basicos: registro, datos, roles, suspensión y supresión.
 - correo: verificación del correo, recuperación y avisos de seguridad (RF-24, RF-25).
 - segundo_factor: verificación en dos pasos (RF-27).
+- cuentas_prueba: cuentas de prueba por rol (crear_cuentas_prueba).
 """
 
-from . import correo, segundo_factor
+from . import correo, cuentas_prueba, segundo_factor
 from .basicos import (
     actualizar_datos,
     asegurar_administrador,
@@ -28,6 +29,7 @@ __all__ = [
     "asignar_rol",
     "cambiar_estado_cuenta",
     "correo",
+    "cuentas_prueba",
     "permisos_por_nombre",
     "registrar_usuario",
     "segundo_factor",

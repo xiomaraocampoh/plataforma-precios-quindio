@@ -165,6 +165,10 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
 }
 
+# Solo en local: las cuentas de crear_cuentas_prueba entran sin segundo paso si DEBUG=True y este
+# ajuste está activo. prod.py lo fija en False; el arranque avisa en consola (cuentas.W001).
+PERMITIR_PRUEBA_SIN_2FA = env.bool("PERMITIR_PRUEBA_SIN_2FA", default=False)
+
 # Reglas de negocio parametrizables (ver docs/adr/0003-vigencia-de-precios.md)
 PRECIOS = {
     "VIGENCIA_REPORTE_DIAS": env.int("VIGENCIA_REPORTE_DIAS", default=7),

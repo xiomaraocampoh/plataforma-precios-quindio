@@ -12,9 +12,9 @@ from apps.catalogo.domain.normalizacion import formatear_cantidad
 from apps.cuentas import services as cuentas
 from apps.establecimientos import services as establecimientos
 
-from . import selectors
-from .domain.auditoria import diferencias
-from .models import RegistroAuditoria
+from .. import selectors
+from ..domain.auditoria import diferencias
+from ..models import RegistroAuditoria
 
 Accion = RegistroAuditoria.Accion
 

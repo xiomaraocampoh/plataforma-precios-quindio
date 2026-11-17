@@ -1,0 +1,7 @@
+accion,precio_id,usuario,motivo,detalle
+sigue_igual,P0001,reportante_ana,,
+sigue_igual,P0111,reportante_prueba,,
+sigue_igual,P0166,reportante_prueba,,
+sigue_igual,P0336,reportante_prueba,,
+denuncia,P0257,reportante_prueba,precio_falso,En la góndola marcaba otro precio.
+denuncia,P0318,reportante_prueba,producto,"Era la presentación de 500 g, no la de 1 kg."

@@ -1,0 +1,14 @@
+nombre,tipo,direccion,barrio,municipio,ficticia,estado,sugerido_por,fuente_direccion
+Éxito Armenia Centro,supermercado,Cl. 19 # 17-27,Centro,Armenia,no,aprobado,,https://www.camaramedellin.com.co/Portals/0/Documentos/Matricula-Mercantil/PUNTOS%20EXITO%20MEDELLIN%20Y%20REGIONES44eb.pdf
+Olímpica Portal del Quindío,supermercado,"Av. Bolívar # 19N-46, C. C. Portal del Quindío",Norte,Armenia,no,aprobado,,https://bancoserfinanza.com/wp-content/uploads/2020/11/OFICINAS-Y-PUNTOS-17-11-2020.pdf
+Éxito Calarcá,supermercado,Cra. 25 # 39-20,Centro,Calarcá,no,aprobado,,aproximado
+D1 Granada,discount,Cra. 19 # 21-35,Granada,Armenia,no,aprobado,,aproximado
+D1 Calarcá Centro,discount,Cra. 24 # 40-15,Centro,Calarcá,no,aprobado,,aproximado
+Ara Centro Armenia,discount,Cra. 18 # 18-40,Centro,Armenia,no,aprobado,,aproximado
+Ara Montenegro,discount,Cra. 5 # 16-30,Centro,Montenegro,no,aprobado,,aproximado
+Galería de Armenia,plaza,Cra. 18 # 15-05,Centro,Armenia,no,aprobado,,aproximado
+Tienda Doña Gloria,tienda,Cl. 10 # 23-14,La Clarita,Armenia,si,aprobado,,ficticia
+Tienda El Paisa,tienda,Mz. 12 Cs. 8,Los Quindos,Armenia,si,aprobado,,ficticia
+Tienda La Bendición,tienda,Cra. 27 # 45-60,Las Ferias,Calarcá,si,aprobado,,ficticia
+Tienda El Ahorro,tienda,Cl. 6 # 12-31,El Centenario,Circasia,si,aprobado,,ficticia
+Tienda La Esperanza,tienda,Cra. 4 # 8-22,Centro,Quimbaya,si,pendiente,reportante_ana,ficticia
