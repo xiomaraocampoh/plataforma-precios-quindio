@@ -597,3 +597,23 @@ select:not([multiple]) {
 }
 select:not([multiple]):focus-visible { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5.5 7.75 10 12.25l4.5-4.5' fill='none' stroke='%230071e3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
 select:disabled { cursor: not-allowed; opacity: .6; }
+
+/* Fondo ilustrado detrás del encabezado de las pantallas de listado (Productos: carrito a la derecha;
+   Establecimientos: a la izquierda). Capa de alto fijo a todo el ancho que se funde con la página; en
+   celular queda como franja sobre el título para no pasar por detrás del texto. */
+.con-fondo { position: relative; isolation: isolate; }
+.con-fondo-der { --img: url("../img/banda-carrito-der-960.webp"); --img-grande: url("../img/banda-carrito-der.webp"); --pos: right top; }
+.con-fondo-izq { --img: url("../img/banda-carrito-izq-960.webp"); --img-grande: url("../img/banda-carrito-izq.webp"); --pos: left top; }
+.con-fondo::before { content: ""; position: absolute; z-index: -1; pointer-events: none; left: 50%; width: 100vw; transform: translateX(-50%);
+  top: -1.5rem; height: 7.5rem; background: var(--img) no-repeat var(--pos) / cover;
+  -webkit-mask-image: linear-gradient(#000 55%, transparent); mask-image: linear-gradient(#000 55%, transparent); }
+@media (max-width: 899px) { .con-fondo { padding-top: 5.5rem; } }
+/* Lo que sigue al encabezado va por encima del fondo (si no, el fondo desteñía filtros y tarjetas). */
+.con-fondo ~ * { position: relative; z-index: 1; }
+@media (min-width: 900px) {
+  .con-fondo { margin-bottom: 3.25rem; }
+  .con-fondo::before { top: -2.5rem; height: clamp(20rem, 30vw, 27rem); background-image: var(--img-grande); background-position: center top;
+    -webkit-mask-image: linear-gradient(transparent, #000 14%, #000 52%, transparent); mask-image: linear-gradient(transparent, #000 14%, #000 52%, transparent); }
+}
+@media (prefers-color-scheme: dark) { .con-fondo::before { display: none; } }
+@media print { .con-fondo::before { display: none; } }
