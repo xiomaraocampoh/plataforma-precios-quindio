@@ -8,3 +8,4 @@ redis>=5                    # RedisCache (dev con compose y producción; ADR-000
 anthropic>=1.0              # reconocimiento de productos por foto (ADR-022); opcional en tiempo de ejecución
 pyotp>=2.9                  # verificación en dos pasos TOTP, RFC 6238 (ADR-021)
 qrcode>=7.4                 # QR en SVG para configurar la app autenticadora (sin PIL)
+django-anymail[brevo]==15.2  # correo por la API HTTPS de Brevo (Render bloquea SMTP; ADR-021)
