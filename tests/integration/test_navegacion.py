@@ -71,3 +71,14 @@ def test_el_menu_de_hamburguesa_tambien_esta_con_sesion_iniciada(client, django_
     client.force_login(usuario)
     html = client.get(reverse("comparacion:inicio")).content.decode()
     assert 'aria-controls="nav-principal"' in html and "menu-cuenta" in html
+
+
+def test_enter_en_el_buscador_de_la_portada_lleva_a_los_resultados(client, db):
+    """Enter en la barra de búsqueda debe enviar la consulta a la lista de productos."""
+    html = client.get(reverse("comparacion:inicio")).content.decode()
+    formulario = re.search(r'<form[^>]*role="search"[^>]*>(.*?)</form>', html, flags=re.DOTALL)
+    assert formulario, "el buscador no está dentro de un formulario de búsqueda"
+    etiqueta = re.search(r"<form[^>]*role=\"search\"[^>]*>", html).group(0)
+    assert 'method="get"' in etiqueta
+    assert f'action="{reverse("comparacion:productos")}"' in etiqueta
+    assert 'name="q"' in formulario.group(1)

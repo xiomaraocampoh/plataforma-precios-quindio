@@ -14,6 +14,7 @@
 
   <div class="hero-buscador">
     <label for="q" class="sr-only">Nombre del producto</label>
+    <form method="get" action="{% url 'comparacion:productos' %}" role="search" style="display:contents">
     <div class="buscador" data-buscador>
       <svg class="ico ico-lupa" aria-hidden="true"><use href="#i-search"/></svg>
       <div class="adjunto" data-adjunto hidden>
@@ -35,6 +36,7 @@
         <svg class="ico" aria-hidden="true"><use href="#i-arrow"/></svg>
       </button>
     </div>
+    </form>
     {# Flotan sobre la página: no empujan el contenido, así el fondo no se deforma #}
     <div class="resultado-pagina" data-pagina-resultado role="status" aria-live="polite" hidden></div>
     <ul id="sugerencias" class="sugerencias" aria-label="Sugerencias de productos" aria-live="polite"></ul>
