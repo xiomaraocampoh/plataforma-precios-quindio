@@ -10,6 +10,7 @@ from decimal import Decimal
 
 import pytest
 from django.core.cache import cache
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 
 from apps.administracion.services import datos_prueba
@@ -67,13 +68,14 @@ def falso(monkeypatch):
     return f
 
 
-def _candidatos(client, falso, nombre, marca="", cantidad="", unidad="") -> tuple[list, str]:
-    from django.core.files.uploadedfile import SimpleUploadedFile
-
+def _subir(client, falso, nombre, marca="", cantidad="", unidad=""):
     falso.resultado = PistaProducto(nombre, marca, cantidad, unidad, "", "alta")
-    r = client.post(
-        reverse("comparacion:buscar_por_foto"), {"foto": SimpleUploadedFile("f.jpg", JPEG)}
-    )
+    foto = SimpleUploadedFile("f.jpg", JPEG)
+    return client.post(reverse("comparacion:buscar_por_foto"), {"foto": foto})
+
+
+def _candidatos(client, falso, nombre, marca="", cantidad="", unidad="") -> tuple[list, str]:
+    r = _subir(client, falso, nombre, marca, cantidad, unidad)
     assert r.status_code == 200
     html = r.content.decode()
     ids = list(dict.fromkeys(int(i) for i in _ENLACE.findall(html)))
@@ -122,10 +124,5 @@ def test_sin_nada_parecido_no_hay_candidatos_y_ofrece_buscar_por_texto(client, c
 
 
 def test_no_redirige_sola_la_persona_confirma(client, catalogo, falso):
-    falso.resultado = PistaProducto("Spaghetti", "Doria", "", "", "", "alta")
-    from django.core.files.uploadedfile import SimpleUploadedFile
-
-    r = client.post(
-        reverse("comparacion:buscar_por_foto"), {"foto": SimpleUploadedFile("f.jpg", JPEG)}
-    )
+    r = _subir(client, falso, "Spaghetti", "Doria")
     assert r.status_code == 200 and "HX-Redirect" not in r.headers
