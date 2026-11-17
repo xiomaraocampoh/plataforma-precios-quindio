@@ -1,4 +1,4 @@
-"""Límites de uso de la API (M-16): los valores por defecto no cambian; solo se pueden subir a propósito.
+"""Límites de uso de la API (M-16): los valores por defecto no cambian; solo se suben a propósito.
 
 Subirlos es necesario únicamente para la prueba de carga (k6 simula 500 personas desde UNA sola
 dirección IP, y el límite es por IP). Se evalúan en un proceso aparte porque se leen al importar.

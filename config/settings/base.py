@@ -143,8 +143,10 @@ REST_FRAMEWORK = {
     ],
     # Resistencia (M-16) ante reportes masivos / coordinados (EC-03)
     "DEFAULT_THROTTLE_RATES": {
-        "anon": "120/min",
-        "user": "240/min",
+        # Por IP. Solo se suben para la prueba de carga (k6 simula 500 personas desde UNA sola IP);
+        # en producción se dejan los valores por defecto.
+        "anon": env.str("LIMITE_ANONIMO", default="120/min"),
+        "user": env.str("LIMITE_USUARIO", default="240/min"),
         "reportes": "30/hour",
         "sugerencias": "10/hour",  # RF-10
         "denuncias": "20/hour",  # RF-20
