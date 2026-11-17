@@ -30,6 +30,8 @@ Si la variable no existe al crear los usuarios, se genera una contraseña aleato
 | RF-02 Recuperar contraseña | Correo con enlace de un solo uso que vence en 1 hora, con la plantilla de AhorraPues y por la cola de correo (ADR-021); máximo 3 por hora por correo y 10 cada 15 min por IP, con la misma respuesta siempre | `/cuentas/contrasena/recuperar/` | `test_recuperar_contrasena.py`, `cuentas/test_correos_de_cuenta.py` |
 | RF-03 Mis datos | Ver y actualizar usuario y correo; suprimir la cuenta con contraseña y confirmación; los aportes se conservan anonimizados | `/cuentas/mis-datos/`, `/cuentas/mis-datos/suprimir/` | `test_mis_datos.py` |
 | RF-04 Búsqueda | Por nombre sin tildes ni mayúsculas (`nombre_normalizado`, conserva la ñ) y por código de barras exacto de 8 a 14 dígitos | buscador de inicio, `/productos/?q=` | `test_busqueda.py` |
+| RF-04 Escanear código de barras | Botón en el buscador: lee el código con la cámara o una foto **en el navegador** (la imagen no se envía) y abre `/escanear/?codigo=`. Valida longitud y dígito de control GTIN; si el producto existe va a su comparación, si no ofrece solicitarlo con el código ya escrito | `/escanear/`, `/catalogo/solicitar/?codigo_barras=` | `test_codigo_barras.py`, `test_escanear.py` |
+| RF-04 Buscar por foto (IA, opcional) | En el mismo diálogo, «Fotografiar el producto»: la IA extrae nombre y marca, el sistema busca en el catálogo y la persona confirma. Sin cuenta, con topes de uso; ADR-022 | `/buscar-por-foto/` (POST) | `test_reconocimiento.py`, `test_reconocedor_claude.py`, `test_buscar_por_foto.py` |
 | RF-06 + PU-05 Duplicados | `normalizar_nombre` y `son_posibles_duplicados` (umbral 0,85, TDD); la solicitud muestra productos similares mientras se escribe y queda pendiente | `/catalogo/solicitar/` | `test_duplicados.py`, `test_solicitud_catalogo.py` |
 | RF-07 SIPSA | Importa el CSV del DANE con fuente «sipsa»; la comparación lo muestra como referencia mayorista fuera del orden; `ClienteSipsa` en línea, pendiente | `importar_sipsa archivo.csv` | `test_sipsa.py`, `test_importar_sipsa.py` |
 | RF-08 Directorio | Establecimientos aprobados con filtros por municipio, barrio y tipo | `/establecimientos/` | `test_establecimientos.py` |
@@ -90,7 +92,8 @@ un establecimiento (EC-07). Los serializers usan lista blanca de campos.
 
 
 1. **RF-04:** en inicio, escribe `CAFE`; aparece «Café molido». En `/productos/` escribe un código de
-   barras completo.
+   barras completo. Con `cargar_demo`, el botón de código de barras del buscador acepta
+   `2000000000015` (Arroz blanco 500 g): escríbelo en el diálogo o sube una foto de ese código.
 2. **RF-14:** ingresa como `demo_ana` y abre la comparación de «Frijol cargamanto». Pulsa
    «Sigue igual»; la segunda vez dice «Ya lo confirmaste hoy».
 3. **Vigencia (EC-02):** en «Frijol cargamanto» solo aparecen Supermercado del Parque (oficial, 29

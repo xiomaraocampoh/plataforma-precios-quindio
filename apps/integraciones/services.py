@@ -1,12 +1,18 @@
 """Importación de precios de referencia SIPSA (RF-07). Capa de aplicación."""
 
+import hashlib
 from dataclasses import dataclass, field
 
+from django.conf import settings
+from django.core.cache import cache
 from django.db import transaction
+from django.utils import timezone
 
 from apps.catalogo import selectors as catalogo
 
 from .clients.sipsa import PrecioExterno
+from .clients.vision import ReconocedorClaude, ReconocedorDeProductos
+from .domain.reconocimiento import PistaProducto, tipo_de_imagen
 from .models import PrecioReferencia
 
 
@@ -42,3 +48,58 @@ def importar_referencias(precios: list[PrecioExterno]) -> ResumenImportacion:
         else:
             resumen.actualizados += 1
     return resumen
+
+
+class LimiteDeReconocimientosExcedidoError(Exception):
+    """Cada reconocimiento por foto cuesta dinero: máximo por hora y por usuario (como RN-10)."""
+
+
+def _crear_reconocedor() -> ReconocedorDeProductos:
+    return ReconocedorClaude()
+
+
+def reconocimiento_activo() -> bool:
+    return bool(settings.INTEGRACIONES["ANTHROPIC_API_KEY"])
+
+
+def _contar(clave: str, segundos: int) -> int:
+    cache.add(clave, 0, timeout=segundos)
+    return cache.incr(clave)
+
+
+def _identidad(usuario, ip: str) -> tuple[str, int]:
+    """Quién consume el cupo y cuánto le toca. De los visitantes solo se guarda una huella
+    de la dirección (no la dirección), y tienen un tope menor que quien tiene cuenta."""
+    cfg = settings.INTEGRACIONES
+    if usuario is not None and getattr(usuario, "is_authenticated", False):
+        return f"u{usuario.pk}", cfg["RECONOCIMIENTOS_POR_HORA"]
+    huella = hashlib.sha256(f"{settings.SECRET_KEY}|{ip}".encode()).hexdigest()[:16]
+    return f"a{huella}", cfg["RECONOCIMIENTOS_ANONIMO_POR_HORA"]
+
+
+def _exigir_cupo_de_reconocimiento(usuario, ip: str) -> None:
+    ahora = timezone.now()
+    quien, limite = _identidad(usuario, ip)
+    if (
+        _contar(f"reconocimiento:v1:dia:{ahora:%Y%m%d}", 86400)
+        > settings.INTEGRACIONES["RECONOCIMIENTOS_POR_DIA_TOTAL"]
+    ):
+        raise LimiteDeReconocimientosExcedidoError(
+            "La búsqueda por foto alcanzó su límite de hoy. "
+            "Puedes buscar por nombre o escanear el código de barras."
+        )
+    if _contar(f"reconocimiento:v1:{quien}:{ahora:%Y%m%d%H}", 3600) > limite:
+        raise LimiteDeReconocimientosExcedidoError(
+            f"Alcanzaste el límite de {limite} búsquedas por foto por hora. "
+            "Mientras tanto puedes buscar por nombre o escanear el código."
+        )
+
+
+def reconocer_producto(*, usuario, imagen: bytes, ip: str = "") -> PistaProducto | None:
+    """Identifica un producto en una foto. La imagen no se guarda: solo vive en memoria.
+
+    Puede usarla un visitante sin cuenta (más fácil), con topes por persona y diario total
+    para acotar el gasto en la API externa."""
+    tipo = tipo_de_imagen(imagen)  # una imagen inválida no consume cupo ni llega a la IA
+    _exigir_cupo_de_reconocimiento(usuario, ip)
+    return _crear_reconocedor().reconocer(imagen, tipo)

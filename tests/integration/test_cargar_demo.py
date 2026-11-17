@@ -8,7 +8,9 @@ import pytest
 from django.core.management import call_command
 from django.utils import timezone
 
+from apps.catalogo.domain.codigo_barras import es_gtin_valido
 from apps.catalogo.models import Presentacion, Producto
+from apps.catalogo.selectors import productos_por_codigo
 from apps.comparacion.selectors import comparar_producto
 from apps.cuentas.models import Usuario
 from apps.establecimientos.models import Establecimiento
@@ -89,3 +91,12 @@ def test_el_usuario_demo_puede_registrar_un_precio_justo_despues_de_cargar(db, m
         precio=Decimal("3333"),
     )
     assert reporte.pk is not None
+
+
+def test_demo_incluye_codigos_de_barras_validos_para_ensayar_el_escaner(db):
+    call_command("cargar_demo", stdout=StringIO())
+    codigos = list(
+        Presentacion.objects.exclude(codigo_barras="").values_list("codigo_barras", flat=True)
+    )
+    assert codigos and all(es_gtin_valido(c) for c in codigos)
+    assert [p.nombre for p in productos_por_codigo(codigos[0])] == ["Arroz blanco"]

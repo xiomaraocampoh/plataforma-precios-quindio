@@ -4,10 +4,18 @@ from urllib.parse import urlencode
 
 from django.core.paginator import Paginator
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, render
-from django.views.decorators.http import require_GET
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.views.decorators.http import require_GET, require_POST
 
 from apps.catalogo import selectors as catalogo
+from apps.catalogo.domain.codigo_barras import es_gtin_valido, normalizar_codigo
+from apps.integraciones import services as integraciones
+from apps.integraciones.clients.vision import ReconocimientoNoDisponibleError
+from apps.integraciones.domain.reconocimiento import (
+    ImagenInvalidaError,
+    consulta_de_busqueda,
+)
 from apps.integraciones.selectors import referencia_sipsa
 
 from .domain.filtros import FiltroPrecio, FiltroUbicacion, interpretar_monto
@@ -33,8 +41,60 @@ def inicio(request):
         "destacados": destacados,
         "ejemplo_producto": destacados[0] if destacados else None,
         "ejemplo": ejemplo_comparacion(destacados[0].pk) if destacados else [],
+        "foto_activa": integraciones.reconocimiento_activo(),
     }
     return render(request, "comparacion/buscar.html", contexto)
+
+
+@require_GET
+def escanear(request):
+    """RF-04: un código leído con la cámara (o escrito) lleva a la comparación del producto.
+
+    La imagen nunca llega al servidor: el navegador la decodifica y solo envía los dígitos.
+    """
+    codigo = normalizar_codigo(request.GET.get("codigo", ""))
+    valido = es_gtin_valido(codigo)
+    if valido:
+        encontrados = list(catalogo.productos_por_codigo(codigo)[:2])
+        if len(encontrados) == 1:
+            return redirect("comparacion:comparar", producto_id=encontrados[0].pk)
+        if encontrados:  # el mismo código en varios productos: que la persona elija
+            return redirect(f"{reverse('comparacion:productos')}?{urlencode({'q': codigo})}")
+    return render(request, "comparacion/escanear.html", {"codigo": codigo, "valido": valido})
+
+
+def _fragmento_foto(request, estado: int, **contexto):
+    return render(request, "comparacion/partials/_foto_resultado.html", contexto, status=estado)
+
+
+@require_POST
+def buscar_por_foto(request):
+    """Fragmento: qué producto parece ser el de la foto. La IA solo extrae texto; el orden y los
+    precios siguen saliendo del catálogo. La persona confirma antes de ir a la comparación."""
+    archivo = request.FILES.get("foto")
+    if archivo is None:
+        return _fragmento_foto(request, 400, error="Elige o toma una foto del producto.")
+    try:
+        pista = integraciones.reconocer_producto(
+            usuario=request.user, imagen=archivo.read(), ip=request.META.get("REMOTE_ADDR", "")
+        )
+    except ImagenInvalidaError as exc:
+        return _fragmento_foto(request, 400, error=str(exc))
+    except integraciones.LimiteDeReconocimientosExcedidoError as exc:
+        return _fragmento_foto(request, 429, error=str(exc))
+    except ReconocimientoNoDisponibleError:
+        return _fragmento_foto(
+            request,
+            503,
+            error="La búsqueda por foto no está disponible ahora. "
+            "Busca con el nombre o con el código de barras.",
+        )
+    if pista is None:
+        return _fragmento_foto(request, 200, no_reconocido=True)
+    candidatos = list(catalogo.buscar_productos(consulta_de_busqueda(pista), limite=5))
+    if pista.codigo_barras and not candidatos:
+        candidatos = list(catalogo.productos_por_codigo(pista.codigo_barras)[:5])
+    return _fragmento_foto(request, 200, pista=pista, candidatos=candidatos)
 
 
 @require_GET

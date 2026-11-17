@@ -16,10 +16,11 @@ Cada ADR sigue la plantilla [`0000-plantilla.md`](0000-plantilla.md) (formato de
 | [0018](0018-precio-oficial-verificado-como-principal.md) | Precio oficial verificado como principal | Propuesto |
 | [0019](0019-panel-de-administracion-y-roles.md) | Panel propio, roles con Groups y Marca como entidad | Propuesto |
 | [0021](0021-correo-transaccional-brevo-outbox-y-2fa.md) | Correo transaccional con Brevo (SMTP), outbox y verificación en dos pasos | Propuesto |
+| [0022](0022-reconocimiento-de-productos-por-foto-con-ia.md) | Reconocimiento de productos por foto con IA (opcional) | Propuesto (requiere aprobación) |
 
 ## Sobre la numeración (decisión D-1 pendiente)
 
-Los ADR 0012 a 0018 usan la numeración de los documentos corregidos del 14 de noviembre de 2026
+Los ADR 0012 a 0019 usan la numeración de los documentos corregidos del 14 de noviembre de 2026
 (la más reciente). Los archivos 0002 y 0003 conservan la numeración con la que se crearon en el
 repositorio y **no coinciden** con la del documento de ADR del Drive (donde la decisión de CQRS es el
 ADR-004 y la de vigencia es el ADR-005). Los ADR 0004 a 0011 del Drive (PostgreSQL, confianza, orden
