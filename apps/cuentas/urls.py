@@ -14,6 +14,8 @@ urlpatterns = [
     path("ingresar/configurar/", views.configurar_al_ingresar, name="ingresar_configurar"),
     path("salir/", LogoutView.as_view(), name="salir"),
     path("registro/", views.registro, name="registro"),
+    # Ley 1581: política de tratamiento de datos, pública (se lee antes de autorizar)
+    path("politica-de-datos/", views.politica_datos, name="politica_datos"),
     path("mis-datos/", views.mis_datos, name="mis_datos"),
     path("mis-datos/suprimir/", views.suprimir, name="suprimir"),
     path("mis-datos/preferencias/", views.preferencias, name="preferencias"),

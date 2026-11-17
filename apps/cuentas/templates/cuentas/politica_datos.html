@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block titulo %}Política de tratamiento de datos · AhorraPues{% endblock %}
+{% block contenido %}
+<div class="auth bento">
+  <article class="tile tile-4" aria-labelledby="t-politica">
+    <p class="etiqueta">Legal</p>
+    <h1 id="t-politica">Política de tratamiento de datos</h1>
+    <p class="suave">Última actualización: 16 de noviembre de 2026. Aplica la Ley Estatutaria 1581 de 2012 y el Decreto 1074 de 2015.</p>
+
+    <h2 id="p-responsable">Responsable del tratamiento</h2>
+    <p>Es {{ politica.RESPONSABLE }}. AhorraPues compara precios de la canasta familiar; no vende productos, no cobra y no es un sistema oficial de precios.</p>
+
+    <h2 id="p-datos">Datos que tratamos</h2>
+    <ul class="lista-simple">
+      <li><strong>De tu cuenta:</strong> nombre de usuario, correo electrónico y contraseña (se guarda cifrada, nunca en claro), y la fecha en que autorizaste esta política.</li>
+      <li><strong>De tus aportes:</strong> los precios que reportas, con el establecimiento elegido y la fecha. Guardamos quién los envió solo para auditoría y moderación; nunca se publica. No almacenamos tu geolocalización: el reporte se asocia al establecimiento, no a ti.</li>
+      <li><strong>De seguridad:</strong> una huella del dispositivo (calculada con el navegador y una IP truncada, nunca la IP completa), códigos de verificación y de respaldo (solo se guardan cifrados) y, si activas la verificación en dos pasos, el secreto de tu app autenticadora.</li>
+      <li><strong>De tus sugerencias</strong> de establecimientos o productos: quién las envió, solo para moderación.</li>
+      <li><strong>Cookies técnicas:</strong> la de sesión, la de protección de formularios y, si eliges «confiar en este dispositivo», una cookie firmada por 30 días. No usamos cookies de publicidad ni de seguimiento.</li>
+    </ul>
+
+    <h2 id="p-finalidades">Para qué usamos tus datos</h2>
+    <ul class="lista-simple">
+      <li>Crear y proteger tu cuenta, y permitirte reportar y consultar precios.</li>
+      <li>Moderar los aportes y mantener la confianza de la comunidad.</li>
+      <li>Enviarte correos de seguridad (verificación, recuperación, cambios de contraseña, ingresos desde un dispositivo nuevo), que son obligatorios, y correos informativos (bienvenida y resultados de moderación), que puedes apagar en «Mis datos».</li>
+    </ul>
+    <p><strong>No vendemos tus datos</strong> ni los usamos para perfilarte. Tu nombre, tu correo y tu ubicación nunca aparecen en la comparación ni en la API pública.</p>
+
+    <h2 id="p-terceros">Terceros que intervienen</h2>
+    <p>Para funcionar usamos proveedores que tratan datos por nuestra cuenta: el alojamiento y la base de datos (Render) y el envío de correos (Brevo).</p>
+    <p><strong>Búsqueda por foto (opcional).</strong> Si usas esta función, la foto se reduce a 1024 px y se recodifica en tu navegador, con lo que se pierden sus metadatos (incluida la ubicación). Luego se envía a Anthropic, un tercero proveedor de inteligencia artificial, solo para identificar el producto, y no se guarda en nuestros servidores. La pantalla te avisa antes de usarla. Siempre puedes buscar por nombre o por código de barras; el código de barras se lee en tu navegador y no envía ninguna imagen.</p>
+
+    <h2 id="p-derechos">Tus derechos</h2>
+    <p>Como titular puedes:</p>
+    <ul class="lista-simple">
+      <li>Conocer, actualizar y rectificar tus datos.</li>
+      <li>Pedir prueba de la autorización que diste y ser informado del uso que se les da.</li>
+      <li>Revocar la autorización y pedir que suprimamos tus datos.</li>
+      <li>Presentar quejas ante la Superintendencia de Industria y Comercio por infracciones a la Ley 1581 de 2012.</li>
+    </ul>
+    <p>Puedes corregir tus datos y suprimir tu cuenta tú mismo desde <a href="{% url 'cuentas:mis_datos' %}">Mis datos</a>. Al suprimirla borramos tus datos personales; tus precios se conservan sin tu identidad, para no dañar las comparaciones de otras personas.</p>
+
+    <h2 id="p-consultas">Consultas y reclamos</h2>
+    <p>{% if politica.CORREO_CONTACTO %}Escribe a <a href="mailto:{{ politica.CORREO_CONTACTO }}">{{ politica.CORREO_CONTACTO }}</a>{% else %}Escríbenos desde tu cuenta, en <a href="{% url 'cuentas:mis_datos' %}">Mis datos</a>,{% endif %} para hacer una consulta o un reclamo. Respondemos las consultas en un máximo de 10 días hábiles y los reclamos en un máximo de 15 días hábiles; si necesitamos más tiempo, te avisamos el motivo y la nueva fecha, dentro de los plazos de la ley.</p>
+
+    <h2 id="p-conservacion">Cuánto tiempo guardamos tus datos</h2>
+    <p>Mientras tu cuenta esté activa. Al suprimirla, tus datos personales se eliminan y tus aportes quedan anonimizados.</p>
+
+    <h2 id="p-cambios">Cambios</h2>
+    <p>Si esta política cambia, publicaremos la nueva versión en esta página y, cuando el cambio sea importante, te lo avisaremos por correo.</p>
+  </article>
+
+  <aside class="tile tile-2 tile-marca" aria-labelledby="t-resumen-politica">
+    <span class="icono-caja" aria-hidden="true"><svg class="ico"><use href="#i-shield"/></svg></span>
+    <h2 id="t-resumen-politica">En corto</h2>
+    <ul class="lista-simple">
+      <li>Tu identidad nunca se publica.</li>
+      <li>No guardamos tu ubicación.</li>
+      <li>No vendemos tus datos.</li>
+      <li>Puedes suprimir tu cuenta cuando quieras.</li>
+    </ul>
+    <p class="pie-tile"><a class="btn btn-sec" href="{% url 'cuentas:registro' %}">Crear cuenta</a></p>
+  </aside>
+</div>
+{% endblock %}

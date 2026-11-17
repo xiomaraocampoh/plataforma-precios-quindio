@@ -1,9 +1,10 @@
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_GET, require_http_methods
 
 from apps.precios.selectors import contar_aportes
 from core.limites import ip_de
@@ -76,3 +77,9 @@ def suprimir(request):
         )
         return redirect("comparacion:inicio")
     return render(request, "cuentas/suprimir.html", {"form": form})
+
+
+@require_GET
+def politica_datos(request):
+    """Ley 1581 de 2012 · ADR-0008 (5): la política es pública; solo presentación, sin ORM."""
+    return render(request, "cuentas/politica_datos.html", {"politica": settings.POLITICA_DATOS})

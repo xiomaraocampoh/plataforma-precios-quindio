@@ -185,6 +185,19 @@ PRECIOS = {
     "LIMITE_REPORTES_HORA": env.int("LIMITE_REPORTES_HORA", default=30),  # RN-10
 }
 
+# Política de tratamiento de datos (Ley 1581 de 2012, ADR-0008 y ADR-022): quién responde y por
+# dónde se consulta o reclama. El correo va por entorno; vacío = la página no muestra ninguno.
+POLITICA_DATOS = {
+    "RESPONSABLE": env.str(
+        "POLITICA_DATOS_RESPONSABLE",
+        default=(
+            "el equipo del proyecto AhorraPues (Ingeniería de Software, "
+            "Corporación Universitaria Empresarial Alexander von Humboldt, Armenia, Quindío)"
+        ),
+    ),
+    "CORREO_CONTACTO": env.str("POLITICA_DATOS_CORREO", default=""),
+}
+
 INTEGRACIONES = {
     "SIPSA_BASE_URL": env.str("SIPSA_BASE_URL", default=""),
     "SIPSA_TIMEOUT_S": env.int("SIPSA_TIMEOUT_S", default=5),

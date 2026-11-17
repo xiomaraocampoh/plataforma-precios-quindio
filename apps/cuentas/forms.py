@@ -3,9 +3,15 @@ import re
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.password_validation import validate_password
+from django.urls import reverse_lazy
+from django.utils.functional import lazy
+from django.utils.html import format_html
+from django.utils.safestring import SafeString
 
 from . import selectors
 from .models import Usuario
+
+format_html_lazy = lazy(format_html, SafeString)  # el enlace se resuelve al mostrar el formulario
 
 FORMATO_USUARIO = re.compile(r"[\w.-]{3,30}")  # letras (con tildes y ñ), números, . - _
 ERROR_FORMATO_USUARIO = (
@@ -66,6 +72,12 @@ class RegistroForm(forms.Form):
     )
     acepto_tratamiento_datos = forms.BooleanField(
         label="Autorizo el tratamiento de mis datos personales (Ley 1581 de 2012)",
+        # El enlace abre otra pestaña para no perder lo escrito; se avisa (WCAG 3.2.5 / G201)
+        help_text=format_html_lazy(
+            'Antes de aceptar, lee la <a href="{}" target="_blank" rel="noopener">'
+            "política de tratamiento de datos</a> (se abre en una pestaña nueva).",
+            reverse_lazy("cuentas:politica_datos"),
+        ),
         error_messages={
             "required": (
                 "Para crear la cuenta necesitamos tu autorización de tratamiento de datos "

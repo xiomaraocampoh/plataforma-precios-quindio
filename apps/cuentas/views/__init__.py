@@ -1,6 +1,6 @@
 """Vistas de cuentas (interfaces), separadas por tema."""
 
-from .basicas import mis_datos, registro, suprimir
+from .basicas import mis_datos, politica_datos, registro, suprimir
 from .ingreso import IngresarView, configurar_al_ingresar, reenviar_codigo, verificar
 from .seguridad import (
     CambiarContrasenaView,
@@ -25,6 +25,7 @@ __all__ = [
     "configurar_app",
     "mis_datos",
     "no_fui_yo",
+    "politica_datos",
     "preferencias",
     "reenviar_codigo",
     "reenviar_verificacion",
