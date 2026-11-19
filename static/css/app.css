@@ -742,3 +742,10 @@ select:disabled { cursor: not-allowed; opacity: .6; }
   .btn-crear-cuenta { display: none; }
   .js .nav a.nav-solo-angosto { display: inline-flex !important; }
 }
+
+/* Íconos de categoría (prototipo): mismo tamaño y estilo para todos, solo ayudan a reconocer (EC-06) */
+.icono-cat { display: inline-grid; place-items: center; flex: none; width: 44px; height: 44px; border-radius: 50%; background: var(--marca-suave); color: var(--marca-enlace); }
+.icono-cat .ico { width: 1.5rem; height: 1.5rem; }
+.fila-producto { display: flex; align-items: center; gap: .75rem; min-width: 0; }
+.ico-cat-chico { width: 1.1em; height: 1.1em; margin-right: .35rem; vertical-align: -.2em; }
+.fila-producto .meta { display: block; }

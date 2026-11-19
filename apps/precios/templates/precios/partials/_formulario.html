@@ -1,3 +1,4 @@
+{% load categorias %}
 {% comment %}Paso 2: con producto, solo sus presentaciones como botones; sin producto (reenvío de la cola
 o error sin presentación), la lista completa de siempre. Mismos nombres de campo: la cola sin conexión
 (ADR-009) y el servidor no cambian.{% endcomment %}
@@ -10,7 +11,10 @@ o error sin presentación), la lista completa de siempre. Mismos nombres de camp
   {% if form.non_field_errors or form.fecha_observacion.errors %}<div class="campo" role="alert">{% for e in form.non_field_errors %}<span class="error">{{ e }}</span>{% endfor %}{% for e in form.fecha_observacion.errors %}<span class="error">{{ e }}</span>{% endfor %}</div>{% endif %}
   {% if producto %}
   <div class="producto-elegido">
-    <div><p class="etiqueta">Producto</p><p class="producto-nombre">{{ producto }}</p></div>
+    <div class="fila-producto">
+      <span class="icono-cat" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="#{{ producto.categoria|icono_categoria }}"/></svg></span>
+      <div><p class="etiqueta">Producto</p><p class="producto-nombre">{{ producto }}</p></div>
+    </div>
     <a class="btn-texto" href="{{ url_registro }}">Cambiar producto<span class="sr-only"> (volver a buscar)</span></a>
   </div>
   {% endif %}

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load categorias %}
 {% block titulo %}{{ producto }} — comparación de precios · AhorraPues{% endblock %}
 {% block contenido %}
 <nav class="migas" aria-label="Ruta de navegación">
@@ -6,7 +7,7 @@
 </nav>
 <div class="encabezado con-fondo con-fondo-der">
   <div>
-    <p class="etiqueta">{{ producto.categoria }}</p>
+    <p class="etiqueta"><svg class="ico" aria-hidden="true"><use href="#{{ producto.categoria|icono_categoria }}"/></svg>{{ producto.categoria }}</p>
     <h1>{{ producto }}</h1>
   </div>
   <a class="btn" href="{% url 'precios:registrar' %}?producto={{ producto.pk }}"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>Registrar un precio</a>

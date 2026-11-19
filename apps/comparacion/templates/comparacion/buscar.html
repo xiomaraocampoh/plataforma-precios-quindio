@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load categorias %}
 {% block titulo %}AhorraPues · Compara precios en Armenia y el Quindío{% endblock %}
 {% block head %}<link rel="preload" as="image" href="{% static 'img/hero-supermercado.webp' %}" media="(min-width: 900px)" fetchpriority="high">
 <script src="{% static 'js/hero.js' %}?v=7" defer></script>
@@ -184,7 +185,7 @@
   <div class="tarjetas">
     {% for p in destacados %}
     <a class="tarjeta" href="{% url 'comparacion:comparar' p.pk %}">
-      <span class="meta">{{ p.categoria }}</span>
+      <span class="meta"><svg class="ico ico-cat-chico" aria-hidden="true"><use href="#{{ p.categoria|icono_categoria }}"/></svg>{{ p.categoria }}</span>
       <span class="nombre">{{ p }}</span>
       <span class="meta">{{ p.n_reportes }} precio{{ p.n_reportes|pluralize }}</span>
       <span class="ir">Comparar</span>
