@@ -5,6 +5,7 @@ from decimal import Decimal
 import pytest
 from django.urls import reverse
 
+from apps.catalogo.models import Marca
 from apps.precios import services as precios
 
 pytestmark = [pytest.mark.integration, pytest.mark.django_db]
@@ -105,3 +106,36 @@ def test_la_foto_aparece_una_sola_vez_aunque_haya_varios_precios(
     catalogo.guardar_foto(dos_precios, catalogo.preparar_foto(imagen()))
     html = _ficha(client, dos_precios)
     assert html.count(f"/productos/{dos_precios.pk}/foto/") == 1
+
+
+# --- Encabezado tipo catálogo: foto grande, descripción completa y datos del producto ----------
+def test_la_foto_del_encabezado_es_grande(client, arroz, imagen):
+    catalogo.guardar_foto(arroz[0], catalogo.preparar_foto(imagen()))
+    assert "foto-ficha" in _ficha(client, arroz[0])
+
+
+def test_la_descripcion_completa_va_junto_al_nombre_en_el_encabezado(client, arroz):
+    texto = "Arroz de grano largo, seleccionado y empacado. Rinde para el almuerzo de la semana."
+    arroz[0].descripcion = texto
+    arroz[0].save()
+    html = _ficha(client, arroz[0])
+    encabezado = html[html.index('class="encabezado') : html.index('aria-label="Presentaciones')]
+    assert texto in encabezado
+
+
+def test_los_datos_del_producto_muestran_marca_categoria_y_codigo_de_barras(client, arroz):
+    prod, p500, _ = arroz
+    prod.marca = Marca.objects.create(nombre="Diana")
+    prod.save()
+    p500.codigo_barras = "7702001000011"
+    p500.save()
+    html = _ficha(client, prod)
+    datos = html[html.index('class="ficha-datos"') :]
+    datos = datos[: datos.index("</dl>")]
+    for texto in ("Marca", "Diana", "Categoría", "Código de barras", "7702001000011"):
+        assert texto in datos
+
+
+def test_sin_marca_ni_codigo_no_hay_filas_vacias(client, arroz):
+    html = _ficha(client, arroz[0])
+    assert "<dt>Marca</dt>" not in html and "Código de barras" not in html
