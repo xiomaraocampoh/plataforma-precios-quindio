@@ -788,3 +788,20 @@ select:disabled { cursor: not-allowed; opacity: .6; }
   .fila-precio { grid-template-columns: 1fr auto; align-items: start; }
   .fila-precio .fp-precio { text-align: right; align-items: flex-end; }
 }
+
+/* Ficha del producto tipo catálogo: foto grande a la izquierda, texto completo a la derecha */
+.ficha-producto { display: grid; grid-template-columns: 1fr; gap: 1rem 2rem; align-items: start; justify-content: stretch; }
+.foto-ficha { width: min(100%, 340px); height: auto; aspect-ratio: 1 / 1; border-radius: 24px; border: 1px solid var(--borde); justify-self: center; }
+.foto-ficha .ico { width: 34%; height: 34%; stroke-width: 1.2; }
+.ficha-texto { display: flex; flex-direction: column; align-items: flex-start; gap: .75rem; min-width: 0; }
+.ficha-texto h1 { margin: 0; }
+.ficha-descripcion { margin: 0; max-width: 60ch; font-size: 1.05rem; line-height: 1.55; }
+.ficha-datos { display: grid; gap: .25rem; margin: 0; }
+.ficha-datos > div { display: flex; flex-wrap: wrap; gap: .1rem .6rem; }
+.ficha-datos dt { font-weight: 600; color: var(--texto-suave); min-width: 8.5rem; }
+.ficha-datos dd { margin: 0; }
+.ficha-codigo { display: block; font-variant-numeric: tabular-nums; }
+@media (min-width: 720px) {
+  .ficha-producto { grid-template-columns: minmax(240px, 340px) 1fr; }
+  .foto-ficha { justify-self: start; }
+}

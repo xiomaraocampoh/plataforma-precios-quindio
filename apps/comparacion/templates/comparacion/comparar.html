@@ -5,22 +5,23 @@
 <nav class="migas" aria-label="Ruta de navegación">
   <a href="{% url 'comparacion:inicio' %}">Comparar</a><span aria-hidden="true">/</span><span aria-current="page">{{ producto }}</span>
 </nav>
-<div class="encabezado con-fondo con-fondo-der">
-  <div class="fila-producto">
-    {% include "partials/_foto_producto.html" with producto=producto clase="foto-encabezado" %}
-    <div>
+<div class="encabezado ficha-producto">
+  {% include "partials/_foto_producto.html" with producto=producto clase="foto-ficha" %}
+  <div class="ficha-texto">
     <p class="etiqueta"><svg class="ico" aria-hidden="true"><use href="#{{ producto.categoria|icono_categoria }}"/></svg>{{ producto.categoria }}</p>
     <h1>{{ producto }}</h1>
+    {% if producto.descripcion %}<p class="ficha-descripcion">{{ producto.descripcion }}</p>{% endif %}
+    <dl class="ficha-datos">
+      {% if producto.marca %}<div><dt>Marca</dt><dd>{{ producto.marca }}</dd></div>{% endif %}
+      <div><dt>Categoría</dt><dd>{{ producto.categoria }}</dd></div>
+      {% if con_codigo %}<div><dt>Código de barras</dt><dd>{% for p in con_codigo %}<span class="ficha-codigo">{{ p.texto }}: {{ p.codigo }}</span>{% endfor %}</dd></div>{% endif %}
+    </dl>
+    {% if presentaciones %}<ul class="ficha-presentaciones" aria-label="Presentaciones disponibles">
+      {% for p in presentaciones %}<li>{{ p.texto }}</li>{% endfor %}
+    </ul>{% endif %}
+    <a class="btn" href="{% url 'precios:registrar' %}?producto={{ producto.pk }}"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>Registrar un precio</a>
   </div>
-  </div>
-  <a class="btn" href="{% url 'precios:registrar' %}?producto={{ producto.pk }}"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>Registrar un precio</a>
 </div>
-<section class="ficha" aria-label="Ficha del producto">
-  {% if producto.descripcion %}<p class="ficha-descripcion">{{ producto.descripcion }}</p>{% endif %}
-  {% if presentaciones %}<ul class="ficha-presentaciones" aria-label="Presentaciones disponibles">
-    {% for p in presentaciones %}<li>{{ p }}</li>{% endfor %}
-  </ul>{% endif %}
-</section>
 {% if total > 1 or municipios|length > 1 or barrios|length > 1 %}
 {# Los filtros no deben ocupar la primera pantalla: los precios van primero (PUX-01). Se abren solos si hay uno activo. #}
 <details class="panel-plegable panel-filtros"{% if filtro.activo or precio_min or precio_max or error_precio %} open{% endif %}>

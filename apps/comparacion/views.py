@@ -138,6 +138,12 @@ def comparar(request, producto_id: int):
     filas, resumen = comparar_con_resumen(producto_id, filtro, filtro_precio)
     todas = comparar_filas(producto_id)
     ids = [f.reporte_id for f in filas]
+    presentaciones = [
+        {"texto": f"{formatear_cantidad(p.cantidad)} {p.unidad}", "codigo": p.codigo_barras}
+        for p in catalogo.presentaciones_publicas()
+        .filter(producto=producto)
+        .order_by("unidad", "cantidad")
+    ]
     contexto = {
         "producto": producto,
         "filas": filas,
@@ -149,12 +155,8 @@ def comparar(request, producto_id: int):
         "precio_min": request.GET.get("precio_min", ""),
         "precio_max": request.GET.get("precio_max", ""),
         "total": len(todas),
-        "presentaciones": [
-            f"{formatear_cantidad(p.cantidad)} {p.unidad}"
-            for p in catalogo.presentaciones_publicas()
-            .filter(producto=producto)
-            .order_by("unidad", "cantidad")
-        ],
+        "presentaciones": presentaciones,
+        "con_codigo": [p for p in presentaciones if p["codigo"]],
         **ubicaciones_de(todas),
         **estado_del_usuario(request.user, ids),
         "referencia": referencia_sipsa(producto_id),
