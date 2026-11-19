@@ -185,6 +185,7 @@
   <div class="tarjetas">
     {% for p in destacados %}
     <a class="tarjeta" href="{% url 'comparacion:comparar' p.pk %}">
+      {% include "partials/_foto_producto.html" with producto=p clase="foto-grande" %}
       <span class="meta"><svg class="ico ico-cat-chico" aria-hidden="true"><use href="#{{ p.categoria|icono_categoria }}"/></svg>{{ p.categoria }}</span>
       <span class="nombre">{{ p }}</span>
       <span class="meta">{{ p.n_reportes }} precio{{ p.n_reportes|pluralize }}</span>

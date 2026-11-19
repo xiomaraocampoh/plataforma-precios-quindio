@@ -225,3 +225,17 @@ def foto_de(producto_id: int) -> tuple[bytes, str, str] | None:
 def con_fotos(productos):
     """Agrega la foto de cada producto en el mismo query, SIN traer los bytes (sin N+1, EC-01)."""
     return productos.select_related("foto").defer("foto__contenido")
+
+
+def productos_por_nombre_de_archivo(texto: str) -> list[Producto]:
+    """Productos públicos cuyo «nombre + marca» coincide con el texto; si no, solo por nombre.
+
+    Sirve para asignar fotos por el nombre del archivo («arroz-blanco_diana.jpg»). Puede devolver
+    varios: quien llama decide qué hacer con la ambigüedad.
+    """
+    clave = normalizar_nombre(texto.replace("_", " ").replace("-", " "))
+    if not clave:
+        return []
+    candidatos = list(con_fotos(productos_publicos()))
+    con_marca = [p for p in candidatos if normalizar_nombre(f"{p.nombre} {p.marca or ''}") == clave]
+    return con_marca or [p for p in candidatos if p.nombre_normalizado == clave]

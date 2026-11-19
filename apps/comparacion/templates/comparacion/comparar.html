@@ -6,9 +6,12 @@
   <a href="{% url 'comparacion:inicio' %}">Comparar</a><span aria-hidden="true">/</span><span aria-current="page">{{ producto }}</span>
 </nav>
 <div class="encabezado con-fondo con-fondo-der">
-  <div>
+  <div class="fila-producto">
+    {% include "partials/_foto_producto.html" with producto=producto clase="foto-encabezado" %}
+    <div>
     <p class="etiqueta"><svg class="ico" aria-hidden="true"><use href="#{{ producto.categoria|icono_categoria }}"/></svg>{{ producto.categoria }}</p>
     <h1>{{ producto }}</h1>
+  </div>
   </div>
   <a class="btn" href="{% url 'precios:registrar' %}?producto={{ producto.pk }}"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>Registrar un precio</a>
 </div>

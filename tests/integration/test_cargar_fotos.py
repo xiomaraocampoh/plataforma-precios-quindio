@@ -64,6 +64,8 @@ def test_la_foto_se_asigna_por_nombre_con_marca(db, arroz, carpeta):
 def test_un_nombre_ambiguo_no_se_adivina(db, arroz, carpeta):
     # «Arroz blanco» existe con dos marcas: sin la marca no se sabe cuál es
     cat = arroz[0].categoria
+    arroz[0].marca = Marca.objects.create(nombre="Sello")
+    arroz[0].save()
     Producto.objects.create(
         nombre="Arroz blanco", marca=Marca.objects.create(nombre="Roa"), categoria=cat
     )
