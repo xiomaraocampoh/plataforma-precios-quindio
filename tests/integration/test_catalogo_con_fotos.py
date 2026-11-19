@@ -1,13 +1,15 @@
-"""Catálogo con fotos: la foto del producto en las pantallas donde se elige y se compara (EC-01, M-03).
+"""Catálogo con fotos: la foto del producto donde se elige y se compara (EC-01, M-03).
 
-Sin foto se ve el ícono de la categoría (respaldo). La imagen es decorativa (alt vacío): el nombre del
-producto sigue siendo el texto accesible. Listar con fotos no hace consultas extra ni trae los bytes.
+Sin foto se ve el ícono de la categoría (respaldo). La imagen es decorativa (alt vacío): el
+nombre del producto sigue siendo el texto accesible. Listar con fotos no hace consultas extra
+ni trae los bytes.
 """
 
 import re
 from decimal import Decimal
 
 import pytest
+from django.core.cache import cache
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
@@ -111,6 +113,7 @@ def _crear_productos(n: int, imagen, desde: int = 0):
 
 
 def _consultas(client, url, **params):
+    cache.clear()  # la portada cachea sus cifras: se mide siempre en las mismas condiciones
     with CaptureQueriesContext(connection) as capturadas:
         client.get(url, params)
     return [c["sql"] for c in capturadas.captured_queries]
