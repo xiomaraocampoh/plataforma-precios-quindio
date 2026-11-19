@@ -139,3 +139,12 @@ def test_tambien_se_puede_subir_la_foto_al_crear_un_producto(entrar, datos, imag
     r = client.post(reverse("panel:nuevo", args=["productos"]), nuevo)
     assert r.status_code == 302, r.content.decode()[:600]
     assert Producto.objects.get(nombre="Leche entera").foto_version
+
+
+def test_el_editor_escribe_la_descripcion_del_producto(entrar, datos):
+    client, _ = entrar("editor_catalogo")
+    arroz = datos["arroz"]
+    r = _editar(client, _datos(arroz, descripcion="Grano largo."), arroz)
+    assert r.status_code == 302
+    arroz.refresh_from_db()
+    assert arroz.descripcion == "Grano largo."
