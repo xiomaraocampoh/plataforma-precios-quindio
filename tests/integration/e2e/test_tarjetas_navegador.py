@@ -104,7 +104,7 @@ def test_tarjetas_de_la_comparacion(pagina, live_server, datos, nombre, tamano, 
     pagina.goto(live_server.url + reverse("comparacion:comparar", args=[datos[0].pk]))
     primera = pagina.locator(".tarjeta-precio").first
     expect(primera).to_contain_text("$8.000 por kg")
-    expect(primera).to_contain_text("para comparar empaques de distinto tamaño")
+    expect(pagina.locator(".resumen-precios")).to_contain_text("empaques de distinto tamaño")
     expect(primera).to_contain_text("Ver en el mapa")
     expect(primera).to_contain_text("Confianza media")
     expect(primera.get_by_role("button", name="Sigue igual")).to_be_visible()

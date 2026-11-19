@@ -52,19 +52,19 @@ def _en_orden(texto: str, partes: list[str]) -> bool:
     return -1 not in posiciones and posiciones == sorted(posiciones)
 
 
-def test_la_tarjeta_muestra_todo_en_el_orden_pedido(client, con_precios, vecina):
+def test_la_fila_muestra_todo_en_el_orden_pedido(client, con_precios, vecina):
     client.force_login(vecina)
     primera = _tarjetas(_comparar(client, con_precios))[0]  # 1 kg: $8.000/kg es el menor
     assert _en_orden(
         primera,
         [
-            "1 kg",  # presentación (el producto y la marca van una sola vez, en la ficha)
-            "$8.000",  # precio total
-            "$8.000 por kg",  # precio por unidad con su unidad
-            "Súper Quindío",  # comercio
+            "Súper Quindío",  # comercio (el producto y la marca van una sola vez, en la ficha)
             "Supermercado",  # tipo
             "Cra 14 # 10-20, Centro, Armenia",  # dirección, barrio y municipio
             "Ver en el mapa",
+            "1 kg",  # presentación
+            "$8.000",  # precio total
+            "$8.000 por kg",  # precio por unidad con su unidad
             "Reportado por usuarios",  # fuente
             "hace un momento",  # antigüedad
             "Confianza media",  # confianza con texto, no solo color
