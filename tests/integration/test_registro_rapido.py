@@ -1,4 +1,4 @@
-"""Registrar un precio con pocos toques (EC-01, M-01, M-04): del producto a «Guardar» sin listas largas.
+"""Registrar un precio con pocos toques (EC-01, M-01, M-04): del producto a «Guardar», sin listas.
 
 PUX-01 mostró que nadie registró en ≤ 15 s: el selector con todas las presentaciones y la tienda
 por elegir cada vez fueron las dificultades. El flujo ahora parte del producto, solo ofrece sus
@@ -241,7 +241,7 @@ def test_la_confirmacion_ofrece_registrar_otro_en_la_misma_tienda_y_ver_la_compa
 def test_el_registro_sigue_exigiendo_cuenta(client, arroz):  # M-13
     r = client.get(URL, {"producto": arroz[0].pk})
     assert r.status_code == 302 and "/cuentas/ingresar/" in r["Location"]
-    assert "producto=" in r["Location"]  # al volver, retoma donde estaba
+    assert "producto" in r["Location"]  # al volver, retoma donde estaba (next=…)
 
 
 # ───────────── Entradas desde la comparación y la cabecera ─────────────
@@ -276,3 +276,35 @@ def test_el_boton_de_registrar_tambien_esta_con_sesion_iniciada(client, reportan
     client.force_login(reportante)
     html = client.get(reverse("comparacion:inicio")).content.decode()
     assert 'class="btn btn-registrar"' in html
+
+
+# ───────────── La comparación muestra los precios primero ─────────────
+
+
+def _comparacion(client, producto, **params):
+    return client.get(reverse("comparacion:comparar", args=[producto.pk]), params).content.decode()
+
+
+def _dos_precios(reportante, arroz, tiendas):
+    _, p500, p1kg = arroz
+    _registrar(reportante, p500, tiendas[0], "2500")
+    _registrar(reportante, p1kg, tiendas[1], "4800")
+
+
+def test_los_filtros_de_la_comparacion_van_plegados_para_ver_primero_los_precios(
+    client, reportante, arroz, tiendas
+):
+    _dos_precios(reportante, arroz, tiendas)
+    html = _comparacion(client, arroz[0])
+    detalles = re.search(r'<details class="panel-plegable panel-filtros"([^>]*)>', html)
+    assert detalles and "open" not in detalles.group(1)
+    assert 'id="filtros-comparacion"' in html  # siguen ahí, solo plegados
+    assert html.index("panel-filtros") < html.index('id="resultados"')
+
+
+def test_con_un_filtro_activo_el_panel_se_abre_solo(client, reportante, arroz, tiendas):
+    _dos_precios(reportante, arroz, tiendas)
+    html = _comparacion(client, arroz[0], precio_min="3000")
+    detalles = re.search(r'<details class="panel-plegable panel-filtros"([^>]*)>', html)
+    assert detalles and "open" in detalles.group(1)
+    assert "· activo" in html

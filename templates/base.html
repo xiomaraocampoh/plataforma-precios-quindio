@@ -7,7 +7,7 @@
   <meta name="description" content="Compara y comparte precios de la canasta familiar en Armenia y el Quindío.">
   <title>{% block titulo %}AhorraPues{% endblock %}</title>
   <script>document.documentElement.classList.add("js")</script>
-  <link rel="stylesheet" href="{% static 'css/app.css' %}?v=2026-11-16-merge">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}?v=2026-11-19-ux">
   {% block head %}{% endblock %}
   {# htmx servido localmente (sin CDN): funciona con red móvil limitada y sin terceros #}
   <script src="{% static 'vendor/htmx.min.js' %}" defer></script>
@@ -37,11 +37,12 @@
            {% if ruta.url_name == 'productos' or ruta.app_name == 'catalogo' %}aria-current="page"{% endif %}>Productos</a>
         <a href="{% url 'establecimientos:directorio' %}"
            {% if ruta.app_name == 'establecimientos' %}aria-current="page"{% endif %}>Establecimientos</a>
-        <a href="{% url 'precios:registrar' %}"
-           {% if ruta.url_name == 'registrar' %}aria-current="page"{% endif %}>Registrar precio</a>
+        {% if not user.is_authenticated %}<a class="nav-solo-angosto" href="{% url 'cuentas:registro' %}">Crear cuenta</a>{% endif %}
       </nav>
       {% endwith %}
       <div class="acciones">
+        {# La acción principal siempre a la vista: no se esconde tras la hamburguesa (PUX-01, M-01) #}
+        <a class="btn btn-registrar" href="{% url 'precios:registrar' %}"{% if request.resolver_match.url_name == 'registrar' %} aria-current="page"{% endif %}><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg><span>Registrar<span class="reg-largo"> precio</span></span></a>
         {% if user.is_authenticated %}
           <details class="menu-cuenta">
             <summary><svg class="ico" aria-hidden="true"><use href="#i-user"/></svg>{{ user.username }}<span class="sr-only">: menú de tu cuenta</span></summary>
@@ -56,7 +57,7 @@
           </details>
         {% else %}
           <a class="btn btn-sec" href="{% url 'cuentas:ingresar' %}">Ingresar</a>
-          <a class="btn" href="{% url 'cuentas:registro' %}">Crear cuenta</a>
+          <a class="btn btn-crear-cuenta" href="{% url 'cuentas:registro' %}">Crear cuenta</a>
         {% endif %}
         <button type="button" class="menu-boton" aria-expanded="false" aria-controls="nav-principal">
           <svg class="ico" aria-hidden="true"><use href="#i-menu"/></svg><span class="sr-only">Menú</span>

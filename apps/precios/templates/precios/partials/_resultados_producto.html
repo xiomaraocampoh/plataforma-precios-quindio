@@ -1,0 +1,17 @@
+{% url 'precios:registrar' as url_registro %}
+{% if resultados is not None %}
+  {% if resultados %}
+  <ul class="lista-filas" aria-label="Productos encontrados">
+    {% for p in resultados %}<li><a href="{{ url_registro }}?producto={{ p.pk }}{% if establecimiento_id %}&amp;establecimiento={{ establecimiento_id }}{% endif %}"><span><span class="nombre">{{ p }}</span>{% if p.categoria %}<span class="meta"> · {{ p.categoria }}</span>{% endif %}</span><svg class="ico" aria-hidden="true"><use href="#i-arrow"/></svg></a></li>{% endfor %}
+  </ul>
+  {% elif q|length < 2 %}
+  <p class="suave">Escribe al menos 2 letras.</p>
+  {% else %}
+  <p>No encontramos «{{ q }}». <a href="{% url 'catalogo:solicitar' %}">Pide que lo agreguen al catálogo</a>.</p>
+  {% endif %}
+{% else %}
+  <h2 class="subtitulo-lista">Más reportados</h2>
+  <ul class="lista-filas" aria-label="Productos más reportados">
+    {% for p in frecuentes %}<li><a href="{{ url_registro }}?producto={{ p.pk }}{% if establecimiento_id %}&amp;establecimiento={{ establecimiento_id }}{% endif %}"><span><span class="nombre">{{ p }}</span>{% if p.categoria %}<span class="meta"> · {{ p.categoria }}</span>{% endif %}</span><svg class="ico" aria-hidden="true"><use href="#i-arrow"/></svg></a></li>{% endfor %}
+  </ul>
+{% endif %}

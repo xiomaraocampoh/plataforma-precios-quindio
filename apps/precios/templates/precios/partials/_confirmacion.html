@@ -9,5 +9,9 @@
     <h2>Listo, tu precio ya está publicado</h2>
     <p class="suave">Ayuda a otras personas a comparar. ¡Gracias por aportar!</p>
   {% endif %}
-  <a class="btn" href="{% url 'precios:registrar' %}" hx-get="{% url 'precios:registrar' %}" hx-target="#registro">Registrar otro precio</a>
+  <div class="acciones-confirmacion">
+    {# La tienda queda elegida: quien recorre un local reporta varios productos seguidos #}
+    <a class="btn" href="{% url 'precios:registrar' %}?establecimiento={{ establecimiento.pk }}" hx-get="{% url 'precios:registrar' %}?establecimiento={{ establecimiento.pk }}" hx-target="#registro">Registrar otro en {{ establecimiento }}</a>
+    <a class="btn btn-sec" href="{% url 'comparacion:comparar' producto.pk %}">Ver la comparación de {{ producto }}</a>
+  </div>
 </div>

@@ -6,10 +6,10 @@
 {% block contenido %}
 <div class="bento angosto">
   <section class="tile tile-4" aria-labelledby="titulo-registro">
-    <p class="etiqueta">Tres campos · menos de 15 segundos</p>
+    <p class="etiqueta">{% if paso == "producto" %}Paso 1 de 2 · el producto{% else %}Paso 2 de 2 · el precio{% endif %}</p>
     <h1 id="titulo-registro" style="font-size:clamp(1.7rem,4.5vw,2.2rem)">Registrar un precio</h1>
-    <p class="suave" style="margin-bottom:.6rem">Escribe el precio total del empaque; calculamos el precio por unidad de medida para comparar. Tu nombre no se muestra a nadie.</p>
-    <div id="registro">{% include "precios/partials/_formulario.html" %}</div>
+    {% if paso == "producto" %}<p class="suave" style="margin-bottom:.6rem">Busca el producto o toca uno de la lista. Tu nombre no se muestra a nadie.</p>{% endif %}
+    <div id="registro">{% if paso == "producto" %}{% include "precios/partials/_elegir_producto.html" %}{% else %}{% include "precios/partials/_formulario.html" %}{% endif %}</div>
     <div id="registros-pendientes" role="status" aria-live="polite" class="pendientes-en-registro"></div>
   </section>
 

@@ -9,9 +9,12 @@
     <p class="etiqueta">{{ producto.categoria }}</p>
     <h1>{{ producto }}</h1>
   </div>
-  <a class="btn btn-sec" href="{% url 'precios:registrar' %}"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>Registrar un precio</a>
+  <a class="btn" href="{% url 'precios:registrar' %}?producto={{ producto.pk }}"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>Registrar un precio</a>
 </div>
 {% if total > 1 or municipios|length > 1 or barrios|length > 1 %}
+{# Los filtros no deben ocupar la primera pantalla: los precios van primero (PUX-01). Se abren solos si hay uno activo. #}
+<details class="panel-plegable panel-filtros"{% if filtro.activo or precio_min or precio_max or error_precio %} open{% endif %}>
+<summary>Filtrar por barrio o precio{% if filtro.activo or precio_min or precio_max %} · activo{% endif %}</summary>
 <form class="filtros" id="filtros-comparacion" method="get" action="{% url 'comparacion:comparar' producto.pk %}" aria-label="Filtrar por ubicación y precio"
       hx-get="{% url 'comparacion:comparar' producto.pk %}" hx-target="#resultados" hx-push-url="true" hx-trigger="change, submit">
   <div class="campo">
@@ -41,6 +44,7 @@
     <a class="btn btn-sec" href="{% url 'comparacion:comparar' producto.pk %}">Quitar filtros</a>
   </div>
 </form>
+</details>
 {% endif %}
 {% if referencia %}
 <aside class="tile tile-tenue referencia" aria-labelledby="t-referencia" style="margin-bottom:var(--gap)">

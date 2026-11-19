@@ -29,6 +29,8 @@ Parámetros: fila, destacada, numero (puesto en el orden), etiqueta (opcional), 
 </ul>
 <p class="tp-explicacion">{{ fila.confianza.1 }}</p>
 <div class="acciones-fila">
+  {# Un toque: producto, presentación y tienda ya van elegidos; solo falta escribir el precio #}
+  <a class="btn btn-pequeno" href="{% url 'precios:registrar' %}?presentacion={{ fila.presentacion_id }}&amp;establecimiento={{ r.establecimiento_id }}">Registrar precio aquí<span class="sr-only"> en {{ r.establecimiento }}</span></a>
   {% if not user.is_authenticated %}
     <a class="btn btn-sec btn-pequeno" href="{% url 'cuentas:ingresar' %}?next={{ request.get_full_path|urlencode }}">Ingresa para confirmar o denunciar<span class="sr-only"> el precio de {{ r.establecimiento }}</span></a>
   {% elif fila.reporte_id in propios %}

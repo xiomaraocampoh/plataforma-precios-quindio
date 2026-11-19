@@ -1,10 +1,29 @@
-<form method="post" action="{% url 'precios:registrar' %}"
-      hx-post="{% url 'precios:registrar' %}" hx-target="#registro" hx-swap="innerHTML"
+{% comment %}Paso 2: con producto, solo sus presentaciones como botones; sin producto (reenvío de la cola
+o error sin presentación), la lista completa de siempre. Mismos nombres de campo: la cola sin conexión
+(ADR-009) y el servidor no cambian.{% endcomment %}
+{% url 'precios:registrar' as url_registro %}
+<form method="post" action="{{ url_registro }}{% if producto %}?producto={{ producto.pk }}{% endif %}"
+      hx-post="{{ url_registro }}{% if producto %}?producto={{ producto.pk }}{% endif %}" hx-target="#registro" hx-swap="innerHTML"
       hx-disabled-elt="find button" hx-request='{"timeout": 15000}' data-cola-registros>
   {% csrf_token %}
   {# los errores de campos ocultos (p. ej. fecha de un registro sin conexión) también se muestran #}
   {% if form.non_field_errors or form.fecha_observacion.errors %}<div class="campo" role="alert">{% for e in form.non_field_errors %}<span class="error">{{ e }}</span>{% endfor %}{% for e in form.fecha_observacion.errors %}<span class="error">{{ e }}</span>{% endfor %}</div>{% endif %}
+  {% if producto %}
+  <div class="producto-elegido">
+    <div><p class="etiqueta">Producto</p><p class="producto-nombre">{{ producto }}</p></div>
+    <a class="btn-texto" href="{{ url_registro }}">Cambiar producto<span class="sr-only"> (volver a buscar)</span></a>
+  </div>
+  {% endif %}
   {% for campo in form.visible_fields %}
+    {% if producto and campo.name == "presentacion" %}
+    <fieldset class="campo grupo-opciones">
+      <legend>{{ campo.label }}</legend>
+      <div class="botones-opcion">
+        {% for radio in campo %}<div class="boton-opcion">{{ radio.tag }}<label for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label></div>{% endfor %}
+      </div>
+      {% if campo.errors %}<span class="error" id="{{ campo.auto_id }}_error" role="alert">{{ campo.errors|join:", " }}</span>{% endif %}
+    </fieldset>
+    {% else %}
     <div class="campo">
       {{ campo.label_tag }}
       {{ campo }}
@@ -14,6 +33,7 @@
       {# el id coincide con el aria-describedby que genera Django (1.3.1) #}
       {% if campo.errors %}<span class="error" id="{{ campo.auto_id }}_error" role="alert">{{ campo.errors|join:", " }}</span>{% endif %}
     </div>
+    {% endif %}
   {% endfor %}
   {% for oculto in form.hidden_fields %}{{ oculto }}{% endfor %}
   <button class="btn btn-bloque" type="submit">Guardar precio</button>
