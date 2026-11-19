@@ -758,3 +758,10 @@ select:disabled { cursor: not-allowed; opacity: .6; }
 .ico-cat-chico { width: 1.1em; height: 1.1em; margin-right: .35rem; vertical-align: -.2em; }
 .fila-producto .meta { display: block; }
 .foto-actual { margin-bottom: 1rem; } .foto-actual img { border-radius: var(--radio-sm); border: 1px solid var(--borde); display: block; }
+
+/* Catálogo en celular: dos columnas, como una tienda; la tarjeta se compacta para que quepan */
+@media (max-width: 519px) {
+  .tarjetas.tarjetas-precio { --cols: 2; --gap: .6rem; }
+  .tarjetas-precio > * { padding: .6rem; font-size: .9rem; overflow-wrap: anywhere; }
+  .tarjetas-precio .foto-grande { margin-bottom: .4rem; }
+}
