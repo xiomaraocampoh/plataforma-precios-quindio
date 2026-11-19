@@ -22,7 +22,7 @@ Accion = RegistroAuditoria.Accion
 CAMPOS = {
     "marca": ("nombre", "activa"),
     "categoria": ("nombre", "perecedera", "activa"),
-    "producto": ("nombre", "marca", "categoria", "activo"),
+    "producto": ("nombre", "marca", "categoria", "descripcion", "activo"),
     "establecimiento": (
         "nombre",
         "tipo",

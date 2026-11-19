@@ -135,15 +135,13 @@ def test_migrate_en_base_vacia_siembra_y_la_reversa_la_deja_como_estaba(sin_clav
 @pytest.mark.django_db(transaction=True)
 @override_settings(DEBUG=True)
 def test_migrate_despues_de_cargar_datos_prueba_no_duplica(sin_clave):
-    for app, nombre in ANTES_DE_LA_SEMILLA:
-        _migrar(app, nombre)
-    try:
-        call_command("cargar_datos_prueba", stdout=StringIO())
-        cargado = _conteos()
-        _migrar()
-        assert _conteos() == cargado == ESPERADO
-    finally:
-        _migrar()
+    # No se retrocede el esquema: cargar_datos_prueba usa los modelos reales y fallaría sin las
+    # columnas posteriores (p. ej. Producto.descripcion). Se ejecutan las funciones de siembra de
+    # las migraciones, que es lo que `migrate` correría sobre datos ya cargados.
+    call_command("cargar_datos_prueba", stdout=StringIO())
+    cargado = _conteos()
+    _sembrar_como_migrate()
+    assert _conteos() == cargado == ESPERADO
 
 
 @pytest.mark.django_db(transaction=True)

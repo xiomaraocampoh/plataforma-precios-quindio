@@ -59,9 +59,19 @@ class CategoriaForm(forms.ModelForm):
 class ProductoForm(forms.ModelForm):
     class Meta:
         model = Producto
-        fields = ["nombre", "marca", "categoria"]
-        labels = {"nombre": "Nombre del producto", "marca": "Marca", "categoria": "Categoría"}
-        help_texts = {"nombre": "Como aparece en el empaque, sin la marca. Ej.: Arroz blanco."}
+        fields = ["nombre", "marca", "categoria", "descripcion"]
+        labels = {
+            "nombre": "Nombre del producto",
+            "marca": "Marca",
+            "categoria": "Categoría",
+            "descripcion": "Descripción (opcional)",
+        }
+        help_texts = {
+            "nombre": "Como aparece en el empaque, sin la marca. Ej.: Arroz blanco.",
+            "descripcion": "Una o dos frases útiles para reconocerlo (hasta 500 caracteres). "
+            "Sin precios ni mensajes comerciales.",
+        }
+        widgets = {"descripcion": forms.Textarea(attrs={"rows": 3, "maxlength": 500})}
 
     foto = forms.FileField(
         required=False,

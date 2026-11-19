@@ -40,7 +40,7 @@ def test_la_descripcion_se_escapa(client, arroz):
 def test_los_precios_siguen_de_menor_a_mayor_precio_por_unidad(
     client, reportante, arroz, tiendas
 ):  # M-06
-    for tienda, valor in zip(tiendas[:2], ("3000", "2500")):
+    for tienda, valor in zip(tiendas[:2], ("3000", "2500"), strict=True):
         precios.registrar_reporte(
             autor=reportante,
             presentacion_id=arroz[1].pk,

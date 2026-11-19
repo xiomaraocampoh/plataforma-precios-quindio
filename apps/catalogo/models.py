@@ -46,6 +46,7 @@ class Producto(ModeloConMarcasDeTiempo):
     )
     nombre_normalizado = models.CharField(max_length=200, db_index=True)  # D-05 duplicados
     categoria = models.ForeignKey(Categoria, on_delete=models.PROTECT, related_name="productos")
+    descripcion = models.CharField(max_length=500, blank=True, default="")
     activo = models.BooleanField(default=True)
 
     class Meta:

@@ -10,6 +10,7 @@ from django.views.decorators.http import require_GET, require_POST
 
 from apps.catalogo import selectors as catalogo
 from apps.catalogo.domain.codigo_barras import es_gtin_valido, normalizar_codigo
+from apps.catalogo.domain.normalizacion import formatear_cantidad
 from apps.integraciones import services as integraciones
 from apps.integraciones.domain.reconocimiento import (
     ImagenInvalidaError,
@@ -148,6 +149,12 @@ def comparar(request, producto_id: int):
         "precio_min": request.GET.get("precio_min", ""),
         "precio_max": request.GET.get("precio_max", ""),
         "total": len(todas),
+        "presentaciones": [
+            f"{formatear_cantidad(p.cantidad)} {p.unidad}"
+            for p in catalogo.presentaciones_publicas()
+            .filter(producto=producto)
+            .order_by("unidad", "cantidad")
+        ],
         **ubicaciones_de(todas),
         **estado_del_usuario(request.user, ids),
         "referencia": referencia_sipsa(producto_id),
