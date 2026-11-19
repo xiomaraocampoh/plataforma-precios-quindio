@@ -10,3 +10,4 @@ pyotp>=2.9                  # verificación en dos pasos TOTP, RFC 6238 (ADR-021
 qrcode>=7.4                 # QR en SVG para configurar la app autenticadora (sin PIL)
 defusedxml==0.7.1           # XML de terceros (SIPSA) sin DTD ni entidades
 django-anymail[brevo]==15.2  # correo por la API HTTPS de Brevo (Render bloquea SMTP; ADR-021)
+Pillow>=11.0                # miniaturas de las fotos de producto (ADR-0024); se reencodean, no se sirve el original
