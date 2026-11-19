@@ -59,6 +59,7 @@ def test_subir_la_foto_queda_en_la_auditoria(entrar, datos, imagen):
     client, editor = entrar("editor_catalogo")
     arroz = datos["arroz"]
     _editar(client, _datos(arroz, foto=_archivo(imagen())), arroz)
+    arroz.refresh_from_db()
     registro = RegistroAuditoria.objects.get()
     assert (registro.actor, registro.accion, registro.entidad) == (editor, "editar", "producto")
     assert registro.cambios["foto"][0] == "sin foto"

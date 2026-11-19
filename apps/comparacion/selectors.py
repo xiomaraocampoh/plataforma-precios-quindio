@@ -287,7 +287,7 @@ def resumen_plataforma() -> dict[str, int]:
 def productos_destacados(limite: int = 8):
     """Productos con más reportes publicados (un solo query; sin criterio comercial)."""
     return list(
-        catalogo.productos_publicos()
+        catalogo.con_fotos(catalogo.productos_publicos())
         .annotate(
             n_reportes=Count(
                 "presentaciones__reportes",

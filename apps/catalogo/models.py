@@ -1,5 +1,7 @@
 from django.conf import settings
 from django.db import models
+from django.db.models.functions import Length
+from django.db.models.lookups import Exact
 
 from core.models import ModeloConMarcasDeTiempo
 
@@ -64,6 +66,18 @@ class Producto(ModeloConMarcasDeTiempo):
     def __str__(self) -> str:
         # Las consultas que listan productos hacen select_related("marca") (sin N+1)
         return f"{self.nombre} {self.marca or ''}".strip()
+
+    @property
+    def foto_version(self) -> str:
+        """Versión de la foto (vacía = sin foto). Sirve para versionar la URL y la caché.
+
+        Lee la relación `foto`: los listados usan `selectors.con_fotos(...)` (join sin los bytes)
+        para no hacer una consulta por producto.
+        """
+        try:
+            return self.foto.version
+        except FotoProducto.DoesNotExist:
+            return ""
 
     def save(self, *args, **kwargs):
         self.nombre_normalizado = normalizar_nombre(self.nombre)  # D-05: siempre la misma regla
@@ -132,3 +146,28 @@ class SolicitudCatalogo(models.Model):
     def __str__(self) -> str:
         texto = f"{self.nombre} {self.marca}".strip()
         return f"{texto} {formatear_cantidad(self.cantidad)} {self.unidad} ({self.estado})"
+
+
+class FotoProducto(models.Model):
+    """Miniatura WebP cuadrada de un producto (ADR-0024). Una por producto.
+
+    La imagen guardada la genera el servidor (`catalogo/imagenes.py`); nunca es el archivo subido.
+    Composición real: si el producto se borra, su foto también (on_delete=CASCADE).
+    """
+
+    producto = models.OneToOneField(Producto, on_delete=models.CASCADE, related_name="foto")
+    contenido = models.BinaryField()
+    tipo_contenido = models.CharField(max_length=30, default="image/webp")
+    # Huella corta del contenido: la misma foto da la misma URL y una distinta la cambia
+    version = models.CharField(max_length=12)
+    actualizada_en = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(Exact(Length("version"), 12)), name="foto_version_de_12"
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"Foto de {self.producto}"

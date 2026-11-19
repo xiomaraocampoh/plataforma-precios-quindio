@@ -749,3 +749,4 @@ select:disabled { cursor: not-allowed; opacity: .6; }
 .fila-producto { display: flex; align-items: center; gap: .75rem; min-width: 0; }
 .ico-cat-chico { width: 1.1em; height: 1.1em; margin-right: .35rem; vertical-align: -.2em; }
 .fila-producto .meta { display: block; }
+.foto-actual { margin-bottom: 1rem; } .foto-actual img { border-radius: var(--radio-sm); border: 1px solid var(--borde); display: block; }
