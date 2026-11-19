@@ -58,12 +58,9 @@ def test_la_tarjeta_muestra_todo_en_el_orden_pedido(client, con_precios, vecina)
     assert _en_orden(
         primera,
         [
-            "Arroz blanco",  # producto
-            "Diana",  # marca
-            "1 kg",  # presentación
+            "1 kg",  # presentación (el producto y la marca van una sola vez, en la ficha)
             "$8.000",  # precio total
             "$8.000 por kg",  # precio por unidad con su unidad
-            "para comparar empaques de distinto tamaño",
             "Súper Quindío",  # comercio
             "Supermercado",  # tipo
             "Cra 14 # 10-20, Centro, Armenia",  # dirección, barrio y municipio
