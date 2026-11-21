@@ -240,3 +240,44 @@ def test_el_fragmento_htmx_de_resultados_tambien_es_accesible(client, con_precio
     ).content.decode()
     assert "<html" not in html and "tarjeta-precio" in html
     assert set(_referencias_rotas(html)) <= {"ayuda-sigue-igual"}  # vive en la página completa
+
+
+def _tarjetas_lista(html: str) -> list[str]:
+    """Las tarjetas de la lista de productos (cada <li class="tarjeta tarjeta-precio">)."""
+    partes = re.split(r'(?=<li class="tarjeta tarjeta-precio)', html)
+    return [p for p in partes if p.startswith('<li class="tarjeta tarjeta-precio')]
+
+
+def _lista(client, con_precios) -> tuple[str, list[str]]:
+    html = client.get(reverse("comparacion:productos")).content.decode()
+    return html, _tarjetas_lista(html)
+
+
+def test_la_lista_explica_el_precio_por_unidad_una_sola_vez(client, con_precios):
+    html, tarjetas = _lista(client, con_precios)
+    ayuda = "para comparar empaques de distinto tamaño"
+    assert tarjetas and html.count(ayuda) == 1
+    assert all(ayuda not in t for t in tarjetas)
+
+
+def test_la_tarjeta_resume_el_lugar_sin_la_direccion_completa(client, con_precios):
+    _, tarjetas = _lista(client, con_precios)
+    primera = tarjetas[0]
+    assert "Súper Quindío" in primera and "Supermercado" in primera
+    assert "Centro, Armenia" in primera and "Ver en el mapa" in primera
+    visible = re.sub(r'<span class="sr-only">.*?</span>', "", primera, flags=re.S)
+    assert "Cra 14 # 10-20" not in re.sub(r"<[^>]+>", " ", visible)  # sigue en el mapa y el lector
+
+
+def test_la_tarjeta_no_repite_la_fuente_comun_ni_la_explicacion_larga(client, con_precios):
+    _, tarjetas = _lista(client, con_precios)
+    primera = tarjetas[0]
+    assert "Reportado por usuarios" not in primera  # es lo normal; solo se destaca lo oficial
+    assert "Confianza media" in primera and "hace un momento" in primera
+    assert 'class="tp-explicacion sr-only"' in primera  # sigue disponible para lector de pantalla
+
+
+def test_el_tipo_de_tienda_de_descuento_no_muestra_el_codigo_interno():
+    from apps.establecimientos.models import Establecimiento
+
+    assert "(discount)" not in str(Establecimiento.Tipo.DISCOUNT.label)

@@ -148,3 +148,14 @@ def test_el_editor_escribe_la_descripcion_del_producto(entrar, datos):
     assert r.status_code == 302
     arroz.refresh_from_db()
     assert arroz.descripcion == "Grano largo."
+
+
+def test_el_campo_de_foto_admite_arrastrar_pegar_y_buscar(entrar, datos):
+    """El campo sigue siendo un input de archivo (buscar) y se mejora con arrastrar y pegar."""
+    client, _ = entrar("editor_catalogo")
+    arroz = datos["arroz"]
+    html = client.get(reverse("panel:editar", args=["productos", arroz.pk])).content.decode()
+    assert 'type="file"' in html and "data-zona-foto" in html
+    assert "js/zona-foto.js" in html
+    # explica las tres formas sin depender del color ni del script
+    assert "arrastra" in html.lower() and "Ctrl+V" in html
