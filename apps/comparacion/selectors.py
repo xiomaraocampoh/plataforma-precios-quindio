@@ -66,6 +66,7 @@ class FilaComparacion:
     ultima_confirmacion: datetime | None
     producto: str = ""
     presentacion_id: int = 0  # precarga «Registrar precio aquí»
+    producto_id: int = 0  # enlace a la comparación de ese producto
     marca: str = ""
     cantidad: Decimal = Decimal("0")
     unidad: str = ""
@@ -103,17 +104,22 @@ class FilaComparacion:
         return antiguedad(self.resultado.fecha_observacion, timezone.now())
 
 
-def _reportes_candidatos(producto_ids: list[int], desde: datetime):
+def _reportes_candidatos(
+    producto_ids: list[int] | None, desde: datetime, establecimiento_id: int | None = None
+):
     # Un reporte viejo confirmado hace poco con «Sigue igual» sigue siendo candidato (RF-14)
+    candidatos = ReportePrecio.objects.filter(
+        Q(fecha_observacion__gte=desde) | Q(confirmaciones__creado_en__gte=desde),
+        presentacion__activa=True,  # una presentación retirada del catálogo no se compara
+        estado=ReportePrecio.Estado.PUBLICADO,
+        establecimiento__activo=True,
+    )
+    if producto_ids is not None:
+        candidatos = candidatos.filter(presentacion__producto_id__in=producto_ids)
+    if establecimiento_id is not None:
+        candidatos = candidatos.filter(establecimiento_id=establecimiento_id)
     return (
-        ReportePrecio.objects.filter(
-            Q(fecha_observacion__gte=desde) | Q(confirmaciones__creado_en__gte=desde),
-            presentacion__producto_id__in=producto_ids,
-            presentacion__activa=True,  # una presentación retirada del catálogo no se compara
-            estado=ReportePrecio.Estado.PUBLICADO,
-            establecimiento__activo=True,
-        )
-        .select_related(
+        candidatos.select_related(
             "presentacion__producto__categoria", "presentacion__producto__marca", "establecimiento"
         )
         .order_by("establecimiento_id", "presentacion_id", "-fecha_observacion")
@@ -121,11 +127,15 @@ def _reportes_candidatos(producto_ids: list[int], desde: datetime):
     )
 
 
-def _ultimos_por_par(producto_ids: list[int], desde: datetime):
+def _ultimos_por_par(
+    producto_ids: list[int] | None, desde: datetime, establecimiento_id: int | None = None
+):
     """El reporte más reciente por (local, presentación) y cuántos anteriores dicen lo mismo."""
     ultimos: dict[tuple[int, int], ReportePrecio] = {}
     iguales: dict[tuple[int, int], int] = {}
-    for r in _reportes_candidatos(producto_ids, desde):  # un solo query; agrupación en memoria
+    for r in _reportes_candidatos(
+        producto_ids, desde, establecimiento_id
+    ):  # un solo query; agrupación en memoria
         clave = (r.establecimiento_id, r.presentacion_id)
         if clave not in ultimos:
             ultimos[clave] = r
@@ -145,6 +155,7 @@ def _fila(r: ReportePrecio, resultado: ResultadoComparacion, ultima) -> FilaComp
         ultima_confirmacion=ultima,
         producto=presentacion.producto.nombre,
         presentacion_id=presentacion.pk,
+        producto_id=presentacion.producto_id,
         marca=presentacion.producto.marca.nombre if presentacion.producto.marca else "",
         cantidad=presentacion.cantidad,
         unidad=presentacion.unidad,
@@ -175,35 +186,55 @@ def _resultado(r: ReportePrecio, n_iguales: int) -> ResultadoComparacion:
     )
 
 
-def _calcular_filas_de(producto_ids: list[int]) -> dict[int, list[FilaComparacion]]:
-    """Filas vigentes de varios productos con un número constante de queries (sin N+1)."""
+def _vigentes(ultimos: dict, iguales: dict):
+    """(reporte, resultado, última confirmación) de los reportes que siguen vigentes (EC-02)."""
     ahora = timezone.now()
     politica = politica_vigencia()
-    desde = ahora - timedelta(days=max(politica.dias_reporte, politica.dias_oficial))
-    ultimos, iguales = _ultimos_por_par(producto_ids, desde)
     confirmaciones = confirmaciones_por_reporte([r.pk for r in ultimos.values()])
-
-    por_producto: dict[int, dict[ResultadoComparacion, FilaComparacion]] = {
-        pid: {} for pid in producto_ids
-    }
     for clave, r in ultimos.items():
         n_conf, ultima = confirmaciones.get(r.pk, (0, None))
         referencia = fecha_de_referencia(r.fecha_observacion, [ultima] if ultima else [])
         perecedero = r.presentacion.producto.categoria.perecedera
-        if not es_vigente(
+        if es_vigente(
             min(referencia, ahora),
             ahora,
             Fuente(r.fuente),
             perecedero=perecedero,
             politica=politica,
         ):
-            continue
-        resultado = _resultado(r, iguales[clave] + n_conf)
+            yield r, _resultado(r, iguales[clave] + n_conf), ultima
+
+
+def _ventana_de_candidatos() -> datetime:
+    politica = politica_vigencia()
+    return timezone.now() - timedelta(days=max(politica.dias_reporte, politica.dias_oficial))
+
+
+def _calcular_filas_de(producto_ids: list[int]) -> dict[int, list[FilaComparacion]]:
+    """Filas vigentes de varios productos con un número constante de queries (sin N+1)."""
+    ultimos, iguales = _ultimos_por_par(producto_ids, _ventana_de_candidatos())
+    por_producto: dict[int, dict[ResultadoComparacion, FilaComparacion]] = {
+        pid: {} for pid in producto_ids
+    }
+    for r, resultado, ultima in _vigentes(ultimos, iguales):
         por_producto[r.presentacion.producto_id][resultado] = _fila(r, resultado, ultima)
     return {
         pid: [filas[r] for r in ordenar_neutral(list(filas))]  # EC-06: solo el orden neutral
         for pid, filas in por_producto.items()
     }
+
+
+def filas_de_establecimiento(establecimiento_id: int) -> list[FilaComparacion]:
+    """Precios vigentes de UN comercio, en orden alfabético por producto.
+
+    No es un ranking: no compara comercios entre sí (eso es `comparar_filas` y su orden neutral,
+    EC-06). Un número constante de consultas, sin importar cuántos productos tenga el comercio.
+    """
+    ultimos, iguales = _ultimos_por_par(None, _ventana_de_candidatos(), establecimiento_id)
+    filas = [_fila(r, resultado, ultima) for r, resultado, ultima in _vigentes(ultimos, iguales)]
+    return sorted(
+        filas, key=lambda f: (f.producto.casefold(), f.marca.casefold(), f.unidad, f.cantidad)
+    )
 
 
 def _calcular_filas(producto_id: int) -> list[FilaComparacion]:

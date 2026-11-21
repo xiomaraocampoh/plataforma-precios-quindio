@@ -23,6 +23,14 @@ def directorio(*, municipio: str = "", barrio: str = "", tipo: str = "") -> list
     return establecimientos
 
 
+def establecimiento_publico(pk: int) -> Establecimiento | None:
+    """Un establecimiento aprobado y activo, o None (el público no ve pendientes ni inactivos)."""
+    e = _aprobados().filter(pk=pk).first()
+    if e is not None:
+        e.enlace_mapa = enlace_openstreetmap(e.latitud, e.longitud)
+    return e
+
+
 def opciones_directorio(municipio: str = "") -> dict:
     aprobados = _aprobados()
     barrios = aprobados.exclude(barrio="")

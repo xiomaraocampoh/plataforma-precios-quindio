@@ -3,7 +3,7 @@
 from urllib.parse import urlencode
 
 from django.core.paginator import Paginator
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_GET, require_POST
@@ -11,6 +11,7 @@ from django.views.decorators.http import require_GET, require_POST
 from apps.catalogo import selectors as catalogo
 from apps.catalogo.domain.codigo_barras import es_gtin_valido, normalizar_codigo
 from apps.catalogo.domain.normalizacion import formatear_cantidad
+from apps.establecimientos import selectors as establecimientos
 from apps.integraciones import services as integraciones
 from apps.integraciones.domain.reconocimiento import (
     ImagenInvalidaError,
@@ -27,6 +28,7 @@ from .selectors import (
     comparar_filas,
     ejemplo_comparacion,
     estado_del_usuario,
+    filas_de_establecimiento,
     productos_destacados,
     resumen_plataforma,
     tarjetas_de_productos,
@@ -165,6 +167,28 @@ def comparar(request, producto_id: int):
         "comparacion/partials/_resultados.html" if request.htmx else "comparacion/comparar.html"
     )
     return render(request, plantilla, contexto)
+
+
+@require_GET
+def establecimiento(request, establecimiento_id: int):
+    """Precios vigentes registrados en un comercio, en orden alfabético (no es un ranking)."""
+    local = establecimientos.establecimiento_publico(establecimiento_id)
+    if local is None:
+        raise Http404("Establecimiento no encontrado.")
+    filas = filas_de_establecimiento(local.pk)
+    productos_de = {  # con su foto en el mismo query, sin traer los bytes
+        p.pk: p
+        for p in catalogo.con_fotos(catalogo.productos_publicos()).filter(
+            pk__in={f.producto_id for f in filas}
+        )
+    }
+    tarjetas = [(productos_de[f.producto_id], f) for f in filas if f.producto_id in productos_de]
+    contexto = {
+        "local": local,
+        "tarjetas": tarjetas,
+        **estado_del_usuario(request.user, [f.reporte_id for _, f in tarjetas]),
+    }
+    return render(request, "comparacion/establecimiento.html", contexto)
 
 
 @require_GET

@@ -77,10 +77,13 @@ class ProductoForm(forms.ModelForm):
         required=False,
         label="Foto del producto",
         help_text=(
+            "Arrastra la imagen aquí, pégala con Ctrl+V (o ⌘+V) tras copiarla, o busca el archivo. "
             "JPG, PNG o WebP, de hasta 5 MB y al menos 200 px. Se recorta cuadrada y se reduce "
             "sola. Usa una foto del empaque de frente, sin personas ni datos personales."
         ),
-        widget=forms.FileInput(attrs={"accept": "image/jpeg,image/png,image/webp"}),
+        widget=forms.FileInput(
+            attrs={"accept": "image/jpeg,image/png,image/webp", "data-zona-foto": ""}
+        ),
     )
     quitar_foto = forms.BooleanField(required=False, label="Quitar la foto actual")
 

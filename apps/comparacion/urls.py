@@ -11,4 +11,5 @@ urlpatterns = [
     path("buscar-por-foto/", views.buscar_por_foto, name="buscar_por_foto"),
     path("productos/", views.productos, name="productos"),
     path("productos/<int:producto_id>/", views.comparar, name="comparar"),
+    path("tiendas/<int:establecimiento_id>/", views.establecimiento, name="establecimiento"),
 ]

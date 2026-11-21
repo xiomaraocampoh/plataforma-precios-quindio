@@ -1,5 +1,5 @@
 {% load categorias %}
-<p class="suave" role="status">{{ pagina.paginator.count }} producto{{ pagina.paginator.count|pluralize }}{% if q or marca or categoria_id %} con los filtros aplicados{% endif %}. Orden alfabético; en cada tarjeta, el primer precio en el orden neutral (menor precio por unidad).</p>
+<p class="suave" role="status">{{ pagina.paginator.count }} producto{{ pagina.paginator.count|pluralize }}{% if q or marca or categoria_id %} con los filtros aplicados{% endif %}. Orden alfabético; en cada tarjeta, el primer precio en el orden neutral (menor precio por unidad). El precio por unidad sirve para comparar empaques de distinto tamaño.</p>
 {% if tarjetas %}
 <ul class="tarjetas tarjetas-precio" aria-label="Productos">
   {% for p, fila in tarjetas %}

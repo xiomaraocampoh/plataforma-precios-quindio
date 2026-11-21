@@ -4,22 +4,23 @@ Tarjeta de un precio (RF-16). Orden fijo: producto y marca · presentación · p
 por unidad · comercio · fuente, antigüedad y confianza · acciones. Solo presentación: los textos
 vienen del selector (FilaComparacion) y el orden de las tarjetas, de ordenar_neutral (EC-06).
 Nunca hay datos del autor (M-15, EC-07).
-Parámetros: fila, destacada, numero (puesto en el orden), etiqueta (opcional), propios, denunciados.
+Parámetros: fila, destacada, numero (puesto en el orden), etiqueta (opcional), propios, denunciados,
+sin_comercio (opcional: oculta el bloque del comercio cuando la página ya es de ese comercio).
 {% endcomment %}
 {% with r=fila.resultado %}
 <span class="{% if destacada %}etiqueta{% else %}puesto{% endif %}">{% if icono %}<svg class="ico ico-cat-chico" aria-hidden="true"><use href="#{{ icono }}"/></svg>{% endif %}{% if etiqueta %}{{ etiqueta }}{% elif destacada %}Primero en el orden · menor precio por unidad{% else %}N.º {{ numero }}{% endif %}</span>
 <h2 class="tp-producto" id="tp-{{ fila.reporte_id }}">{{ fila.producto }}{% if fila.marca %} <span class="tp-marca">{{ fila.marca }}</span>{% endif %}</h2>
 <p class="tp-presentacion"><span class="sr-only">Presentación: </span>{{ fila.presentacion_texto }}</p>
 <p class="precio"><span class="sr-only">Precio total del empaque: </span>{{ fila.precio_texto }}</p>
-<p class="tp-unidad"><span class="por-unidad">{{ fila.por_unidad_texto }}</span> <span class="tp-ayuda">{{ fila.ayuda_por_unidad }}</span></p>
-<div class="tp-comercio">
+<p class="tp-unidad"><span class="por-unidad">{{ fila.por_unidad_texto }}</span></p>
+{% if not sin_comercio %}<div class="tp-comercio">
   <p class="nombre-tienda">{{ r.establecimiento }}</p>
-  <p class="tp-tipo">{{ fila.tipo }}</p>
-  <address class="tp-direccion">{{ fila.direccion }}{% if fila.barrio %}, {{ fila.barrio }}{% endif %}{% if fila.municipio %}, {{ fila.municipio }}{% endif %}</address>
-  {% if fila.enlace_mapa %}<a class="tp-mapa" href="{{ fila.enlace_mapa }}" target="_blank" rel="noopener noreferrer">Ver en el mapa<span class="sr-only"> «{{ r.establecimiento }}» en OpenStreetMap (se abre en otra pestaña)</span></a>{% endif %}
+  <p class="tp-tipo">{{ fila.tipo }}{% if fila.barrio or fila.municipio %} · {% if fila.barrio %}{{ fila.barrio }}{% if fila.municipio %}, {% endif %}{% endif %}{{ fila.municipio }}{% endif %}</p>
+  {% if fila.enlace_mapa %}<a class="tp-mapa" href="{{ fila.enlace_mapa }}" title="{{ fila.direccion }}" target="_blank" rel="noopener noreferrer">Ver en el mapa<span class="sr-only"> «{{ r.establecimiento }}», {{ fila.direccion }}, en OpenStreetMap (se abre en otra pestaña)</span></a>{% endif %}
 </div>
+{% endif %}
 <ul class="pie-tile tp-datos" aria-label="Origen y confianza del precio">
-  <li class="chip">{{ fila.fuente_texto }}</li>
+  {% if r.fuente != "reportante" %}<li class="chip">{{ fila.fuente_texto }}</li>{% endif %}
   <li class="chip"><time datetime="{{ r.fecha_observacion|date:'c' }}">{{ fila.antiguedad }}</time></li>
   <li class="chip tp-confianza-{{ r.confianza }}{% if r.confianza == 'baja' %} chip-alerta{% elif r.confianza == 'alta' %} chip-positivo{% endif %}">
     <svg class="ico" aria-hidden="true"><use href="#{% if r.confianza == 'alta' %}i-check{% elif r.confianza == 'baja' %}i-info{% else %}i-shield{% endif %}"/></svg>{{ fila.confianza.0 }}
@@ -27,7 +28,7 @@ Parámetros: fila, destacada, numero (puesto en el orden), etiqueta (opcional), 
   {% if r.es_promocion %}<li class="chip chip-promo">Promoción</li>{% endif %}
   {% if fila.ultima_confirmacion %}<li class="chip chip-positivo"><time datetime="{{ fila.ultima_confirmacion|date:'c' }}">confirmado hace {{ fila.ultima_confirmacion|hace }}</time></li>{% endif %}
 </ul>
-<p class="tp-explicacion">{{ fila.confianza.1 }}</p>
+<p class="tp-explicacion{% if r.confianza != 'baja' %} sr-only{% endif %}">{{ fila.confianza.1 }}</p>
 <div class="acciones-fila">
   {# Un toque: producto, presentación y tienda ya van elegidos; solo falta escribir el precio #}
   <a class="btn btn-pequeno" href="{% url 'precios:registrar' %}?presentacion={{ fila.presentacion_id }}&amp;establecimiento={{ r.establecimiento_id }}">Registrar precio aquí<span class="sr-only"> en {{ r.establecimiento }}</span></a>

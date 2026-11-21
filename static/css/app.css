@@ -805,3 +805,48 @@ select:disabled { cursor: not-allowed; opacity: .6; }
   .ficha-producto { grid-template-columns: minmax(240px, 340px) 1fr; }
   .foto-ficha { justify-self: start; }
 }
+
+/* Zona para soltar o pegar la foto del producto (panel) */
+.zona-foto { border: 2px dashed var(--borde, #b9c2b0); border-radius: 16px; padding: 1rem; display: grid; gap: .6rem; justify-items: start; background: var(--superficie, #fff); transition: background .15s, border-color .15s; }
+.zona-foto.es-activa { border-color: var(--acento, #2f6b3a); background: #eef6ea; }
+.zona-foto-texto { margin: 0; font-weight: 600; }
+.zona-foto-estado { margin: 0; font-size: .9rem; }
+.zona-foto-estado.es-error { color: #a31515; font-weight: 600; }
+.zona-foto-vista { border-radius: 12px; object-fit: cover; }
+
+/* Tarjeta de lista más resumida: lugar en dos líneas, datos en una fila compacta */
+.tarjetas-precio .tp-comercio { gap: 0; }
+.tarjetas-precio .tp-mapa { min-height: 32px; font-size: .9rem; }
+.tarjetas-precio .tp-datos { gap: .35rem; }
+.tarjetas-precio .tp-datos .chip { font-size: .8rem; padding: .15rem .55rem; }
+
+/* Tarjetas de lista alineadas: bloques de altura pareja y acciones pegadas al fondo, de modo que
+   el nombre, el precio y los botones queden a la misma altura aunque el texto varíe. */
+.tarjetas-precio .tp-producto { min-height: calc(2 * 1.25em); }
+.tarjetas-precio .tp-comercio { margin-top: .25rem; }
+.tarjetas-precio .nombre-tienda { min-height: calc(2 * 1.25em); }
+.tarjetas-precio .tp-tipo { min-height: calc(2 * 1.35em); line-height: 1.35; }
+.tarjetas-precio .tp-datos { padding-top: .35rem; }
+.tarjeta-precio .acciones-fila { display: grid; grid-template-columns: 1fr 1fr; gap: .4rem; margin-top: auto; padding-top: .6rem; align-items: stretch; }
+.tarjeta-precio .acciones-fila > a.btn, .tarjeta-precio .acciones-fila > p { grid-column: 1 / -1; margin: 0; }
+.tarjeta-precio .acciones-fila .btn, .tarjeta-precio .acciones-fila summary { width: 100%; min-height: 40px; justify-content: center; text-align: center; line-height: 1.15; padding: .35rem .6rem; box-sizing: border-box; }
+.tarjeta-precio .acciones-fila form { display: flex; }
+.tarjeta-precio .acciones-fila .panel-plegable[open] { grid-column: 1 / -1; }
+.tarjeta-precio .acciones-fila .panel-plegable summary { border: 1px solid var(--marca-enlace); border-radius: 999px; font-size: .875rem; list-style: none; }
+.tarjeta-precio .acciones-fila .panel-plegable summary::-webkit-details-marker { display: none; }
+.tarjeta-precio .ir { margin-top: 0; padding-top: .5rem; border-top: 1px solid var(--borde); margin-top: .5rem; justify-content: center; }
+.tarjeta-precio .acciones-fila form .btn, .tarjeta-precio .acciones-fila .panel-plegable summary { overflow-wrap: normal; word-break: normal; white-space: nowrap; padding-inline: .25rem; font-size: .8rem; }
+
+/* Página de un establecimiento: filas de producto; sin la numeración del ranking */
+.lista-tienda { list-style: none; padding: 0; margin: 0; }
+.lista-tienda .nombre-tienda a { color: inherit; }
+.lista-tienda .ir::after { content: " ›"; }
+.directorio-tarjeta .nombre { color: inherit; }
+
+/* Tarjeta del directorio: todo el recuadro es clicable (el enlace del nombre se estira) */
+.tarjeta-enlace { position: relative; cursor: pointer; }
+.tarjeta-enlace .nombre { color: inherit; }
+.tarjeta-enlace .nombre::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.tarjeta-enlace .nombre:focus-visible { outline: none; }
+.tarjeta-enlace .nombre:focus-visible::after { outline: 3px solid var(--marca-enlace); outline-offset: 2px; }
+.tarjeta-enlace .tp-mapa { position: relative; z-index: 1; }
