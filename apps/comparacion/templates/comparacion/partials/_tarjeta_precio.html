@@ -7,7 +7,7 @@ Nunca hay datos del autor (M-15, EC-07).
 Parámetros: fila, destacada, numero (puesto en el orden), etiqueta (opcional), propios, denunciados.
 {% endcomment %}
 {% with r=fila.resultado %}
-<span class="{% if destacada %}etiqueta{% else %}puesto{% endif %}">{% if etiqueta %}{{ etiqueta }}{% elif destacada %}Primero en el orden · menor precio por unidad{% else %}N.º {{ numero }}{% endif %}</span>
+<span class="{% if destacada %}etiqueta{% else %}puesto{% endif %}">{% if icono %}<svg class="ico ico-cat-chico" aria-hidden="true"><use href="#{{ icono }}"/></svg>{% endif %}{% if etiqueta %}{{ etiqueta }}{% elif destacada %}Primero en el orden · menor precio por unidad{% else %}N.º {{ numero }}{% endif %}</span>
 <h2 class="tp-producto" id="tp-{{ fila.reporte_id }}">{{ fila.producto }}{% if fila.marca %} <span class="tp-marca">{{ fila.marca }}</span>{% endif %}</h2>
 <p class="tp-presentacion"><span class="sr-only">Presentación: </span>{{ fila.presentacion_texto }}</p>
 <p class="precio"><span class="sr-only">Precio total del empaque: </span>{{ fila.precio_texto }}</p>
