@@ -1,0 +1,13 @@
+{# Paso 1: buscar el producto (resultados en vivo con HTMX; sin JavaScript, el botón Buscar lo hace igual) #}
+{% url 'precios:registrar' as url_registro %}
+<form method="get" action="{{ url_registro }}" role="search" aria-label="Buscar el producto"
+      hx-get="{{ url_registro }}" hx-target="#resultados-producto" hx-swap="innerHTML" hx-push-url="false"
+      hx-trigger="input changed delay:250ms from:find input[type=search], submit">
+  {% if establecimiento_id %}<input type="hidden" name="establecimiento" value="{{ establecimiento_id }}">{% endif %}
+  <div class="campo">
+    <label for="q-producto">¿Qué producto?</label>
+    <input id="q-producto" name="q" type="search" value="{{ q }}" placeholder="Ej.: arroz, leche, café" autocomplete="off" autofocus aria-controls="resultados-producto">
+  </div>
+  <button class="btn btn-sec js-ocultar" type="submit">Buscar</button>
+</form>
+<div id="resultados-producto" aria-live="polite">{% include "precios/partials/_resultados_producto.html" %}</div>

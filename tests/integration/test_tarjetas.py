@@ -183,7 +183,7 @@ def test_listado_sin_n_mas_1(client, reportante, tiendas):
 
 def test_registro_habla_de_precio_total_y_calcula_por_unidad(client, reportante, arroz, tiendas):
     client.force_login(reportante)
-    html = client.get(reverse("precios:registrar")).content.decode()
+    html = client.get(reverse("precios:registrar"), {"producto": arroz[0].pk}).content.decode()
     assert "Precio total del empaque ($)" in html
     assert "El precio que marca la etiqueta para esa presentación" in html
     assert 'aria-describedby="id_precio_helptext"' in html

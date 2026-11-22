@@ -7,8 +7,10 @@ dominio. Vive aquí para que servicios de escritura y selectores de otros módul
 from datetime import datetime
 
 from django.conf import settings
-from django.db.models import Count, Max
+from django.db.models import Count, Exists, Max, OuterRef, Q
 from django.utils import timezone
+
+from apps.catalogo import selectors as catalogo
 
 from .domain.vigencia import PoliticaVigencia
 from .models import ConfirmacionPrecio, ReportePrecio
@@ -58,4 +60,39 @@ def confirmados_hoy(usuario, reporte_ids: list[int]) -> set[int]:
 def reportes_propios(usuario, reporte_ids: list[int]) -> set[int]:
     return set(
         ReportePrecio.objects.filter(autor=usuario, pk__in=reporte_ids).values_list("pk", flat=True)
+    )
+
+
+def ultimo_establecimiento_id(usuario) -> int | None:
+    """La tienda donde la persona registró por última vez (solo suya, solo si sigue activa).
+
+    Sirve para dejarla elegida al registrar el siguiente precio: quien recorre un local suele
+    reportar varios productos seguidos. No expone nada de otras personas (M-15).
+    """
+    return (
+        ReportePrecio.objects.filter(autor=usuario, establecimiento__activo=True)
+        .order_by("-creado_en", "-pk")
+        .values_list("establecimiento_id", flat=True)
+        .first()
+    )
+
+
+def productos_para_registrar(limite: int = 8) -> list:
+    """Productos a un toque al registrar: los más reportados primero, luego por nombre.
+
+    Solo productos públicos con alguna presentación registrable. Sin criterio comercial: el orden
+    es por actividad de la comunidad, igual que los destacados de la portada.
+    """
+    presentaciones = catalogo.presentaciones_publicas().filter(producto=OuterRef("pk"))
+    return list(
+        catalogo.productos_publicos()
+        .filter(Exists(presentaciones))
+        .annotate(
+            n_reportes=Count(
+                "presentaciones__reportes",
+                filter=Q(presentaciones__reportes__estado=ReportePrecio.Estado.PUBLICADO),
+                distinct=True,
+            )
+        )
+        .order_by("-n_reportes", "nombre")[:limite]
     )

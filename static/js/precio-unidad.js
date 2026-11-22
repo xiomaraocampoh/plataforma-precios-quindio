@@ -10,9 +10,11 @@
   function calcular(form) {
     var salida = form.querySelector("[data-equivale]");
     var precio = form.querySelector("[data-precio-total]");
+    // La presentación puede ser una lista (todo el catálogo) o botones de radio (un producto)
     var select = form.querySelector("select[name='presentacion']");
-    if (!salida || !precio || !select) return;
-    var opcion = select.options[select.selectedIndex];
+    var elegida = form.querySelector("input[name='presentacion']:checked");
+    if (!salida || !precio || !(select || elegida)) return;
+    var opcion = elegida || select.options[select.selectedIndex];
     var valor = parseFloat(String(precio.value).replace(",", "."));
     var cantidad = opcion ? parseFloat(opcion.getAttribute("data-cantidad")) : NaN;
     var conversion = opcion ? BASE[opcion.getAttribute("data-unidad")] : null;

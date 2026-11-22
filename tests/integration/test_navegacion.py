@@ -61,7 +61,9 @@ def test_cabecera_tiene_menu_de_hamburguesa_accesible_y_deja_los_botones_a_la_vi
     assert re.search(r'<button[^>]*class="menu-boton"[^>]*aria-controls="nav-principal"', html)
     assert 'aria-expanded="false"' in html
     assert re.search(r'<a class="btn btn-sec" href="[^"]*ingresar/">Ingresar</a>', html)
-    assert re.search(r'<a class="btn" href="[^"]*registro/">Crear cuenta</a>', html)
+    assert re.search(r'<a class="btn btn-crear-cuenta" href="[^"]*registro/">Crear', html)
+    # En teléfonos muy angostos «Crear cuenta» pasa al menú para que quepa «Registrar» a la vista
+    assert re.search(r'<a class="nav-solo-angosto" href="[^"]*registro/">Crear cuenta</a>', html)
 
 
 def test_el_menu_de_hamburguesa_tambien_esta_con_sesion_iniciada(client, django_user_model):

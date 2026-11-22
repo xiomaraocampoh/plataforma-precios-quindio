@@ -65,6 +65,7 @@ class FilaComparacion:
     barrio: str
     ultima_confirmacion: datetime | None
     producto: str = ""
+    presentacion_id: int = 0  # precarga «Registrar precio aquí»
     marca: str = ""
     cantidad: Decimal = Decimal("0")
     unidad: str = ""
@@ -143,6 +144,7 @@ def _fila(r: ReportePrecio, resultado: ResultadoComparacion, ultima) -> FilaComp
         barrio=local.barrio,
         ultima_confirmacion=ultima,
         producto=presentacion.producto.nombre,
+        presentacion_id=presentacion.pk,
         marca=presentacion.producto.marca.nombre if presentacion.producto.marca else "",
         cantidad=presentacion.cantidad,
         unidad=presentacion.unidad,

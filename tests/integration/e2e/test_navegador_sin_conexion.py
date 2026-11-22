@@ -11,23 +11,26 @@ import pytest
 from django.urls import reverse
 from playwright.sync_api import Route, expect
 
+from apps.catalogo.models import Producto
 from apps.precios.models import ReportePrecio
 
 pytestmark = [pytest.mark.integration, pytest.mark.e2e]
 
 RUTA_REGISTRO = reverse("precios:registrar")
-PATRON_REGISTRO = re.compile(re.escape(RUTA_REGISTRO) + r"$")
+PATRON_REGISTRO = re.compile(re.escape(RUTA_REGISTRO) + r"(\?.*)?$")  # con o sin ?producto=
 UUID = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$")
 
 
 def _abrir_registro(pagina, live_server):
-    pagina.goto(live_server.url + RUTA_REGISTRO)
+    producto = Producto.objects.order_by("pk").first()
+    # paso 2 del flujo: la persona ya eligió el producto
+    pagina.goto(f"{live_server.url}{RUTA_REGISTRO}?producto={producto.pk}")
     expect(pagina.locator("input[name=id_cliente]")).to_have_value(UUID)  # crypto.randomUUID
 
 
 def _llenar_y_guardar(pagina, precio="4500"):
     pagina.select_option("select[name=establecimiento]", index=1)
-    pagina.select_option("select[name=presentacion]", index=1)
+    pagina.locator("input[name=presentacion]").first.check()  # un toque: botón de presentación
     pagina.fill("input[name=precio]", precio)
     pagina.get_by_role("button", name="Guardar precio").click()
 
