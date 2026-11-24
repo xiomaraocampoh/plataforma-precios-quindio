@@ -171,7 +171,7 @@ def test_etiqueta_muestra_precio_y_precio_por_unidad_calculado(client, falso, ar
     html = _enviar(client).content.decode()
     assert 'data-escaneo="etiqueta"' in html
     assert "$4.350" in html
-    assert "$8.700/kg" in html  # calculado con precio_por_unidad (M-02), no el impreso
+    assert "$8.700 por kg" in html  # calculado con precio_por_unidad (M-02), no el impreso
     assert "Impreso en la etiqueta" in html
     assert "Registrar este precio" in html and "Ver comparación" in html
 
