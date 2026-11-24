@@ -1,3 +1,6 @@
+from decimal import Decimal, InvalidOperation
+
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
@@ -18,6 +21,17 @@ def _id(valor) -> int | None:
     except (TypeError, ValueError):
         return None
     return numero if numero > 0 else None
+
+
+def _precio(valor) -> Decimal | None:
+    """Un precio de la dirección (lo trae «Registrar este precio» desde la etiqueta): positivo y
+    dentro del tope, o nada. La persona lo revisa antes de guardar (M-02)."""
+    try:
+        precio = Decimal(str(valor))
+    except (InvalidOperation, ValueError):
+        return None
+    tope = Decimal(str(settings.INTEGRACIONES["PRECIO_MAXIMO_ETIQUETA"]))
+    return precio if precio.is_finite() and 0 < precio <= tope else None
 
 
 def _producto_pedido(request):
@@ -56,6 +70,12 @@ def _valores_iniciales(request, producto) -> dict:
     )
     if tienda:
         iniciales["establecimiento"] = tienda
+    precio = _precio(request.GET.get("precio"))
+    if precio is not None:
+        iniciales["precio"] = (
+            precio.quantize(Decimal(1)) if precio == precio.to_integral() else precio
+        )
+        iniciales["origen"] = request.GET.get("origen", "")
     return iniciales
 
 
@@ -94,6 +114,7 @@ def registrar(request):
                     precio=d["precio"],
                     fecha_observacion=d.get("fecha_observacion"),
                     id_cliente=d.get("id_cliente"),
+                    origen=d.get("origen") or "manual",
                 )
             except ValidationError as exc:
                 form.add_error(None, exc)
