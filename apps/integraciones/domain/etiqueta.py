@@ -148,6 +148,18 @@ def _es_consistente(
     return abs(impreso_por_base - calculado) <= calculado * TOLERANCIA_CONSISTENCIA
 
 
+def _presentacion(crudo: dict) -> tuple[Decimal | None, Unidad | None]:
+    """Cantidad y unidad juntas o ninguna: media presentación no permite calcular nada."""
+    unidad, cantidad = _unidad(crudo.get("unidad")), _cantidad(crudo.get("cantidad"))
+    return (cantidad, unidad) if unidad is not None and cantidad is not None else (None, None)
+
+
+def _precio_por_unidad_impreso(crudo: dict) -> tuple[Decimal | None, str]:
+    referencia = crudo.get("unidad_precio_por_unidad")
+    impreso = leer_precio(crudo.get("precio_por_unidad"))
+    return (impreso, referencia) if impreso and referencia in _REFERENCIAS else (None, "")
+
+
 def _precio_anterior(crudo: dict, precio: Decimal) -> Decimal | None:
     anterior = leer_precio(crudo.get("precio_anterior"))
     return anterior if anterior is not None and anterior > precio else None
@@ -168,14 +180,8 @@ def interpretar_etiqueta(
     if not nombre and not codigo:
         return None
 
-    unidad, cantidad = _unidad(crudo.get("unidad")), _cantidad(crudo.get("cantidad"))
-    if unidad is None or cantidad is None:
-        unidad, cantidad = None, None
-    referencia = crudo.get("unidad_precio_por_unidad")
-    impreso = leer_precio(crudo.get("precio_por_unidad"))
-    if impreso is None or referencia not in _REFERENCIAS:
-        impreso, referencia = None, ""
-
+    cantidad, unidad = _presentacion(crudo)
+    impreso, referencia = _precio_por_unidad_impreso(crudo)
     consistente = None
     if impreso is not None and unidad is not None:
         consistente = _es_consistente(precio, cantidad, unidad, impreso, referencia)
