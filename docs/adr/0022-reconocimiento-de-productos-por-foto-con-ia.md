@@ -5,6 +5,7 @@
 - **Autores:** Equipo; borrador generado con apoyo de IA y pendiente de revisión humana
 - **Escenarios de calidad afectados:** EC-01 (rapidez de uso), EC-06 (neutralidad); riesgos de privacidad (Ley 1581) y costo
 - **Métricas que lo verifican:** M-01, M-06, M-15
+- **Ampliado por:** [ADR-0026](0026-escaneo-en-vivo-e-interpretacion-de-etiquetas.md) (escáner en vivo y etiquetas de precio, 2026-11-24)
 
 ## Contexto
 La persona quiere buscar un producto fotografiándolo. El escáner de código de barras (RF-04) es
@@ -42,6 +43,14 @@ Se ofrece, **de forma opcional y apagada por defecto**, la búsqueda por foto co
   confirmación manual).
 - (−) No hay medición de precisión todavía: **no se debe afirmar un porcentaje de acierto** hasta
   probarla con fotos reales de productos de Armenia.
+
+## Actualización (2026-11-24, ADR-0026)
+- La foto manual se conserva como respaldo («Tomar foto») y para imágenes de la galería, con el mismo
+  modelo (`RECONOCIMIENTO_MODELO`).
+- El escáner en vivo usa un modelo aparte, rápido y económico (`RECONOCIMIENTO_MODELO_VIVO`), y
+  **comparte** los topes por hora y por día de esta decisión: cada fotograma enviado cuenta como una
+  consulta.
+- `_texto` pasó a llamarse `limpiar_texto` y se reutiliza para limpiar lo leído en las etiquetas.
 
 ## Alternativas descartadas
 - Reconocedor local (modelo propio): más privado, pero exige entrenar y operar un modelo.

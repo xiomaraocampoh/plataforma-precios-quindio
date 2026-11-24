@@ -18,6 +18,7 @@ Cada ADR sigue la plantilla [`0000-plantilla.md`](0000-plantilla.md) (formato de
 | [0021](0021-correo-transaccional-brevo-outbox-y-2fa.md) | Correo transaccional con Brevo (SMTP), outbox y verificación en dos pasos | Propuesto |
 | [0022](0022-reconocimiento-de-productos-por-foto-con-ia.md) | Reconocimiento de productos por foto con IA (opcional) | Propuesto (requiere aprobación) |
 | [0023](0023-semilla-de-prueba-en-migraciones.md) | Datos y cuentas de prueba sembrados desde las migraciones | Propuesto |
+| [0026](0026-escaneo-en-vivo-e-interpretacion-de-etiquetas.md) | Escaneo en vivo e interpretación de etiquetas de precio (amplía el 0022) | Propuesto (apagado por defecto; requiere aprobación) |
 
 ## Sobre la numeración (decisión D-1 pendiente)
 
