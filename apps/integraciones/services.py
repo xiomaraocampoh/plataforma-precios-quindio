@@ -1,6 +1,7 @@
 """Importación de precios de referencia SIPSA (RF-07). Capa de aplicación."""
 
 import hashlib
+import logging
 from dataclasses import dataclass, field
 from decimal import Decimal
 
@@ -18,8 +19,11 @@ from .clients.vision import (  # noqa: F401  (se reexporta para las vistas)
     ReconocedorDeProductos,
     ReconocimientoNoDisponibleError,
 )
+from .domain.escaneo import ControlDeEnvio, ResultadoEscaneo
 from .domain.reconocimiento import PistaProducto, tipo_de_imagen
 from .models import PrecioReferencia
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -134,3 +138,33 @@ def reconocer_producto(*, usuario, imagen: bytes, ip: str = "") -> PistaProducto
     tipo = tipo_de_imagen(imagen)  # una imagen inválida no consume cupo ni llega a la IA
     _exigir_cupo_de_reconocimiento(usuario, ip)
     return _crear_reconocedor().reconocer(imagen, tipo)
+
+
+def escaneo_vivo_activo() -> bool:
+    """El escáner en vivo (ADR-0026) exige el interruptor y la clave; sin ellos queda la foto o el
+    código de barras, que se lee en el teléfono."""
+    return reconocimiento_activo() and bool(settings.INTEGRACIONES["ESCANEO_VIVO_ACTIVO"])
+
+
+def control_de_envio() -> ControlDeEnvio:
+    """Los parámetros que el navegador usa para decidir cuándo enviar un fotograma."""
+    cfg = settings.INTEGRACIONES
+    return ControlDeEnvio(
+        intervalo_ms=cfg["ESCANEO_INTERVALO_MS"],
+        max_por_sesion=cfg["ESCANEO_MAX_FOTOGRAMAS_SESION"],
+    )
+
+
+def escanear_fotograma(*, usuario, imagen: bytes, ip: str = "") -> ResultadoEscaneo:
+    """Qué hay en un fotograma del escáner en vivo: un empaque, una etiqueta de precio o nada.
+
+    Consume el mismo cupo por hora y por día que la foto manual. La imagen vive solo en memoria:
+    no se guarda en disco, en la base de datos ni en los registros; del resultado solo se anota
+    el tipo y la confianza, sin nada de la persona (M-15)."""
+    tipo = tipo_de_imagen(imagen)
+    _exigir_cupo_de_reconocimiento(usuario, ip)
+    resultado = _crear_reconocedor().escanear(imagen, tipo)
+    leido = resultado.etiqueta or resultado.pista
+    confianza = leido.confianza if leido else "-"
+    logger.info("Escaneo en vivo: %s (confianza %s)", resultado.tipo.value, confianza)
+    return resultado

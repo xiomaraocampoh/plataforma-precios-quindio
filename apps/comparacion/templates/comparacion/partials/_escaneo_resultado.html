@@ -1,0 +1,60 @@
+{% load categorias %}
+{% comment %}Hoja del escáner en vivo (ADR-0026). Solo presentación: los textos y las consultas los arma
+comparacion.selectors.propuesta_de_escaneo. El precio por unidad mostrado es el CALCULADO; el impreso
+en la etiqueta aparece solo como dato.{% endcomment %}
+{% if error %}
+<div class="foto-res" data-escaneo="error"><p class="foto-error"><svg class="ico" aria-hidden="true"><use href="#i-info"/></svg><span>{{ error }}</span></p></div>
+{% elif p.tipo == "etiqueta" %}
+<div class="foto-res" data-escaneo="etiqueta">
+  <p class="foto-sobre">Etiqueta de precio</p>
+  <p class="esc-precio">{{ p.precio_texto }}{% if p.etiqueta.es_promocion %} <span class="esc-promo">Promoción</span>{% endif %}</p>
+  {% if p.precio_anterior_texto %}<p class="foto-meta suave">Antes <s>{{ p.precio_anterior_texto }}</s></p>{% endif %}
+  <h3 class="foto-nombre" tabindex="-1" data-foco>{% if p.producto %}{{ p.producto }}{% else %}{{ p.nombre|default:"Producto sin nombre" }}{% endif %}</h3>
+  <p class="foto-meta">
+    {% if p.marca %}<span class="etq">{{ p.marca }}</span>{% endif %}
+    {% if p.cantidad_texto %}<span class="etq">{{ p.cantidad_texto }}</span>{% endif %}
+    {% if p.etiqueta.referencia %}<span class="etq">Ref. {{ p.etiqueta.referencia }}</span>{% endif %}
+  </p>
+  {% if p.por_unidad_texto %}<p class="foto-meta">Equivale a <strong>{{ p.por_unidad_texto }}</strong></p>{% endif %}
+  {% if p.impreso_texto %}<p class="foto-meta suave">Impreso en la etiqueta: {{ p.impreso_texto }}{% if p.etiqueta.consistente is False %}. No coincide con el precio: revísalo.{% endif %}</p>{% endif %}
+  {% if p.establecimiento %}
+  <p class="foto-meta">{% if p.establecimiento_leido %}Tienda de la etiqueta{% else %}Tu última tienda{% endif %}: <strong>{{ p.establecimiento.nombre }}</strong>. Puedes cambiarla al registrar.</p>
+  {% endif %}
+  {% if p.consulta_sugerir %}<p class="foto-meta">«{{ p.etiqueta.establecimiento_texto }}» no está en el directorio. <a href="{% url 'establecimientos:sugerir' %}?{{ p.consulta_sugerir }}">Sugerir este establecimiento</a></p>{% endif %}
+  {% if p.producto %}
+  <a class="btn btn-bloque" href="{% url 'precios:registrar' %}?{{ p.consulta_registrar }}">Registrar este precio</a>
+  <a class="btn btn-sec btn-bloque" href="{% url 'comparacion:comparar' p.producto.pk %}">Ver comparación</a>
+  {% else %}
+  <div class="foto-aun">
+    <svg class="ico" aria-hidden="true"><use href="#i-info"/></svg>
+    <div><p><strong>Aún no está en nuestro catálogo</strong></p><p class="suave">Pide que lo agreguemos y luego podrás registrar su precio.</p></div>
+  </div>
+  <a class="btn btn-bloque" href="{% url 'catalogo:solicitar' %}?{{ p.consulta_solicitar }}">Solicitar este producto</a>
+  {% endif %}
+  <p class="foto-aviso">La lectura puede equivocarse: revisa el precio antes de guardarlo.</p>
+</div>
+{% else %}
+<div class="foto-res" data-escaneo="producto">
+  {% if p.producto %}
+  <div class="fila-producto">
+    <span class="icono-cat" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="#{{ p.producto.categoria|icono_categoria }}"/></svg></span>
+    <div>
+      <p class="foto-sobre">Producto reconocido</p>
+      <h3 class="foto-nombre" tabindex="-1" data-foco>{{ p.producto }}</h3>
+      {% if p.cantidad_texto %}<p class="foto-meta suave">Presentación leída: {{ p.cantidad_texto }}</p>{% endif %}
+    </div>
+  </div>
+  <a class="btn btn-bloque" href="{% url 'comparacion:comparar' p.producto.pk %}">Ver comparación</a>
+  {% else %}
+  <p class="foto-sobre">Parece ser</p>
+  <h3 class="foto-nombre" tabindex="-1" data-foco>{{ p.nombre|default:"Producto sin nombre" }}</h3>
+  <p class="foto-meta">{% if p.marca %}<span class="etq">{{ p.marca }}</span>{% endif %}{% if p.cantidad_texto %}<span class="etq">{{ p.cantidad_texto }}</span>{% endif %}</p>
+  <div class="foto-aun">
+    <svg class="ico" aria-hidden="true"><use href="#i-info"/></svg>
+    <div><p><strong>Aún no está en nuestro catálogo</strong></p><p class="suave">Todavía no tenemos precios de este producto, pero puedes pedir que lo agreguemos.</p></div>
+  </div>
+  <a class="btn btn-bloque" href="{% url 'catalogo:solicitar' %}?{{ p.consulta_solicitar }}">Solicitar este producto</a>
+  {% endif %}
+  <p class="foto-aviso">La lectura puede equivocarse: revisa que sea el producto correcto.</p>
+</div>
+{% endif %}

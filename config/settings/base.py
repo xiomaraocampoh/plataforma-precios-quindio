@@ -161,6 +161,8 @@ REST_FRAMEWORK = {
         "denuncias": "20/hour",  # RF-20
         "moderacion": "600/hour",  # RF-21
         "correos_cron": "30/hour",  # POST /interno/correos/procesar/ (cron cada 10 min)
+        # Escáner en vivo (ADR-0026): un fotograma cada 1,5 s como máximo ≈ 40 por minuto
+        "escaneo": env.str("LIMITE_ESCANEO", default="40/min"),
     },
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
