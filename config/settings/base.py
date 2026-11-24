@@ -221,4 +221,12 @@ INTEGRACIONES = {
     "RECONOCIMIENTOS_POR_HORA": env.int("RECONOCIMIENTOS_POR_HORA", default=20),
     "RECONOCIMIENTOS_ANONIMO_POR_HORA": env.int("RECONOCIMIENTOS_ANONIMO_POR_HORA", default=10),
     "RECONOCIMIENTOS_POR_DIA_TOTAL": env.int("RECONOCIMIENTOS_POR_DIA_TOTAL", default=300),
+    # Escáner en vivo (ADR-0026): apagado por defecto; además exige ANTHROPIC_API_KEY. Cada
+    # fotograma enviado consume el mismo cupo por hora y por día que una foto.
+    "ESCANEO_VIVO_ACTIVO": env.bool("ESCANEO_VIVO_ACTIVO", default=False),
+    "RECONOCIMIENTO_MODELO_VIVO": env.str("RECONOCIMIENTO_MODELO_VIVO", default="claude-haiku-5-5"),
+    "RECONOCIMIENTO_TIMEOUT_VIVO_S": env.int("RECONOCIMIENTO_TIMEOUT_VIVO_S", default=6),
+    "ESCANEO_MAX_FOTOGRAMAS_SESION": env.int("ESCANEO_MAX_FOTOGRAMAS_SESION", default=20),
+    "ESCANEO_INTERVALO_MS": env.int("ESCANEO_INTERVALO_MS", default=1500),
+    "PRECIO_MAXIMO_ETIQUETA": env.str("PRECIO_MAXIMO_ETIQUETA", default="2000000"),
 }
