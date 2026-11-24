@@ -118,8 +118,8 @@ def test_no_es_etiqueta_si_no_hay_ni_nombre_ni_codigo():
 
 
 def test_basta_un_codigo_valido_sin_nombre():
-    e = interpretar_etiqueta(_crudo(nombre="", codigo_barras="7702001023017"))
-    assert e is not None and e.codigo_barras == "7702001023017"
+    e = interpretar_etiqueta(_crudo(nombre="", codigo_barras="7702001023011"))
+    assert e is not None and e.codigo_barras == "7702001023011"
 
 
 @pytest.mark.parametrize("crudo", [None, "texto", 42, ["precio", "1"]])
@@ -272,19 +272,19 @@ def test_referencia_impresa_desconocida_se_descarta():
 
 # --- códigos y textos ---------------------------------------------------------------------------
 def test_un_gtin_invalido_se_descarta():
-    assert interpretar_etiqueta(_crudo(codigo_barras="7702001023018")).codigo_barras == ""
+    assert interpretar_etiqueta(_crudo(codigo_barras="7702001023017")).codigo_barras == ""
 
 
 def test_el_gtin_se_normaliza():
     assert (
-        interpretar_etiqueta(_crudo(codigo_barras="770 2001 023017")).codigo_barras
-        == "7702001023017"
+        interpretar_etiqueta(_crudo(codigo_barras="770 2001 023011")).codigo_barras
+        == "7702001023011"
     )
 
 
 def test_la_referencia_solo_conserva_letras_digitos_y_guiones():
     e = interpretar_etiqueta(_crudo(referencia="SKU: 12-AB<script>"))
-    assert e.referencia == "SKU 12-ABscript"
+    assert e.referencia == "SKU 12-AB script"
 
 
 def test_la_referencia_se_acota():
