@@ -8,19 +8,19 @@ en la etiqueta aparece solo como dato.{% endcomment %}
 <div class="foto-res" data-escaneo="etiqueta">
   <p class="foto-sobre">Etiqueta de precio</p>
   <p class="esc-precio">{{ p.precio_texto }}{% if p.etiqueta.es_promocion %} <span class="esc-promo">Promoción</span>{% endif %}</p>
-  {% if p.precio_anterior_texto %}<p class="foto-meta suave">Antes <s>{{ p.precio_anterior_texto }}</s></p>{% endif %}
+  {% if p.precio_anterior_texto %}<p class="esc-dato suave">Antes <s>{{ p.precio_anterior_texto }}</s></p>{% endif %}
   <h3 class="foto-nombre" tabindex="-1" data-foco>{% if p.producto %}{{ p.producto }}{% else %}{{ p.nombre|default:"Producto sin nombre" }}{% endif %}</h3>
   <p class="foto-meta">
     {% if p.marca %}<span class="etq">{{ p.marca }}</span>{% endif %}
     {% if p.cantidad_texto %}<span class="etq">{{ p.cantidad_texto }}</span>{% endif %}
     {% if p.etiqueta.referencia %}<span class="etq">Ref. {{ p.etiqueta.referencia }}</span>{% endif %}
   </p>
-  {% if p.por_unidad_texto %}<p class="foto-meta">Equivale a <strong>{{ p.por_unidad_texto }}</strong></p>{% endif %}
-  {% if p.impreso_texto %}<p class="foto-meta suave">Impreso en la etiqueta: {{ p.impreso_texto }}{% if p.etiqueta.consistente is False %}. No coincide con el precio: revísalo.{% endif %}</p>{% endif %}
+  {% if p.por_unidad_texto %}<p class="esc-dato">Equivale a <strong>{{ p.por_unidad_texto }}</strong></p>{% endif %}
+  {% if p.impreso_texto %}<p class="esc-dato suave">Impreso en la etiqueta: {{ p.impreso_texto }}{% if p.etiqueta.consistente is False %}. No coincide con el precio: revísalo.{% endif %}</p>{% endif %}
   {% if p.establecimiento %}
-  <p class="foto-meta">{% if p.establecimiento_leido %}Tienda de la etiqueta{% else %}Tu última tienda{% endif %}: <strong>{{ p.establecimiento.nombre }}</strong>. Puedes cambiarla al registrar.</p>
+  <p class="esc-dato">{% if p.establecimiento_leido %}Tienda de la etiqueta{% else %}Tu última tienda{% endif %}: <strong>{{ p.establecimiento.nombre }}</strong>. Puedes cambiarla al registrar.</p>
   {% endif %}
-  {% if p.consulta_sugerir %}<p class="foto-meta">«{{ p.etiqueta.establecimiento_texto }}» no está en el directorio. <a href="{% url 'establecimientos:sugerir' %}?{{ p.consulta_sugerir }}">Sugerir este establecimiento</a></p>{% endif %}
+  {% if p.consulta_sugerir %}<p class="esc-dato">«{{ p.etiqueta.establecimiento_texto }}» no está en el directorio. <a href="{% url 'establecimientos:sugerir' %}?{{ p.consulta_sugerir }}">Sugerir este establecimiento</a></p>{% endif %}
   {% if p.producto %}
   <a class="btn btn-bloque" href="{% url 'precios:registrar' %}?{{ p.consulta_registrar }}">Registrar este precio</a>
   <a class="btn btn-sec btn-bloque" href="{% url 'comparacion:comparar' p.producto.pk %}">Ver comparación</a>
@@ -41,7 +41,7 @@ en la etiqueta aparece solo como dato.{% endcomment %}
     <div>
       <p class="foto-sobre">Producto reconocido</p>
       <h3 class="foto-nombre" tabindex="-1" data-foco>{{ p.producto }}</h3>
-      {% if p.cantidad_texto %}<p class="foto-meta suave">Presentación leída: {{ p.cantidad_texto }}</p>{% endif %}
+      {% if p.cantidad_texto %}<p class="esc-dato suave">Presentación leída: {{ p.cantidad_texto }}</p>{% endif %}
     </div>
   </div>
   <a class="btn btn-bloque" href="{% url 'comparacion:comparar' p.producto.pk %}">Ver comparación</a>
