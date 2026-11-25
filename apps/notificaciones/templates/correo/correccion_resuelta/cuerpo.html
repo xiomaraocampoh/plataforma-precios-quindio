@@ -1,0 +1,7 @@
+{% extends "correo/base.html" %}
+{% block preheader %}Moderación revisó tu solicitud de corrección sobre {{ establecimiento }}.{% endblock %}
+{% block chip %}{% if aprobado %}{% include 'correo/_chip.html' with tono='aprobado' texto='Corrección resuelta' %}{% else %}{% include 'correo/_chip.html' with tono='rechazado' texto='Corrección no procede' %}{% endif %}{% endblock %}
+{% block titulo %}{% if aprobado %}Corregimos la información de {{ establecimiento }}{% else %}No hicimos la corrección que pediste{% endif %}{% endblock %}
+{% block cuerpo %}<p style="margin:0 0 16px 0;font-size:16px;line-height:1.5;color:#5f5f64;">{% if respuesta %}Respuesta de moderación: {{ respuesta }}{% elif aprobado %}La información ya está corregida.{% else %}Moderación revisó la solicitud y no encontró un error que corregir.{% endif %}</p>{% endblock %}
+{% block accion %}{% include 'correo/_boton.html' with url=enlace_portal texto='Ir al portal de comercios' %}{% endblock %}
+{% block motivo %}pediste corregir información de tu comercio{% endblock %}

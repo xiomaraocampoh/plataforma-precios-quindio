@@ -1,0 +1,9 @@
+{% extends "correo/base.txt" %}
+{% block titulo %}{% if aprobado %}[Corrección resuelta]{% else %}[Corrección no procede]{% endif %} {% if aprobado %}Corregimos la información de {{ establecimiento }}{% else %}No hicimos la corrección que pediste{% endif %}{% endblock %}
+{% block cuerpo %}{% if respuesta %}Respuesta de moderación: {{ respuesta }}{% elif aprobado %}La información ya está corregida.{% else %}Moderación revisó la solicitud y no encontró un error que corregir.{% endif %}
+
+{% endblock %}
+{% block accion %}Ir al portal de comercios: {{ enlace_portal }}
+
+{% endblock %}
+{% block motivo %}pediste corregir información de tu comercio{% endblock %}

@@ -50,6 +50,20 @@ EJEMPLOS: dict[str, dict] = {
         "aprobado": False,
         "establecimiento": "Tienda La Esquina",
     },
+    Tipo.PERFIL_VERIFICADO: {
+        "nombre": "rosa",
+        "aprobado": True,
+        "establecimiento": "Tienda Doña Rosa",
+        "motivo": "",
+        "enlace_portal": "https://ahorrapues.example/comercios/",
+    },
+    Tipo.CORRECCION_RESUELTA: {
+        "nombre": "rosa",
+        "aprobado": True,
+        "establecimiento": "Tienda Doña Rosa",
+        "respuesta": "Actualizamos la dirección del local.",
+        "enlace_portal": "https://ahorrapues.example/comercios/",
+    },
 }
 
 
