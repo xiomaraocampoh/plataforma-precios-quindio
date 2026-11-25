@@ -16,6 +16,8 @@ from datetime import date, datetime
 from decimal import Decimal
 from typing import Protocol, runtime_checkable
 
+from .tarjeta import formatear_pesos, texto_por_unidad
+
 PUNTO_DATOS_COMERCIALES = "comparacion.datos_comerciales"
 
 Par = tuple[int, int]  # (establecimiento_id, presentacion_id)
@@ -53,6 +55,14 @@ class PromocionComparacion:
     motivo: str
     condiciones: str
     fecha_vencimiento_producto: date | None = None
+
+    @property
+    def precio_texto(self) -> str:
+        return formatear_pesos(self.precio_efectivo)
+
+    @property
+    def por_unidad_texto(self) -> str:
+        return texto_por_unidad(self.precio_efectivo_unitario, self.unidad_base)
 
 
 @dataclass(frozen=True)
