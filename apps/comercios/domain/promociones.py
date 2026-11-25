@@ -229,7 +229,9 @@ def exigir_datos_del_motivo(
     promoción no dura más que el producto. Los demás motivos no llevan esa fecha."""
     if MotivoPromocion(motivo) != MotivoPromocion.PROXIMO_A_VENCER:
         if fecha_vencimiento is not None:
-            raise PromocionInvalidaError("La fecha de vencimiento solo aplica a «próximo a vencer».")
+            raise PromocionInvalidaError(
+                "La fecha de vencimiento solo aplica a «próximo a vencer»."
+            )
         return
     if fecha_vencimiento is None:
         raise PromocionInvalidaError("Indica la fecha de vencimiento del producto.")
