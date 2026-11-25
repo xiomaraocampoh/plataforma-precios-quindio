@@ -4,7 +4,7 @@ from apps.establecimientos.models import Establecimiento
 
 
 class EstablecimientoSerializer(serializers.ModelSerializer):
-    """Contrato público. Lista blanca: nunca sugerido_por ni revisado_por (EC-07, M-15)."""
+    """Contrato público. Lista blanca: nunca sugerido_por ni revisado_por (EC-15, M-15)."""
 
     enlace_mapa = serializers.CharField(read_only=True, allow_null=True)
 

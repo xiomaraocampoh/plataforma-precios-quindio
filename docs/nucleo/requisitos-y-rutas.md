@@ -56,7 +56,7 @@ Si la variable no existe al crear los usuarios, se genera una contraseña aleato
 ## API v1
 
 Todas aparecen en `/api/docs/`. Ninguna respuesta incluye al autor de un reporte ni a quien sugirió
-un establecimiento (EC-07). Los serializers usan lista blanca de campos.
+un establecimiento (EC-15). Los serializers usan lista blanca de campos.
 
 | Método y ruta | Permiso | Throttle |
 |---|---|---|

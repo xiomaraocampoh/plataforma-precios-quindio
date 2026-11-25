@@ -4,7 +4,7 @@ from rest_framework import serializers
 class ResultadoComparacionSerializer(serializers.Serializer):
     """Contrato público. Lista blanca de campos: NUNCA autor ni ubicación del reportante (M-15).
 
-    La dirección es la del COMERCIO, un dato público del directorio (RF-16, EC-07); no la de
+    La dirección es la del COMERCIO, un dato público del directorio (RF-16, EC-15); no la de
     quien reportó.
     """
 
