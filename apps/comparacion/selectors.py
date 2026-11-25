@@ -62,7 +62,7 @@ class FilaComparacion:
 
     El orden lo fija SOLO `ordenar_neutral` sobre los `ResultadoComparacion` (EC-06); estos datos
     extra (producto, comercio, dirección, mapa, confirmación) nunca entran en la clave de orden.
-    Del autor no hay nada: ni nombre, ni usuario, ni ubicación (M-15, EC-07).
+    Del autor no hay nada: ni nombre, ni usuario, ni ubicación (M-15, EC-15).
     """
 
     resultado: ResultadoComparacion
