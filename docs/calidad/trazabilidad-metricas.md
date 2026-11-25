@@ -28,7 +28,8 @@ Fuente de métricas y umbrales: documento *Modelo Proyecto nuclear* (pasos 4 y 5
 *Planificado:* nada de esta sección está implementado ni medido todavía. Requisitos en el
 [análisis de impacto](../arquitectura/analisis-impacto-canasta.md#2-requerimiento-del-cambio);
 escenarios en [escenarios-ampliacion-a1.md](escenarios-ampliacion-a1.md). EC-07 se usa en el sentido
-del Anexo 1 (ver la decisión pendiente D-A1-1 sobre la numeración); EC-14 es propio del equipo.
+del Anexo 1 (decisión D-A1-1 del 2026-11-25); EC-14 es propio del equipo. Privacidad es **EC-15** y
+registro sin conexión es **EC-16** (antes EC-07 y EC-08).
 
 ### Métricas nuevas (propuestas)
 
@@ -52,7 +53,7 @@ impacto (mínimo, extensión y plus por aparte).
 | RF-A1-05 Orden por criterio declarado | EC-07, EC-06 | M-06 | `tests/unit/canasta/test_orden.py` (criterios, empates); `tests/integration/canasta/test_neutralidad.py` (`# EC-06`) |
 | RF-A1-06 Filtro municipio y barrio | EC-06 | M-06 | `tests/integration/canasta/test_filtros_canasta.py` (solo reduce) |
 | RF-A1-07 Detalle y enlace a la comparación | EC-07 | — | `tests/integration/canasta/test_vista_canasta.py` |
-| RF-A1-08 API de cálculo | EC-07, privacidad | M-23, M-15 | `tests/integration/canasta/test_api_canasta.py` (sin autor, `# M-15`; *throttle*; sin N+1 con `django_assert_num_queries`) |
+| RF-A1-08 API de cálculo | EC-07, EC-15 | M-23, M-15 | `tests/integration/canasta/test_api_canasta.py` (sin autor, `# M-15`; *throttle*; sin N+1 con `django_assert_num_queries`) |
 | RF-A1-09 Ahorro por «pague X lleve Y» | EC-06 | M-06 | `tests/unit/canasta/test_promociones.py` (puerto falso; el orden no cambia) |
 | RF-A1-10 Combinación de dos tiendas (extensión) | EC-07 | M-05 | `tests/unit/canasta/test_combinacion.py` |
 | RF-A1-11 Asistente con IA (plus) | EC-14 | M-25, M-15 | `tests/unit/asistente/test_validacion_salida.py`; `tests/integration/asistente/` (cifra inventada, inyección, tope, privacidad) |

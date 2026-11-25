@@ -2,14 +2,16 @@
 
 **Anexo 1 de la guía · Corte 3 · Arquitectura de Software II y Modelos de Calidad**
 
-- **Fecha:** 2026-11-24
+- **Fecha:** 2026-11-24 · **Aprobado por el equipo:** 2026-11-25 (estimaciones y numeración; ver
+  sección 8)
 - **Base analizada:** `main` @ `fccb9fd` (núcleo del Corte 2, sin el módulo comercial fusionado)
 - **Opción del bloque A:** A1, canasta comparada. **Escenario de referencia:** EC-07 (Anexo 1, §6).
 - **Plantilla:** 8.3 del Anexo 1 (registro de análisis de impacto). Las columnas *Tipo de cambio* y
   *Esfuerzo estimado* se llenan **antes de construir**; la de *Esfuerzo real*, al cierre.
 - **Declaración de uso de IA:** este documento se redactó con apoyo de un asistente de IA generativa
-  (Claude, Anthropic) a partir de la lectura del código y del Anexo 1. Las estimaciones son una
-  **propuesta para que el equipo la apruebe o ajuste**; el equipo debe poder defender cada cifra.
+  (Claude, Anthropic) a partir de la lectura del código y del Anexo 1. El equipo **aprobó las
+  estimaciones el 2026-11-25** sin ajustes (114 h; 131 h con contingencia) y debe poder defender cada
+  cifra.
 
 **Marcas de estado.** *Verificado* = comprobado en el código en esta fecha. *Propuesto* = decisión o
 estimación pendiente de aprobación. *Planificado* = se medirá al cerrar la ampliación.
@@ -31,7 +33,7 @@ El trabajo se separa en tres bloques para que el contraste del Entregable 6 se h
 | **Mínimo exigible A1** | Canasta de hasta 20 productos, con o sin cuenta; total normalizado; productos sin precio señalados; orden declarado; TDD; API; k6 | **67** | **77** |
 | **Extensión del Anexo** | Mejor combinación de dos establecimientos | **9** | **10** |
 | **Plus del equipo** | Asistente de compras con IA (tool use) | **38** | **44** |
-| **Total** | | **114** | **131** |
+| **Total (aprobado el 2026-11-25)** | | **114** | **131** |
 
 El **mínimo tiene prioridad** (regla 3 del Anexo): la extensión y el plus solo empiezan cuando el
 mínimo pase sus pruebas y la prueba de carga de EC-07.
@@ -147,11 +149,13 @@ Descomposición por componentes y juicio del equipo, con **15 % de contingencia*
 análisis del módulo comercial, para que las dos mediciones de M-17 sean comparables. Las cifras toman
 como referencia el tamaño real de piezas parecidas ya construidas (por ejemplo, los filtros de la
 comparación y el reconocimiento por foto). **El equipo debe confirmar o ajustar las cifras antes del
-primer commit de código.**
+primer commit de código.** *Aprobado el 2026-11-25:* el equipo confirmó las cifras sin ajustes
+(114 h; 131 h con contingencia).
 
 **Riesgo para la estimación.** La ampliación se hace en paralelo con el módulo comercial y con un plazo
-de dos semanas. Si el equipo no tiene capacidad para los 131 h, se recorta en este orden: plus,
-extensión. El mínimo no se recorta.
+de dos semanas. **Orden de recorte aprobado (2026-11-25):** si falta tiempo para las 131 h, primero
+se recorta el asistente (plus) y luego la extensión (combinación de dos tiendas); el mínimo exigible
+no se toca.
 
 ---
 
@@ -209,15 +213,21 @@ módulo comercial.
 
 ---
 
-## 8. Pendientes de decisión del equipo
+## 8. Decisiones y pendientes del equipo
 
-1. **Aprobar o ajustar las estimaciones** (secciones 4.1 a 4.3) y el método. Sin esto no se escribe código.
-2. **Choque de numeración de escenarios (D-A1-1).** La especificación del Corte 2 usa EC-07 para
-   privacidad y EC-08 para el registro sin conexión, pero el Anexo 1 asigna **EC-07 a EC-13** a la
-   ampliación. Se propone conservar la numeración del Anexo (es la que leerá el docente), renombrar
-   los escenarios propios del equipo como **EC-15** (privacidad) y **EC-16** (sin conexión) y numerar
-   el escenario del asistente como **EC-14**. Hasta que el equipo decida, este documento usa EC-07
-   solo en el sentido del Anexo.
+### Decididas el 2026-11-25
+
+1. **Estimaciones APROBADAS** (secciones 4.1 a 4.3) y su método: **114 h** (**131 h** con 15 % de
+   contingencia). Orden de recorte si falta tiempo: primero el asistente (plus) y luego la extensión;
+   el mínimo exigible no se toca. Con esta aprobación queda habilitado el primer commit de código.
+2. **Numeración de escenarios (D-A1-1), decidida.** Se conserva la del Anexo 1: **EC-07 a EC-14**
+   (EC-07 a EC-13 del Anexo y EC-14 para el asistente). Los escenarios propios del Corte 2 se renombran:
+   privacidad, antes EC-07, pasa a **EC-15**; registro sin conexión, antes EC-08, pasa a **EC-16**. Se
+   actualizaron las referencias en `docs/`, los ADR y los comentarios del código y de las pruebas, sin
+   cambiar el comportamiento. En este documento EC-07 siempre es el del Anexo.
+
+### Pendientes
+
 3. **Módulo comercial (D-A1-2).** No está fusionado y su rama no existe; esta rama sale de `main`. Las
    promociones de la canasta dependen del puerto de extensiones (DP-1, opción B del análisis del
    módulo comercial), que todavía no existe.

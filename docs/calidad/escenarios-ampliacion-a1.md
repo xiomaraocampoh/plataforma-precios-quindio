@@ -1,6 +1,6 @@
 # Escenarios de calidad de la ampliación A1 (canasta comparada)
 
-- **Fecha:** 2026-11-24 · **Estado:** Propuesto (pendiente de aprobación del equipo)
+- **Fecha:** 2026-11-24 · **Estado:** Aprobado por el equipo el 2026-11-25
 - **Formato:** plantilla 8.2 del Anexo 1, en las seis partes de Bass, Clements y Kazman (2021).
 - **Relación:** [análisis de impacto](../arquitectura/analisis-impacto-canasta.md), ADR
   [0027](../adr/0027-calculo-de-la-canasta-en-cada-consulta.md),
@@ -8,9 +8,10 @@
   [0029](../adr/0029-cantidades-y-promociones-en-la-canasta.md) y
   [0030](../adr/0030-asistente-de-compras-con-tool-use.md).
 
-> **Numeración.** EC-07 es el del Anexo 1, §6. La especificación del Corte 2 usa EC-07 para
-> privacidad; ver la decisión pendiente D-A1-1 del análisis de impacto. El escenario propio del
-> asistente se numera **EC-14**, el siguiente libre después de los del Anexo (EC-07 a EC-13).
+> **Numeración (D-A1-1, decidida el 2026-11-25).** Se conserva la del Anexo 1: EC-07 es el del
+> Anexo, §6, y el escenario propio del asistente es **EC-14**, el siguiente libre después de los del
+> Anexo (EC-07 a EC-13). Los escenarios del Corte 2 se renombraron: privacidad (antes EC-07) es
+> **EC-15** y registro sin conexión (antes EC-08) es **EC-16**.
 
 ---
 
@@ -77,7 +78,7 @@ Su tiempo de respuesta se registra por aparte en una muestra pequeña y manual.
 | EC-02 | Un precio nuevo se refleja en la canasta en ≤ 1 min (misma caché e invalidación que la comparación; ADR-0027) |
 | EC-05 | Segunda medición: desviación de esfuerzo ≤ ±30 % y 0 cambios estructurales al núcleo (M-17, M-18) |
 | EC-06 | El orden de la canasta solo usa criterios declarados; promociones y perfiles de comercio no entran (ADR-0028, 0029) |
-| Privacidad (EC-07 de la especificación; EC-15 propuesto) | La canasta y su API no exponen autores de reportes (M-15) |
+| EC-15 (privacidad; antes EC-07) | La canasta y su API no exponen autores de reportes (M-15) |
 
 ## Referencia
 
