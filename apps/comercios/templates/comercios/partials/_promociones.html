@@ -1,0 +1,38 @@
+<section class="seccion" id="sec-promociones" aria-labelledby="t-promociones" style="margin-top:2rem">
+  <h2 id="t-promociones">Promociones</h2>
+  {% include "comercios/partials/_mensaje.html" %}
+  <p class="suave">Se muestran como etiqueta con sus condiciones. No mejoran tu lugar en la comparación (orden neutral).</p>
+  {% if promociones %}<ul class="lista-filas">
+    {% for item in promociones %}<li class="tile" style="margin-top:.75rem">
+      <p><span class="chip chip-promo">{% if item.vigente %}Vigente{% else %}No vigente{% endif %}</span> <strong>{{ item.descripcion }}</strong> · {{ item.promocion.presentacion.producto.nombre }} {{ item.promocion.presentacion }}{% if item.precio_efectivo %} · <span class="num">{{ item.precio_efectivo }}</span>{% endif %}</p>
+      <p class="suave">Del {{ item.promocion.inicio|date:"j \d\e F" }} al {{ item.promocion.fin|date:"j \d\e F, H:i" }} · {{ item.promocion.get_motivo_display }} · {{ item.promocion.condiciones }}</p>
+      {% if item.promocion.activa %}
+      <form method="post" action="{% url 'comercios:finalizar_promocion' item.promocion.pk %}"
+            hx-post="{% url 'comercios:finalizar_promocion' item.promocion.pk %}" hx-target="#sec-promociones" hx-swap="outerHTML" hx-disabled-elt="find button">
+        {% csrf_token %}
+        <button class="btn btn-sec btn-pequeno" type="submit">Terminar promoción<span class="sr-only"> {{ item.descripcion }}</span></button>
+      </form>
+      {% endif %}
+    </li>{% endfor %}
+  </ul>{% else %}<p class="tile tile-tenue">No tienes promociones.</p>{% endif %}
+  <details class="panel-plegable" {% if form_promocion.errors %}open{% endif %} style="margin-top:1rem">
+    <summary>Crear una promoción</summary>
+    <form method="post" action="{% url 'comercios:crear_promocion' %}" novalidate
+          hx-post="{% url 'comercios:crear_promocion' %}" hx-target="#sec-promociones" hx-swap="outerHTML" hx-disabled-elt="find button">
+      {% csrf_token %}
+      {% include "partials/_errores_generales.html" with form=form_promocion %}
+      {% include "partials/_campo.html" with campo=form_promocion.presentacion %}
+      {% include "partials/_campo.html" with campo=form_promocion.tipo %}
+      {% include "partials/_campo.html" with campo=form_promocion.porcentaje %}
+      {% include "partials/_campo.html" with campo=form_promocion.precio_especial %}
+      {% include "partials/_campo.html" with campo=form_promocion.lleve %}
+      {% include "partials/_campo.html" with campo=form_promocion.pague %}
+      {% include "partials/_campo.html" with campo=form_promocion.inicio %}
+      {% include "partials/_campo.html" with campo=form_promocion.fin %}
+      {% include "partials/_campo.html" with campo=form_promocion.motivo %}
+      {% include "partials/_campo.html" with campo=form_promocion.fecha_vencimiento_producto %}
+      {% include "partials/_campo.html" with campo=form_promocion.condiciones %}
+      <button class="btn" type="submit">Publicar promoción</button>
+    </form>
+  </details>
+</section>
