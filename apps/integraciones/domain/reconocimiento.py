@@ -48,7 +48,8 @@ def tipo_de_imagen(datos: bytes, max_bytes: int = MAX_BYTES_IMAGEN) -> str:
     raise ImagenInvalidaError("Solo se aceptan fotos JPEG, PNG o WebP.")
 
 
-def _texto(valor, maximo: int) -> str:
+def limpiar_texto(valor, maximo: int) -> str:
+    """Texto de la IA como dato: sin controles ni símbolos de marcado, espacios simples, acotado."""
     if not isinstance(valor, str):
         return ""
     limpio = _ESPACIOS.sub(" ", _NO_PERMITIDOS.sub(" ", valor)).strip()
@@ -71,7 +72,7 @@ def interpretar_respuesta(crudo) -> PistaProducto | None:
     """Convierte lo extraído por el modelo en una pista segura, o None si no sirve."""
     if not isinstance(crudo, dict):
         return None
-    nombre = _texto(crudo.get("nombre"), MAX_NOMBRE)
+    nombre = limpiar_texto(crudo.get("nombre"), MAX_NOMBRE)
     codigo = normalizar_codigo(str(crudo.get("codigo_barras") or ""))
     codigo = codigo if es_gtin_valido(codigo) else ""
     if not nombre and not codigo:
@@ -83,7 +84,7 @@ def interpretar_respuesta(crudo) -> PistaProducto | None:
     confianza = crudo.get("confianza")
     return PistaProducto(
         nombre=nombre,
-        marca=_texto(crudo.get("marca"), MAX_MARCA),
+        marca=limpiar_texto(crudo.get("marca"), MAX_MARCA),
         cantidad=cantidad,
         unidad=unidad,
         codigo_barras=codigo,

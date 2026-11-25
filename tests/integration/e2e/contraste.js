@@ -1,7 +1,8 @@
 // WCAG 1.4.3: contraste de cada texto visible de las tarjetas de precio contra su fondo real.
 // Mezcla las capas translúcidas de los ancestros. Devuelve los textos que no llegan a 4.5:1
 // (3:1 si el texto es grande: ≥ 24 px, o ≥ 18,66 px en negrita). Lo usa test_tarjetas_navegador.py.
-() => {
+// Con un selector como argumento revisa ese contenedor (p. ej. la hoja del escáner, ADR-0026).
+(raiz) => {
   const rgba = (c) => {
     const m = c.match(/[\d.]+/g).map(Number);
     return [m[0], m[1], m[2], m.length > 3 ? m[3] : 1];
@@ -29,7 +30,7 @@
     return capas.reverse().reduce((abajo, arriba) => mezclar(arriba, abajo), base);
   };
   const fallos = [];
-  document.querySelectorAll(".tarjeta-precio *").forEach((el) => {
+  document.querySelectorAll((raiz || ".tarjeta-precio") + " *").forEach((el) => {
     const texto = [...el.childNodes]
       .filter((n) => n.nodeType === 3)
       .map((n) => n.textContent.trim())

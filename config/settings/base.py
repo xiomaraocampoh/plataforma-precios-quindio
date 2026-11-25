@@ -161,6 +161,8 @@ REST_FRAMEWORK = {
         "denuncias": "20/hour",  # RF-20
         "moderacion": "600/hour",  # RF-21
         "correos_cron": "30/hour",  # POST /interno/correos/procesar/ (cron cada 10 min)
+        # Escáner en vivo (ADR-0026): un fotograma cada 1,5 s como máximo ≈ 40 por minuto
+        "escaneo": env.str("LIMITE_ESCANEO", default="40/min"),
     },
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
@@ -218,7 +220,15 @@ INTEGRACIONES = {
     "ANTHROPIC_API_KEY": env.str("ANTHROPIC_API_KEY", default=""),
     "RECONOCIMIENTO_MODELO": env.str("RECONOCIMIENTO_MODELO", default="claude-opus-5-5"),
     "RECONOCIMIENTO_TIMEOUT_S": env.int("RECONOCIMIENTO_TIMEOUT_S", default=20),
-    "RECONOCIMIENTOS_POR_HORA": env.int("RECONOCIMIENTOS_POR_HORA", default=20),
+    "RECONOCIMIENTOS_POR_HORA": env.int("RECONOCIMIENTOS_POR_HORA", default=60),
     "RECONOCIMIENTOS_ANONIMO_POR_HORA": env.int("RECONOCIMIENTOS_ANONIMO_POR_HORA", default=10),
     "RECONOCIMIENTOS_POR_DIA_TOTAL": env.int("RECONOCIMIENTOS_POR_DIA_TOTAL", default=300),
+    # Escáner en vivo (ADR-0026): apagado por defecto; además exige ANTHROPIC_API_KEY. Cada
+    # fotograma enviado consume el mismo cupo por hora y por día que una foto.
+    "ESCANEO_VIVO_ACTIVO": env.bool("ESCANEO_VIVO_ACTIVO", default=False),
+    "RECONOCIMIENTO_MODELO_VIVO": env.str("RECONOCIMIENTO_MODELO_VIVO", default="claude-haiku-5-5"),
+    "RECONOCIMIENTO_TIMEOUT_VIVO_S": env.int("RECONOCIMIENTO_TIMEOUT_VIVO_S", default=6),
+    "ESCANEO_MAX_FOTOGRAMAS_SESION": env.int("ESCANEO_MAX_FOTOGRAMAS_SESION", default=20),
+    "ESCANEO_INTERVALO_MS": env.int("ESCANEO_INTERVALO_MS", default=1500),
+    "PRECIO_MAXIMO_ETIQUETA": env.str("PRECIO_MAXIMO_ETIQUETA", default="2000000"),
 }

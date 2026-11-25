@@ -8,15 +8,20 @@ materializada / tabla de lectura alimentada por los servicios de escritura (ver 
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
+from urllib.parse import urlencode
 
 from django.core.cache import cache
 from django.db.models import Count, Q
 from django.utils import timezone
 
 from apps.catalogo import selectors as catalogo
-from apps.catalogo.domain.normalizacion import formatear_cantidad, precio_por_unidad
+from apps.catalogo.domain.normalizacion import a_unidad_base, formatear_cantidad, precio_por_unidad
+from apps.catalogo.models import Presentacion, Producto
 from apps.establecimientos.domain.mapas import enlace_mapa
 from apps.establecimientos.models import Establecimiento
+from apps.establecimientos.selectors import establecimiento_de_etiqueta
+from apps.integraciones.domain.escaneo import ResultadoEscaneo, TipoEscaneo
+from apps.integraciones.domain.etiqueta import EtiquetaPrecio
 from apps.moderacion.selectors import denunciados_por
 from apps.precios.domain.confianza import nivel_confianza
 from apps.precios.domain.vigencia import Fuente, es_vigente, fecha_de_referencia
@@ -26,6 +31,7 @@ from apps.precios.selectors import (
     confirmados_hoy,
     politica_vigencia,
     reportes_propios,
+    ultimo_establecimiento_id,
 )
 from core.cache import clave_comparacion, clave_resumen, ttl_comparacion
 
@@ -326,3 +332,159 @@ def estado_del_usuario(usuario, reporte_ids: list[int]) -> dict[str, set[int]]:
         "propios": reportes_propios(usuario, reporte_ids),
         "denunciados": denunciados_por(usuario, reporte_ids),
     }
+
+
+# ───────────── Escáner en vivo (ADR-0026) ─────────────
+
+
+@dataclass(frozen=True)
+class PropuestaEscaneo:
+    """Lo que la hoja del escáner muestra. Todo sale del catálogo y del directorio; de la IA solo
+    se usa lo leído para buscar, y el precio por unidad se CALCULA (`precio_por_unidad`)."""
+
+    tipo: str
+    producto: Producto | None = None
+    presentacion: Presentacion | None = None
+    etiqueta: EtiquetaPrecio | None = None
+    nombre: str = ""
+    marca: str = ""
+    cantidad_texto: str = ""
+    precio_texto: str = ""
+    precio_anterior_texto: str = ""
+    por_unidad_texto: str = ""
+    impreso_texto: str = ""
+    establecimiento: Establecimiento | None = None
+    establecimiento_leido: bool = False  # True: la tienda salió de la etiqueta
+    consulta_registrar: str = ""
+    consulta_solicitar: str = ""
+    consulta_sugerir: str = ""
+
+
+def _presentacion_de(producto: Producto, cantidad, unidad, codigo: str) -> Presentacion | None:
+    """La presentación del catálogo que es la de la etiqueta (código, o la misma cantidad en la
+    unidad base: 1000 g = 1 kg). Si no hay una exacta, la persona elige: no se adivina (M-02)."""
+    presentaciones = list(catalogo.presentaciones_publicas().filter(producto=producto))
+    if codigo:
+        por_codigo = [p for p in presentaciones if p.codigo_barras == codigo]
+        if por_codigo:
+            return por_codigo[0]
+    if cantidad is None or not unidad:
+        return None
+    buscada = a_unidad_base(Decimal(cantidad), unidad)
+    iguales = [p for p in presentaciones if a_unidad_base(p.cantidad, p.unidad) == buscada]
+    return iguales[0] if len(iguales) == 1 else None
+
+
+def _textos_de_precio(etiqueta: EtiquetaPrecio, presentacion: Presentacion | None) -> dict:
+    cantidad, unidad = (
+        (presentacion.cantidad, presentacion.unidad)
+        if presentacion
+        else (etiqueta.cantidad, etiqueta.unidad)
+    )
+    textos = {"precio_texto": formatear_pesos(etiqueta.precio)}
+    if etiqueta.precio_anterior:
+        textos["precio_anterior_texto"] = formatear_pesos(etiqueta.precio_anterior)
+    if cantidad and unidad:
+        valor, base = precio_por_unidad(etiqueta.precio, cantidad, unidad)
+        textos["por_unidad_texto"] = texto_por_unidad(valor, base)
+    if etiqueta.precio_por_unidad_impreso:
+        impreso = formatear_pesos(etiqueta.precio_por_unidad_impreso)
+        textos["impreso_texto"] = f"{impreso} por {etiqueta.unidad_impresa}"
+    return textos
+
+
+def _tienda_propuesta(etiqueta: EtiquetaPrecio, usuario) -> tuple[Establecimiento | None, bool]:
+    """La tienda que dice la etiqueta si está en el directorio; si no, la última de la persona.
+    Nunca se crea una (RF-09)."""
+    leida = establecimiento_de_etiqueta(etiqueta.establecimiento_texto)
+    if leida is not None:
+        return leida, True
+    if usuario is None or not getattr(usuario, "is_authenticated", False):
+        return None, False
+    ultima = ultimo_establecimiento_id(usuario)
+    return Establecimiento.objects.filter(pk=ultima).first() if ultima else None, False
+
+
+def _consulta_solicitar(nombre, marca, cantidad, unidad, codigo) -> str:
+    datos = {"nombre": nombre, "marca": marca, "codigo_barras": codigo}
+    if cantidad and unidad:
+        datos.update(cantidad=format(Decimal(cantidad).normalize(), "f"), unidad=unidad)
+    return urlencode({k: v for k, v in datos.items() if v})
+
+
+def _propuesta_etiqueta(resultado: ResultadoEscaneo, producto, usuario) -> PropuestaEscaneo:
+    etiqueta = resultado.etiqueta
+    presentacion = (
+        _presentacion_de(producto, etiqueta.cantidad, etiqueta.unidad, etiqueta.codigo_barras)
+        if producto
+        else None
+    )
+    tienda, leida = _tienda_propuesta(etiqueta, usuario)
+    registrar = {"precio": format(etiqueta.precio.normalize(), "f"), "origen": "etiqueta"}
+    if producto:
+        registrar["producto"] = producto.pk
+    if presentacion:
+        registrar["presentacion"] = presentacion.pk
+    if tienda:
+        registrar["establecimiento"] = tienda.pk
+    cantidad = (
+        f"{formatear_cantidad(etiqueta.cantidad)} {etiqueta.unidad}" if etiqueta.cantidad else ""
+    )
+    return PropuestaEscaneo(
+        tipo=TipoEscaneo.ETIQUETA,
+        producto=producto,
+        presentacion=presentacion,
+        etiqueta=etiqueta,
+        nombre=etiqueta.nombre,
+        marca=etiqueta.marca,
+        cantidad_texto=cantidad,
+        establecimiento=tienda,
+        establecimiento_leido=leida,
+        consulta_registrar=urlencode(registrar),
+        consulta_solicitar=_consulta_solicitar(
+            etiqueta.nombre,
+            etiqueta.marca,
+            etiqueta.cantidad,
+            etiqueta.unidad,
+            etiqueta.codigo_barras,
+        ),
+        consulta_sugerir=urlencode({"nombre": etiqueta.establecimiento_texto})
+        if etiqueta.establecimiento_texto and not leida
+        else "",
+        **_textos_de_precio(etiqueta, presentacion),
+    )
+
+
+def propuesta_de_escaneo(resultado: ResultadoEscaneo, usuario) -> PropuestaEscaneo | None:
+    """Qué ofrecer tras reconocer un fotograma, o None si no hay nada que mostrar.
+
+    Elegir el producto no toca el orden neutral de la comparación (EC-06): solo decide qué
+    comparación abrir."""
+    if resultado.tipo == TipoEscaneo.NADA or resultado.pista is None and not resultado.etiqueta:
+        return None
+    pista = resultado.pista
+    candidatos = (
+        catalogo.buscar_por_pista(
+            nombre=pista.nombre,
+            marca=pista.marca,
+            cantidad=pista.cantidad,
+            unidad=pista.unidad,
+            codigo=pista.codigo_barras,
+            limite=1,
+        )
+        if pista
+        else []
+    )
+    producto = candidatos[0] if candidatos else None
+    if resultado.tipo == TipoEscaneo.ETIQUETA:
+        return _propuesta_etiqueta(resultado, producto, usuario)
+    return PropuestaEscaneo(
+        tipo=TipoEscaneo.PRODUCTO,
+        producto=producto,
+        nombre=pista.nombre,
+        marca=pista.marca,
+        cantidad_texto=f"{pista.cantidad} {pista.unidad}" if pista.cantidad else "",
+        consulta_solicitar=_consulta_solicitar(
+            pista.nombre, pista.marca, pista.cantidad, pista.unidad, pista.codigo_barras
+        ),
+    )
