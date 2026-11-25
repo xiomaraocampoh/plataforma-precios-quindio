@@ -19,7 +19,21 @@ def _publico(fila: FilaComparacion) -> dict:
         "direccion": fila.direccion,
         "barrio": fila.barrio,
         "municipio": fila.municipio,
+        "usuarios_reportan": fila.usuarios_reportan,
     }
+
+
+def _promociones(filas: list[FilaComparacion]) -> list[dict]:
+    """Las promociones en el mismo orden neutral de las filas; con el nombre del establecimiento."""
+    return [
+        {
+            **asdict(promo),
+            "establecimiento": fila.resultado.establecimiento,
+            "presentacion": fila.resultado.presentacion,
+        }
+        for fila in filas
+        for promo in fila.promociones
+    ]
 
 
 class ComparacionAPI(APIView):
@@ -32,6 +46,10 @@ class ComparacionAPI(APIView):
         parameters=[OpenApiParameter("producto_id", int, OpenApiParameter.PATH)],
     )
     def get(self, request, producto_id: int):
-        resultados = [_publico(f) for f in comparar_filas(producto_id)]  # orden neutral (EC-06)
-        datos = {"criterio_orden": CRITERIO_DECLARADO, "resultados": resultados}
+        filas = comparar_filas(producto_id)  # orden neutral (EC-06)
+        datos = {
+            "criterio_orden": CRITERIO_DECLARADO,
+            "resultados": [_publico(f) for f in filas],
+            "promociones": _promociones(filas),
+        }
         return Response(ComparacionSerializer(datos).data)

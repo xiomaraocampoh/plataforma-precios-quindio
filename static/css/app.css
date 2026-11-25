@@ -196,6 +196,13 @@ a.chip:hover { text-decoration: none; background: var(--borde); }
 .chip-promo { background: var(--ambar-fondo); color: var(--ambar-texto); }
 .chip-alerta { background: var(--error-fondo); color: var(--error); }
 .chip-positivo { background: var(--positivo-fondo); color: var(--positivo); }
+/* Promociones del módulo comercial (ADR-014): etiqueta con condiciones junto al precio, sin orden */
+.tp-promos { list-style: none; margin: .5rem 0 0; padding: 0; display: grid; gap: .5rem; }
+.tp-promo { padding: .5rem .75rem; border-radius: 14px; background: var(--superficie-2); }
+.tp-promo-titulo, .tp-promo-condiciones { margin: 0; font-size: .875rem; line-height: 1.4; }
+.tp-promo-condiciones { color: var(--texto-suave, var(--texto)); }
+.tile-oscuro .tp-promo { background: rgb(255 255 255 / .12); }
+.tile-oscuro .tp-promo-condiciones { color: var(--sobre-oscura-suave); }
 
 .lista-filas { list-style: none; padding: 0; margin: 0; display: grid; }
 .lista-filas a { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 60px; padding: .65rem .25rem; border-top: 1px solid var(--borde); color: var(--texto); }
