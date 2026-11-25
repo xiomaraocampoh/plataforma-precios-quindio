@@ -61,3 +61,10 @@ def test_los_precios_sembrados_salen_como_oficiales_en_la_comparacion(datos):
 def test_sin_moderador_de_prueba_no_siembra(db):
     nuevos, avisos = semilla.sembrar(registro, ahora=timezone.now())
     assert nuevos == 0 and "moderador_prueba" in avisos[0]
+
+
+def test_la_duena_sembrada_no_es_una_cuenta_de_prueba_con_2fa_omitible(datos):
+    # La marca es_cuenta_prueba es solo de CUENTAS_PRUEBA (test_semilla_migraciones la cuenta)
+    semilla.sembrar(registro, ahora=timezone.now())
+    duena = Usuario.objects.get(username=semilla.DUENA_NUEVA)
+    assert not duena.es_cuenta_prueba and not duena.has_usable_password()

@@ -34,6 +34,7 @@ from .domain.promociones import Promocion as PromocionDominio
 
 MODERADOR = "moderador_prueba"
 DUENA_NUEVA = "comercio_paisa_prueba"
+CORREO_DUENA_NUEVA = "paisa+comercio@example.com"  # RFC 2606: nunca llega a nadie
 
 
 @dataclass(frozen=True)
@@ -131,13 +132,13 @@ def _duena(apps, comercio: ComercioPrueba, ahora):
         return usuario
     return Usuario.objects.create(
         username=DUENA_NUEVA,
-        email="paisa+comercio@example.com",
+        email=CORREO_DUENA_NUEVA,
         password=make_password(None),  # inutilizable: nadie ingresa con esta cuenta
         rol="comercio",
         acepto_tratamiento_datos=True,
         fecha_aceptacion_datos=ahora,
         email_verificado_en=ahora,
-        es_cuenta_prueba=True,
+        # Sin la marca de cuenta de prueba: esa marca es solo de CUENTAS_PRUEBA (y exime del 2FA)
     )
 
 
@@ -228,4 +229,4 @@ def revertir(apps) -> None:
         perfil.precios.all().delete()
         perfil.correcciones.all().delete()
     perfiles.delete()
-    Usuario.objects.filter(username=DUENA_NUEVA, es_cuenta_prueba=True).delete()
+    Usuario.objects.filter(username=DUENA_NUEVA, email=CORREO_DUENA_NUEVA).delete()
