@@ -113,7 +113,7 @@ lint-imports                          # límites de arquitectura (contratos en .
 
 ## Documentación
 
-- `CLAUDE.md` — reglas de código, arquitectura y checklists ISO/IEC 25010 (léelo primero)
+- `CLAUDE.md` — reglas de código, arquitectura y checklists ISO/IEC 25010 
 - `docs/adr/` — decisiones arquitectónicas
 - `docs/calidad/trazabilidad-metricas.md` — métrica → prueba/herramienta
 - `docs/calidad/sonarqube.md` — análisis estático con SonarQube en Docker
@@ -123,4 +123,4 @@ lint-imports                          # límites de arquitectura (contratos en .
 ## Declaración de uso de IA
 
 El esqueleto inicial y parte de la documentación se elaboraron con apoyo de un asistente de IA
-generativa, revisado por el equipo. Cada PR declara el uso de IA en su plantilla, según la guía.
+generativa, revisado por el equipo. 
