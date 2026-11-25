@@ -147,7 +147,7 @@ def asegurar_comercio(*, usuario_id: int) -> Usuario:
     if usuario.rol == Usuario.Rol.COMERCIO:
         return usuario
     if usuario.rol not in _ROLES_QUE_PASAN_A_COMERCIO or usuario.is_staff or usuario.is_superuser:
-        raise ValidationError("Esta cuenta tiene un rol de la plataforma; no puede ser un comercio.")
+        raise ValidationError("Esta cuenta tiene un rol de la plataforma; no puede ser comercio.")
     if not usuario.is_active:
         raise ValidationError("La cuenta está suspendida.")
     usuario.rol = Usuario.Rol.COMERCIO

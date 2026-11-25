@@ -184,7 +184,9 @@ def test_aplicar_dentro_de_la_vigencia_si_descuenta():
         ("6000", "6", "und", "900.00", Unidad.UNIDAD),
     ],
 )
-def test_precio_efectivo_por_unidad_con_unidades_distintas(regular, cantidad, unidad, esperado, base):
+def test_precio_efectivo_por_unidad_con_unidades_distintas(
+    regular, cantidad, unidad, esperado, base
+):
     promo = _promo(DescuentoPorcentual(Decimal("10")), regular=regular)
     valor, unidad_base = precio_efectivo_por_unidad(promo, Decimal(cantidad), unidad)
     assert valor == Decimal(esperado)

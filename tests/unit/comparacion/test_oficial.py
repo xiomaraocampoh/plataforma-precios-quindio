@@ -72,7 +72,11 @@ def test_el_dia_7_exacto_todavia_cuenta():
 
 
 def test_los_reportes_que_coinciden_con_el_oficial_no_cuentan():
-    reportes = [(Decimal("4000"), _hace(1)), (Decimal("4100"), _hace(1)), (Decimal("5000"), _hace(2))]
+    reportes = [
+        (Decimal("4000"), _hace(1)),
+        (Decimal("4100"), _hace(1)),
+        (Decimal("5000"), _hace(2)),
+    ]
     assert discrepancia(OFICIAL, reportes, AHORA) is None
 
 
