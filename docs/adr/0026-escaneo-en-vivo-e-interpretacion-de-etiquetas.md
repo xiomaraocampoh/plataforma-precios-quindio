@@ -114,7 +114,9 @@ caché, así que no se usa caché de prompts.
   datos ni en los registros. El log anota solo el tipo de resultado y la confianza, sin usuario ni IP
   (prueba `test_la_imagen_no_se_registra_en_los_logs`).
 - La pantalla avisa que los cuadros se envían a Anthropic y no se guardan. La política de tratamiento
-  de datos debe mencionar el escaneo en vivo antes de activarlo (pendiente, como en el ADR-022).
+  de datos ya menciona el escaneo en vivo (sección «Terceros que intervienen»: envío a Anthropic solo
+  para extraer el texto, sin guardar la imagen, función opcional); lo verifica
+  `test_la_politica_informa_el_escaneo_en_vivo_con_ia`.
 - Riesgo conocido: un cuadro puede captar a otra persona en la tienda. Lo mitigan el encuadre cercano
   que exige la regla de nitidez, el tope por sesión y el botón «Pausar escaneo».
 
@@ -127,10 +129,12 @@ caché, así que no se usa caché de prompts.
   interruptor apagado, todo funciona como antes.
 - (+) `origen` permite comparar el tiempo y la tasa de anomalías entre los registros escritos a mano y
   los leídos de una etiqueta.
-- (−) **El cupo es compartido con la foto:** con los valores actuales (20 por hora con cuenta, 10 sin
-  cuenta), una sola sesión que llegue al tope agota el cupo de la hora. Al activar el escáner conviene
-  subir `RECONOCIMIENTOS_POR_HORA` (p. ej. 60) y `RECONOCIMIENTOS_POR_DIA_TOTAL` según el presupuesto.
-  Lo decide el equipo.
+- (−) **El cupo es compartido con la foto:** cada fotograma cuenta como una foto. Con el valor
+  anterior (20 por hora con cuenta) una sola sesión que llegara al tope de 20 fotogramas agotaba el
+  cupo de la hora. **Decisión del equipo (2026-11-25):** el valor por defecto de
+  `RECONOCIMIENTOS_POR_HORA` pasa a **60** en `config/settings/base.py`, `.env.example` y
+  `.env.prod.example` (tres sesiones completas por hora). `RECONOCIMIENTOS_ANONIMO_POR_HORA` (10) y
+  `RECONOCIMIENTOS_POR_DIA_TOTAL` (300) no cambian; este último sigue acotando el gasto diario.
 - (−) Dependencia externa y costo variable; los umbrales de quietud y nitidez son iniciales y deben
   ajustarse con teléfonos reales de gama baja.
 - (−) Precisión no medida: no hay todavía un conjunto de etiquetas reales de Armenia. **No se debe

@@ -66,7 +66,7 @@ python manage.py runserver
 | `ESCANEO_INTERVALO_MS` | `1500` | Mínimo entre dos envíos |
 | `PRECIO_MAXIMO_ETIQUETA` | `2000000` | Un precio leído mayor se descarta |
 | `LIMITE_ESCANEO` | `40/min` | Ritmo máximo del endpoint (`throttle_scope` «escaneo») |
-| `RECONOCIMIENTOS_POR_HORA`, `_ANONIMO_POR_HORA`, `_POR_DIA_TOTAL` | 20, 10, 300 | Cupo **compartido** con la foto: cada cuadro cuenta |
+| `RECONOCIMIENTOS_POR_HORA`, `_ANONIMO_POR_HORA`, `_POR_DIA_TOTAL` | 60, 10, 300 | Cupo **compartido** con la foto: cada cuadro cuenta |
 
 ## Privacidad
 
