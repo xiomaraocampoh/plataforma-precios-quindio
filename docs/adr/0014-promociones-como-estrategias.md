@@ -1,6 +1,6 @@
 # ADR-014: Modelar las promociones como estrategias, fuera del criterio de orden
 
-- **Estado:** Propuesto (la forma de viajar al cliente, D-3, está pendiente)
+- **Estado:** Aceptado por el equipo el 2026-11-25 (D-3 = conservar `es_promocion` y agregar `promociones`)
 - **Fecha:** 2026-11-16
 - **Autores:** Equipo (borrador C2-AS2-E4 del Drive, 14-nov-2026); adaptado al repositorio con apoyo de IA
 - **Escenarios de calidad afectados:** EC-06
@@ -29,9 +29,15 @@ orden sigue usando el precio regular por unidad. La promoción se muestra como e
 efectivo y condiciones. «Pague X lleve Y» nunca participa en el orden porque exige comprar varias
 unidades.
 
-**Pendiente (D-3).** Cómo viaja la promoción al cliente: se recomienda *conservar* `es_promocion` y
-**agregar** un arreglo `promociones` (cambio aditivo en `/v1`), en coherencia con la referencia SIPSA,
-que ya se muestra aparte. Ver el [análisis de impacto](../arquitectura/analisis-impacto-modulo-comercial.md#61-decisión-d-3-cómo-viajan-las-promociones-hacia-el-cliente).
+**D-3 (decidido el 2026-11-25).** Se **conserva** `es_promocion` en cada resultado (la etiqueta) y se
+**agrega** un arreglo `promociones` en la respuesta de la comparación, como cambio aditivo en `/v1`
+(ningún campo existente cambia ni desaparece). El arreglo es la fuente de las condiciones: tipo,
+precio efectivo, vigencia, motivo y condiciones. Es coherente con la referencia SIPSA, que ya se
+muestra aparte. Ver el [análisis de impacto](../arquitectura/analisis-impacto-modulo-comercial.md#61-decisión-d-3-cómo-viajan-las-promociones-hacia-el-cliente).
+
+Las estrategias viven en `comercios/domain/promociones.py` y llegan a la comparación por el puerto del
+ADR-012. La función `aplicar_a_cantidad(promocion, cantidad)` queda disponible para la canasta
+(ADR-0029).
 
 ## Consecuencias
 - (+) M-06 = 100 % verificable con una prueba que compara el orden con y sin promociones.
