@@ -5,6 +5,7 @@ Si la prueba de carga (EC-04) no alcanza p95 ≤ 2 s, el siguiente paso es una v
 materializada / tabla de lectura alimentada por los servicios de escritura (ver ADR-0002).
 """
 
+import logging
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
@@ -34,8 +35,17 @@ from apps.precios.selectors import (
     ultimo_establecimiento_id,
 )
 from core.cache import clave_comparacion, clave_resumen, ttl_comparacion
+from core.extensiones import extensiones
 
+from .domain.extensiones import (
+    PUNTO_DATOS_COMERCIALES,
+    DatosComerciales,
+    PrecioOficialVigente,
+    PromocionComparacion,
+    reunir_datos,
+)
 from .domain.filtros import FiltroPrecio, FiltroUbicacion, filtrar, filtrar_por_precio
+from .domain.oficial import discrepancia
 from .domain.ranking import ResultadoComparacion, ordenar_neutral
 from .domain.resumen import ResumenComparacion, resumir_precios
 from .domain.tarjeta import (
@@ -49,6 +59,8 @@ from .domain.tarjeta import (
 
 MIN_CARACTERES_BUSQUEDA = catalogo.MIN_CARACTERES_BUSQUEDA  # una sola fuente: el catálogo (RF-04)
 MIN_FILAS_EJEMPLO = 2  # el gráfico de la portada necesita al menos dos precios que comparar
+
+log = logging.getLogger("ahorrapues.comparacion")
 
 
 def buscar_productos(texto: str, limite: int = 10):
@@ -78,6 +90,23 @@ class FilaComparacion:
     tipo: str = ""
     direccion: str = ""
     enlace_mapa: str | None = None
+    # Módulo comercial por el puerto (ADR-012, ADR-018, ADR-014). Nunca entran en el orden.
+    es_oficial: bool = False
+    usuarios_reportan: Decimal | None = None  # discrepancia del ADR-018
+    promociones: tuple[PromocionComparacion, ...] = ()
+
+    @property
+    def ancla(self) -> str:
+        """Id de la tarjeta: la fila oficial no tiene reporte propio."""
+        if self.reporte_id:
+            return f"tp-{self.reporte_id}"
+        return f"tpo-{self.resultado.establecimiento_id}-{self.presentacion_id}"
+
+    @property
+    def usuarios_reportan_texto(self) -> str:
+        if self.usuarios_reportan is None:
+            return ""
+        return f"Usuarios reportan {formatear_pesos(self.usuarios_reportan)}"
 
     # ---- textos de la tarjeta (dominio puro; la plantilla solo los muestra) ----
     @property
@@ -128,24 +157,32 @@ def _reportes_candidatos(producto_ids: list[int], desde: datetime):
 
 
 def _ultimos_por_par(producto_ids: list[int], desde: datetime):
-    """El reporte más reciente por (local, presentación) y cuántos anteriores dicen lo mismo."""
+    """El reporte más reciente por (local, presentación), cuántos anteriores dicen lo mismo y
+    todos los (precio, fecha) del par, que la discrepancia del ADR-018 necesita."""
     ultimos: dict[tuple[int, int], ReportePrecio] = {}
     iguales: dict[tuple[int, int], int] = {}
+    todos: dict[tuple[int, int], list[tuple[Decimal, datetime]]] = {}
     for r in _reportes_candidatos(producto_ids, desde):  # un solo query; agrupación en memoria
         clave = (r.establecimiento_id, r.presentacion_id)
+        todos.setdefault(clave, []).append((r.precio, r.fecha_observacion))
         if clave not in ultimos:
             ultimos[clave] = r
             iguales[clave] = 0
         elif r.precio == ultimos[clave].precio:
             iguales[clave] += 1
-    return ultimos, iguales
+    return ultimos, iguales, todos
 
 
 def _fila(r: ReportePrecio, resultado: ResultadoComparacion, ultima) -> FilaComparacion:
-    local, presentacion = r.establecimiento, r.presentacion
+    return _fila_de(r.establecimiento, r.presentacion, resultado, reporte_id=r.pk, ultima=ultima)
+
+
+def _fila_de(
+    local, presentacion, resultado: ResultadoComparacion, *, reporte_id=0, ultima=None, **extra
+) -> FilaComparacion:
     return FilaComparacion(
         resultado=resultado,
-        reporte_id=r.pk,
+        reporte_id=reporte_id,
         municipio=local.municipio,
         barrio=local.barrio,
         ultima_confirmacion=ultima,
@@ -163,6 +200,7 @@ def _fila(r: ReportePrecio, resultado: ResultadoComparacion, ultima) -> FilaComp
             barrio=local.barrio,
             municipio=local.municipio,
         ),
+        **extra,
     )
 
 
@@ -181,18 +219,108 @@ def _resultado(r: ReportePrecio, n_iguales: int) -> ResultadoComparacion:
     )
 
 
+def _datos_comerciales(producto_ids: list[int], ahora: datetime) -> DatosComerciales:
+    """Lo que aportan las extensiones registradas (módulo comercial). Si una falla, la comparación
+    sigue con lo reportado: el núcleo no depende de ella (EC-05)."""
+    try:
+        return reunir_datos(extensiones(PUNTO_DATOS_COMERCIALES), producto_ids, ahora)
+    except Exception:  # una extensión rota no debe tumbar la comparación
+        log.exception("Una extensión de la comparación falló; se muestran solo los reportes.")
+        return DatosComerciales()
+
+
+def _oficiales_vigentes(datos: DatosComerciales, ahora, politica) -> dict:
+    """ADR-018: solo el oficial confirmado en los últimos 30 días (fuente «comercio»)."""
+    return {
+        par: o
+        for par, o in datos.oficiales_por_par().items()
+        if es_vigente(min(o.confirmado_en, ahora), ahora, Fuente.COMERCIO, politica=politica)
+    }
+
+
+def _objetos_de(oficiales: dict, ultimos: dict) -> tuple[dict, dict]:
+    """Establecimiento y presentación de cada par oficial: de los reportes ya leídos o, si no hay
+    reporte del par, en dos queries más (activos y públicos, como en los reportes)."""
+    faltan = [par for par in oficiales if par not in ultimos]
+    locales = {r.establecimiento_id: r.establecimiento for r in ultimos.values()}
+    presentaciones = {r.presentacion_id: r.presentacion for r in ultimos.values()}
+    if faltan:
+        locales |= Establecimiento.objects.filter(
+            pk__in={e for e, _ in faltan}, activo=True
+        ).in_bulk()
+        presentaciones |= (
+            catalogo.presentaciones_publicas()
+            .filter(pk__in={p for _, p in faltan})
+            .select_related("producto__categoria", "producto__marca")
+            .in_bulk()
+        )
+    return locales, presentaciones
+
+
+def _fila_oficial(o: PrecioOficialVigente, local, presentacion, reportes, promos, ahora):
+    """El precio oficial verificado es el principal; la discrepancia baja la confianza a media."""
+    aviso = discrepancia(o.precio, reportes, ahora)
+    unitario, base = precio_por_unidad(o.precio, presentacion.cantidad, presentacion.unidad)
+    confianza = nivel_confianza(Fuente.COMERCIO, 0, False).value if aviso is None else "media"
+    resultado = ResultadoComparacion(
+        establecimiento_id=local.pk,
+        establecimiento=local.nombre,
+        presentacion=str(presentacion),
+        precio=o.precio,
+        precio_unitario=unitario,
+        unidad_base=base.value,
+        fuente=Fuente.COMERCIO.value,
+        confianza=confianza,
+        fecha_observacion=o.confirmado_en,
+        es_promocion=bool(promos),  # etiqueta: no altera el orden (EC-06)
+    )
+    return _fila_de(
+        local,
+        presentacion,
+        resultado,
+        es_oficial=True,
+        usuarios_reportan=aviso,
+        promociones=tuple(promos),
+    )
+
+
+def _filas_oficiales(datos, oficiales, ultimos, todos, ahora):
+    """(producto, par, fila) de cada oficial vigente con local y presentación activos."""
+    locales, presentaciones = _objetos_de(oficiales, ultimos)
+    promos = datos.promociones_por_par()
+    for par, o in oficiales.items():
+        local, presentacion = locales.get(par[0]), presentaciones.get(par[1])
+        if local is None or presentacion is None:  # inactivo o retirado del catálogo
+            continue
+        fila = _fila_oficial(o, local, presentacion, todos.get(par, []), promos.get(par, []), ahora)
+        yield o.producto_id, par, fila
+
+
 def _calcular_filas_de(producto_ids: list[int]) -> dict[int, list[FilaComparacion]]:
-    """Filas vigentes de varios productos con un número constante de queries (sin N+1)."""
+    """Filas vigentes de varios productos con un número constante de queries (sin N+1).
+
+    Si un comercio verificado tiene precio oficial vigente para un (local, presentación), esa fila
+    reemplaza a la del reporte (ADR-018). El orden sigue siendo SOLO `ordenar_neutral` (EC-06).
+    """
     ahora = timezone.now()
     politica = politica_vigencia()
     desde = ahora - timedelta(days=max(politica.dias_reporte, politica.dias_oficial))
-    ultimos, iguales = _ultimos_por_par(producto_ids, desde)
+    ultimos, iguales, todos = _ultimos_por_par(producto_ids, desde)
     confirmaciones = confirmaciones_por_reporte([r.pk for r in ultimos.values()])
+    datos = _datos_comerciales(producto_ids, ahora)
+    oficiales = _oficiales_vigentes(datos, ahora, politica)
 
     por_producto: dict[int, dict[ResultadoComparacion, FilaComparacion]] = {
         pid: {} for pid in producto_ids
     }
+    con_oficial: set[tuple[int, int]] = set()
+    for pid, par, fila in _filas_oficiales(datos, oficiales, ultimos, todos, ahora):
+        if pid in por_producto:
+            por_producto[pid][fila.resultado] = fila
+            con_oficial.add(par)
     for clave, r in ultimos.items():
+        if clave in con_oficial:
+            continue  # el oficial verificado es el principal (ADR-018)
         n_conf, ultima = confirmaciones.get(r.pk, (0, None))
         referencia = fecha_de_referencia(r.fecha_observacion, [ultima] if ultima else [])
         perecedero = r.presentacion.producto.categoria.perecedera

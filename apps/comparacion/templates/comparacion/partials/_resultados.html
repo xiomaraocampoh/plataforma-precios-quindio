@@ -5,7 +5,7 @@
 {% if filas %}
 <ol class="bento" style="padding:0" aria-label="Precios vigentes por establecimiento, en orden">
   {% for fila in filas %}{% with r=fila.resultado %}
-  <li class="tile tarjeta-precio {% if forloop.first %}tile-oscuro tile-4{% else %}tile-2{% endif %}" aria-labelledby="tp-{{ fila.reporte_id }}">
+  <li class="tile tarjeta-precio {% if forloop.first %}tile-oscuro tile-4{% else %}tile-2{% endif %}" aria-labelledby="{{ fila.ancla }}">
     {% include "comparacion/partials/_tarjeta_precio.html" with destacada=forloop.first numero=forloop.counter %}
   </li>
   {% if forloop.first %}

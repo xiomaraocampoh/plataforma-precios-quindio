@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block titulo %}Portal de comercios · AhorraPues{% endblock %}
+{% block contenido %}
+<div class="encabezado">
+  <div>
+    <p class="etiqueta">Comercios</p>
+    <h1>{% if perfil %}{{ perfil.establecimiento.nombre }}{% else %}Portal de comercios{% endif %}</h1>
+  </div>
+</div>
+<p class="suave">Publica tus precios oficiales y tus promociones. En la comparación aparecen con la etiqueta «Oficial», pero el orden no cambia: siempre va primero el menor precio por unidad, sea de quien sea.</p>
+
+{% if not perfil or not perfil.verificado %}
+  {% include "comercios/partials/_perfil.html" %}
+{% else %}
+  <nav class="chips" aria-label="Secciones del portal" style="margin:1rem 0">
+    <a class="chip" href="#sec-precios">Precios oficiales</a>
+    <a class="chip" href="#sec-promociones">Promociones</a>
+    <a class="chip" href="#sec-correcciones">Correcciones</a>
+  </nav>
+  {% include "comercios/partials/_precios.html" %}
+  {% include "comercios/partials/_promociones.html" %}
+  {% include "comercios/partials/_correcciones.html" %}
+{% endif %}
+{% endblock %}

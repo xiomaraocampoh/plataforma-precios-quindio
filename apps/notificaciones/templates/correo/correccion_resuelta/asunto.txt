@@ -1,0 +1,1 @@
+{% if aprobado %}Atendimos tu solicitud de corrección{% else %}Revisamos tu solicitud de corrección{% endif %}

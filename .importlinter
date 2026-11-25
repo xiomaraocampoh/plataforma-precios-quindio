@@ -27,6 +27,7 @@ source_modules =
     apps.cuentas.domain
     apps.administracion.domain
     apps.notificaciones.domain
+    apps.comercios.domain
 forbidden_modules =
     django
     rest_framework
@@ -43,6 +44,7 @@ source_modules =
     apps.cuentas.domain
     apps.administracion.domain
     apps.notificaciones.domain
+    apps.comercios.domain
 forbidden_modules =
     core
     config
@@ -60,6 +62,9 @@ forbidden_modules =
     apps.comparacion.api
     apps.comparacion.urls
     apps.moderacion.models
+    apps.comercios.models
+    apps.comercios.services
+    apps.comercios.selectors
 allow_indirect_imports = True
 
 [importlinter:contract:capas-por-modulo]
@@ -95,6 +100,7 @@ source_modules =
     apps.establecimientos.semilla
     apps.cuentas.semilla
     apps.precios.semilla
+    apps.comercios.semilla
     core.semilla
 forbidden_modules =
     apps.cuentas.models
@@ -107,6 +113,8 @@ forbidden_modules =
     apps.establecimientos.services
     apps.precios.services
     apps.moderacion.services
+    apps.comercios.models
+    apps.comercios.services
 
 [importlinter:contract:interfaces-privadas-precios]
 name = Ningún otro módulo importa las interfaces de precios (views, api, forms, urls)

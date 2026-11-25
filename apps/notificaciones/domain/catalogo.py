@@ -27,6 +27,9 @@ class Tipo(StrEnum):
     REPORTE_MODERADO = "reporte_moderado"
     SOLICITUD_RESUELTA = "solicitud_resuelta"
     ESTABLECIMIENTO_RESUELTO = "establecimiento_resuelto"
+    # Módulo comercial (Corte III): informativos, como las demás decisiones de moderación
+    PERFIL_VERIFICADO = "perfil_verificado"
+    CORRECCION_RESUELTA = "correccion_resuelta"
 
 
 _SEGURIDAD = frozenset(

@@ -1,0 +1,34 @@
+<section class="seccion" id="sec-precios" aria-labelledby="t-precios" style="margin-top:1.5rem">
+  <h2 id="t-precios">Precios oficiales</h2>
+  {% include "comercios/partials/_mensaje.html" %}
+  <p class="suave">Cada precio sigue vigente 30 días. Si no cambió, confírmalo con un toque.</p>
+  {% if precios %}
+  <form method="post" action="{% url 'comercios:confirmar_vigencia' %}"
+        hx-post="{% url 'comercios:confirmar_vigencia' %}" hx-target="#sec-precios" hx-swap="outerHTML" hx-disabled-elt="find button">
+    {% csrf_token %}
+    <button class="btn" type="submit" id="confirmar-vigencia">Mis precios siguen igual</button>
+  </form>
+  <ul class="lista-filas">
+    {% for item in precios %}<li class="tile" style="margin-top:.75rem">
+      <p><strong>{{ item.precio.presentacion.producto.nombre }}{% if item.precio.presentacion.producto.marca %} {{ item.precio.presentacion.producto.marca.nombre }}{% endif %}</strong> · {{ item.precio.presentacion }} · <span class="num">{{ item.precio_texto }}</span></p>
+      <p class="suave">{% if item.vigente %}Vigente hasta el <time datetime="{{ item.vence_en|date:'c' }}">{{ item.vence_en|date:"j \d\e F" }}</time>{% else %}<span class="chip chip-alerta">Vencido</span> No aparece en la comparación hasta que lo confirmes o lo actualices.{% endif %}</p>
+      {% if item.usuarios_reportan %}<p class="chip chip-alerta">Usuarios reportan {{ item.usuarios_reportan }} esta semana. Revisa tu precio o pide una corrección.</p>{% endif %}
+      <form method="post" action="{% url 'comercios:retirar_precio' item.precio.pk %}"
+            hx-post="{% url 'comercios:retirar_precio' item.precio.pk %}" hx-target="#sec-precios" hx-swap="outerHTML" hx-disabled-elt="find button">
+        {% csrf_token %}
+        <button class="btn btn-sec btn-pequeno" type="submit">Retirar<span class="sr-only"> el precio de {{ item.precio.presentacion }}</span></button>
+      </form>
+    </li>{% endfor %}
+  </ul>
+  {% else %}<p class="tile tile-tenue">Aún no publicas precios oficiales.</p>{% endif %}
+  <details class="panel-plegable" {% if form_precio.errors or not precios %}open{% endif %} style="margin-top:1rem">
+    <summary>Publicar o actualizar un precio</summary>
+    <form method="post" action="{% url 'comercios:publicar_precio' %}" novalidate
+          hx-post="{% url 'comercios:publicar_precio' %}" hx-target="#sec-precios" hx-swap="outerHTML" hx-disabled-elt="find button">
+      {% csrf_token %}
+      {% include "partials/_campo.html" with campo=form_precio.presentacion %}
+      {% include "partials/_campo.html" with campo=form_precio.precio %}
+      <button class="btn" type="submit" id="publicar-precio">Publicar precio oficial</button>
+    </form>
+  </details>
+</section>

@@ -1,0 +1,9 @@
+{% extends "correo/base.txt" %}
+{% block titulo %}{% if aprobado %}[Comercio verificado]{% else %}[Perfil no verificado]{% endif %} {% if aprobado %}{{ establecimiento }} ya es un comercio verificado{% else %}No pudimos verificar {{ establecimiento }}{% endif %}{% endblock %}
+{% block cuerpo %}{% if aprobado %}Ya puedes publicar precios oficiales y promociones. En la comparación tus precios aparecen con la etiqueta «Oficial», sin cambiar el orden: siempre va primero el menor precio por unidad.{% else %}Moderación no pudo confirmar que representas al comercio.{% if motivo %} Motivo: {{ motivo }}.{% endif %} Puedes crear un perfil nuevo con otra evidencia.{% endif %}
+
+{% endblock %}
+{% block accion %}Ir al portal de comercios: {{ enlace_portal }}
+
+{% endblock %}
+{% block motivo %}pediste un perfil de comercio en AhorraPues{% endblock %}
