@@ -276,3 +276,103 @@ def test_la_api_de_comercios_tiene_su_throttle_scope(api, comercio, duena, monke
 def test_el_esquema_openapi_documenta_la_api_de_comercios(client):
     esquema = client.get(reverse("schema")).content.decode()
     assert "/api/v1/comercios/precios/" in esquema and "TipoPromocionEnum" in esquema
+
+
+# ---------- Sin HTMX: la misma vista responde con la página completa ----------
+
+
+def test_sin_htmx_publicar_redirige_al_portal_con_el_mensaje(client, comercio, duena, arroz):
+    client.force_login(duena)
+    respuesta = client.post(
+        reverse("comercios:publicar_precio"),
+        {"presentacion": arroz[2].pk, "precio": "4100"},
+        follow=True,
+    )
+    assert respuesta.redirect_chain[-1][0] == reverse("comercios:inicio")
+    assert "Precio oficial publicado" in respuesta.content.decode()
+
+
+def test_sin_htmx_un_formulario_invalido_muestra_la_pagina_con_errores(client, comercio, duena):
+    client.force_login(duena)
+    respuesta = client.post(reverse("comercios:publicar_precio"), {"precio": "0"})
+    html = respuesta.content.decode()
+    assert respuesta.status_code == 200 and "<html" in html and 'class="error"' in html
+    assert _referencias_rotas(html) == []
+
+
+def test_pedir_y_resolver_una_correccion_desde_el_portal(
+    client, comercio, duena, moderador, tiendas, arroz, reportar
+):
+    reporte = reportar(arroz[2], tiendas[0], "9000")
+    client.force_login(duena)
+    html = client.post(
+        reverse("comercios:solicitar_correccion"),
+        {"tipo": "precio_reportado", "reporte": reporte.pk, "descripcion": "Vale 4.000"},
+        **HTMX,
+    ).content.decode()
+    assert "Enviamos tu solicitud a moderación." in html
+    client.force_login(moderador)
+    pagina = client.get(reverse("comercios:verificacion")).content.decode()
+    assert "Vale 4.000" in pagina and _controles_sin_etiqueta(pagina) == []
+    solicitud = comercio.correcciones.get()
+    respuesta = client.post(
+        reverse("comercios:decidir_correccion", args=[solicitud.pk]),
+        {"decision": "aprobar", "motivo": "Retiramos el reporte"},
+        **HTMX,
+    )
+    assert "Decisión registrada." in respuesta.content.decode()
+    solicitud.refresh_from_db()
+    assert solicitud.estado == "resuelta" and solicitud.respuesta == "Retiramos el reporte"
+
+
+def test_terminar_una_promocion_desde_el_portal(client, comercio, duena, arroz):
+    services.publicar_precio_oficial(
+        usuario=duena, presentacion_id=arroz[2].pk, precio=Decimal(4000)
+    )
+    promo = services.crear_promocion(
+        usuario=duena,
+        presentacion_id=arroz[2].pk,
+        tipo="precio_especial",
+        precio_especial=Decimal("3500"),
+        inicio=timezone.now(),
+        fin=timezone.now() + timedelta(days=2),
+        motivo="temporada",
+        condiciones="x",
+    )
+    client.force_login(duena)
+    html = client.post(
+        reverse("comercios:finalizar_promocion", args=[promo.pk]), **HTMX
+    ).content.decode()
+    assert "Terminamos la promoción." in html and not Promocion.objects.get(pk=promo.pk).activa
+
+
+def test_una_promocion_invalida_por_el_portal_explica_el_motivo(client, comercio, duena, arroz):
+    services.publicar_precio_oficial(
+        usuario=duena, presentacion_id=arroz[2].pk, precio=Decimal(4000)
+    )
+    client.force_login(duena)
+    hoy = timezone.localdate()
+    html = client.post(
+        reverse("comercios:crear_promocion"),
+        {
+            "presentacion": arroz[2].pk,
+            "tipo": "precio_especial",
+            "precio_especial": "5000",
+            "inicio": hoy.isoformat(),
+            "fin": hoy.isoformat(),
+            "motivo": "temporada",
+            "condiciones": "x",
+        },
+        **HTMX,
+    ).content.decode()
+    assert "menor que el precio regular" in html and not Promocion.objects.exists()
+
+
+def test_una_decision_sin_valor_valido_no_hace_nada(client, duena, tiendas, moderador):
+    perfil = services.crear_perfil(
+        usuario=duena, establecimiento_id=tiendas[0].pk, nombre_contacto="R", evidencia="x"
+    )
+    client.force_login(moderador)
+    respuesta = client.post(reverse("comercios:decidir_perfil", args=[perfil.pk]), {}, follow=True)
+    assert "La decisión no es válida." in respuesta.content.decode()
+    assert PerfilComercio.objects.get(pk=perfil.pk).estado == "pendiente"
