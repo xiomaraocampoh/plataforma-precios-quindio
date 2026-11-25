@@ -105,3 +105,9 @@ def test_los_datos_se_agrupan_por_establecimiento_y_presentacion():
     assert set(datos.oficiales_por_par()) == {(1, 10), (2, 10)}
     promos = datos.promociones_por_par()
     assert len(promos[(1, 10)]) == 2 and len(promos[(2, 11)]) == 1
+
+
+def test_la_promocion_trae_sus_textos_para_la_tarjeta():
+    promo = _promo()
+    assert promo.precio_texto == "$3.690"
+    assert promo.por_unidad_texto == "$7.380 por kg"
