@@ -1,21 +1,21 @@
 participante,tarea,tiempo_s,completo,error,pidio_ayuda,observaciones
-P1,T1,,,,,
-P1,T3,,,,,
-P1,T2,,,,,
-P1,T4,,,,,
-P2,T1,,,,,
-P2,T3,,,,,
-P2,T2,,,,,
-P2,T4,,,,,
-P3,T1,,,,,
-P3,T3,,,,,
-P3,T2,,,,,
-P3,T4,,,,,
-P4,T1,,,,,
-P4,T3,,,,,
-P4,T2,,,,,
-P4,T4,,,,,
-P5,T1,,,,,
-P5,T3,,,,,
-P5,T2,,,,,
-P5,T4,,,,,
+P1,T1,26.04,s,ninguno,n,pude revisar correctamente
+P1,T3,20.79,s,ninguno,n,se hizo completo
+P1,T2,52.37,s,ninguno,n,se creó correctamente y es intuitiva
+P1,T4,22.17,s,ninguno,n,"tienda doña rosa, es poco confiable porque solo una persona lo ha registrado"
+P2,T1,17.03,s,ninguno,n,se revisó bien
+P2,T3,16.78,s,ninguno,n,se completó
+P2,T2,28.81,s,ninguno,n,es fácil de entender y va al grano
+P2,T4,32.75,s,ninguno,n,la opción más barata es tienda doña rosa pero no es confiable porque solo lo registró 1 persona
+P3,T1,25.0,s,ninguno,n,Se reviso bien
+P3,T3,27.5,s,ninguno,n,se completó
+P3,T2,18.76,s,ninguno,n,facil de usar y entender
+P3,T4,27.46,s,ninguno,n,facil de entender y analizar
+P4,T1,74.2,s,ninguno,s,le costó ubicar el buscador en pantalla pequeña
+P4,T3,95.4,s,ninguno,s,se confundió con los requisitos de la contraseña y dudó en la casilla de datos
+P4,T2,120.0,n,ninguno,s,encontró engorroso el selector con todas las presentaciones y superó los 2 min
+P4,T4,65.1,s,ninguno,s,identificó la tienda más barata pero necesitó pista para entender el indicador de confianza
+P5,T1,80.0,s,ninguno,s,no encontraba en donde decia que tienda era
+P5,T3,77.0,s,ninguno,n,le costo identificar cuando se salta el campo de producto
+P5,T2,290.0,s,ninguno,s,diligencias los campos de correo y entender que tenia q volver a poner contraseña
+P5,T4,90.0,s,ninguno,n,identifico el mas barato pero el indicador no

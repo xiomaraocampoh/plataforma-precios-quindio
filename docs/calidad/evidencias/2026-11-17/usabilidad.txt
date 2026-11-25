@@ -1,0 +1,11 @@
+Prueba de usabilidad PUX-01 - EC-01
+Participantes evaluados: 5 - cuestionarios SUS: 5
+M-01  Registro en <= 15 s         0.0 % NO CUMPLE (mínimo >= 80 %, objetivo >= 90 %)
+M-02  Registros con error         0.0 % CUMPLE    (mínimo <= 10 %, objetivo <= 5 %)
+M-04  Completan sin ayuda        60.0 % NO CUMPLE (mínimo >= 80 %, objetivo >= 90 %)
+SUS   Puntaje SUS promedio       71.5   CUMPLE    (mínimo >= 68, objetivo >= 80)
+  SUS P1: 92.5
+  SUS P2: 97.5
+  SUS P3: 67.5
+  SUS P4: 40.0
+  SUS P5: 60.0
