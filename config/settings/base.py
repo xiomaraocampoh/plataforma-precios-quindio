@@ -178,6 +178,11 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Registro, consulta y comparación neutral de precios de la canasta familiar.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    # El «tipo» de la promoción choca de nombre con otros «tipo» del esquema
+    "ENUM_NAME_OVERRIDES": {
+        "TipoEnum": "apps.establecimientos.models.Establecimiento.Tipo",  # nombre de siempre
+        "TipoPromocionEnum": "apps.comercios.models.Promocion.Tipo",
+    },
 }
 
 # Solo en local: las cuentas de crear_cuentas_prueba entran sin segundo paso si DEBUG=True y este
