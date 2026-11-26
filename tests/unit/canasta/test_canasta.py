@@ -140,7 +140,9 @@ def test_un_establecimiento_sin_ningun_precio_de_la_canasta_no_aparece():
 
 
 def test_oferta_de_otra_magnitud_no_cuenta_como_precio():
-    opciones = calcular_canasta([_item()], [_oferta(10, ARROZ, "3000", tamano="1", unidad="L")], TIENDAS)
+    opciones = calcular_canasta(
+        [_item()], [_oferta(10, ARROZ, "3000", tamano="1", unidad="L")], TIENDAS
+    )
     assert opciones == []
 
 
@@ -171,7 +173,9 @@ def test_empate_total_y_cobertura_desempata_por_nombre_sin_tildes_ni_mayusculas_
     items = [_item()]
     ofertas = [_oferta(e, ARROZ, "6000") for e in (10, 20, 30)]
     nombres = {10: "zeta", 20: "Éxito", 30: "ÉXITO"}
-    orden = [o.establecimiento_id for o in ordenar_opciones(calcular_canasta(items, ofertas, nombres))]
+    orden = [
+        o.establecimiento_id for o in ordenar_opciones(calcular_canasta(items, ofertas, nombres))
+    ]
     assert orden == [20, 30, 10]
 
 
