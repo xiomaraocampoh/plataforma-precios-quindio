@@ -1170,13 +1170,15 @@ select:disabled { cursor: not-allowed; opacity: .6; }
 .burbuja.asistente .cuerpo { background: var(--superficie-2); }
 .burbuja .avatar { width: 34px; height: 34px; }
 .cc-res { box-shadow: inset 0 0 0 2px var(--marca), 0 8px 20px -14px rgb(0 80 200 / .5); }
-.escribiendo { display: none; align-items: center; gap: .3rem; width: max-content; margin: 0 0 .5rem 1.1rem; padding: .55rem .8rem; border-radius: 18px; background: var(--superficie-2); }
-.escribiendo.htmx-request { display: flex; }
-.escribiendo i { width: 7px; height: 7px; border-radius: 50%; background: var(--texto-suave); animation: salto 1s infinite ease-in-out; }
-.escribiendo i:nth-child(2) { animation-delay: .15s; } .escribiendo i:nth-child(3) { animation-delay: .3s; }
+.puntos { display: inline-flex; align-items: center; gap: .3rem; padding: .35rem 0; }
+.puntos i { width: 7px; height: 7px; border-radius: 50%; background: var(--texto-suave); animation: salto 1s infinite ease-in-out; }
+.puntos i:nth-child(2) { animation-delay: .15s; } .puntos i:nth-child(3) { animation-delay: .3s; }
 @keyframes salto { 0%, 60%, 100% { transform: translateY(0); opacity: .5; } 30% { transform: translateY(-5px); opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .escribiendo i { animation: none; } .asistente-icono .ico { transition: none; } }
-.chat-pagina .escribiendo { margin-left: 1rem; }
+@media (prefers-reduced-motion: reduce) { .puntos i { animation: none; opacity: .8; } .asistente-icono .ico { transition: none; } }
+.burbuja.usuario .cuerpo p { white-space: pre-wrap; overflow-wrap: anywhere; }
+.burbuja.error .cuerpo { background: var(--error-fondo); color: var(--error); }
+.chat-hilo > .burbuja:last-child { animation: aparece .22s ease both; }
+@media (prefers-reduced-motion: reduce) { .chat-hilo > .burbuja:last-child { animation: none; } }
 .asistente-cuerpo .chat-entrada { margin: 0 .6rem .7rem; border-radius: 24px; background: var(--superficie-2); border-color: transparent; }
 .asistente-cuerpo .chat-entrada:focus-within { border-color: var(--marca); background: var(--superficie); }
 .asistente-lanzador { animation: aparece .4s ease both; }

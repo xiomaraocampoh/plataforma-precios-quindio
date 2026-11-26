@@ -27,7 +27,12 @@ def chat(page, live_server, mercado):
     page.set_default_timeout(10_000)
     page.goto(live_server.url + "/")
     page.click("[data-lanzador]")
-    page.wait_for_selector("#chat-mensaje")
+    # htmx termina de preparar el formulario recién cargado: sin esperar, el envío sería nativo
+    page.wait_for_function(
+        """() => { const c = document.querySelector('[data-cuerpo]');
+          return c && c.querySelector('#chat-mensaje') && !c.classList.contains('htmx-settling')
+            && !c.classList.contains('htmx-swapping'); }"""
+    )
     return page, retenidas
 
 

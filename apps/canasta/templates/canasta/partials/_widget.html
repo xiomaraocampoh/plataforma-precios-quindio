@@ -17,7 +17,7 @@ al abrirlo por primera vez, así que no pesa en la carga de ninguna página.
         <button class="asistente-icono" type="button" data-asistente-cerrar title="Cerrar" aria-label="Cerrar el asistente"><svg class="ico" aria-hidden="true"><use href="#i-x"/></svg></button>
       </div>
     </header>
-    <div class="asistente-cuerpo" data-cuerpo hx-get="{% url 'canasta:cuerpo' %}" hx-trigger="asistente:abrir once" hx-swap="innerHTML">
+    <div class="asistente-cuerpo" data-cuerpo hx-get="{% url 'canasta:cuerpo' %}" hx-trigger="asistente:abrir once" hx-swap="innerHTML settle:0ms">
       <p class="suave asistente-cargando">Cargando…</p>
     </div>
   </section>
