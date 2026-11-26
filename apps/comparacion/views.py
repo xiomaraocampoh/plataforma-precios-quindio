@@ -25,12 +25,12 @@ from .domain.ranking import CRITERIO_DECLARADO
 from .selectors import (
     MIN_CARACTERES_BUSQUEDA,
     buscar_productos,
-    categorias_frecuentes,
     comparar_con_resumen,
     comparar_filas,
     ejemplo_comparacion,
     estado_del_usuario,
     filas_de_establecimiento,
+    grupos_para_portada,
     productos_destacados,
     propuesta_de_escaneo,
     resumen_plataforma,
@@ -45,7 +45,7 @@ def inicio(request):
     contexto = {
         "resumen": resumen_plataforma(),
         "destacados": destacados,
-        "categorias_rapidas": categorias_frecuentes(),
+        "grupos_rapidos": grupos_para_portada(),
         "ejemplo_producto": destacados[0] if destacados else None,
         "ejemplo": ejemplo_comparacion(destacados[0].pk) if destacados else [],
         "foto_activa": integraciones.reconocimiento_activo(),
@@ -241,7 +241,10 @@ def productos(request):
     marca = request.GET.get("marca", "").strip()
     categoria = request.GET.get("categoria", "")
     categoria_id = int(categoria) if categoria.isdigit() else None
-    lista = catalogo.listar_productos(texto=texto, marca=marca, categoria_id=categoria_id)
+    grupo = request.GET.get("grupo", "").strip()
+    lista = catalogo.listar_productos(
+        texto=texto, marca=marca, categoria_id=categoria_id, grupo=grupo
+    )
     pagina = Paginator(lista, 24).get_page(request.GET.get("pagina"))
     tarjetas = tarjetas_de_productos(pagina.object_list)  # un lote: sin N+1
     ids = [fila.reporte_id for _, fila in tarjetas if fila is not None]
@@ -252,6 +255,7 @@ def productos(request):
         "q": texto,
         "marca": marca,
         "categoria_id": categoria_id,
+        "grupo": grupo,
         "consulta": urlencode({k: v for k, v in request.GET.items() if k != "pagina" and v}),
         **catalogo.opciones_de_filtro(),
     }

@@ -1047,3 +1047,6 @@ select:disabled { cursor: not-allowed; opacity: .6; }
    (si ambos tuvieran margen automático se repartirían el sobrante y el botón quedaría a alturas distintas). */
 .tarjeta-precio .acciones-fila { margin-top: auto; }
 .tarjeta-precio .acciones-fila + .ir { margin-top: .5rem; }
+
+/* Cinco departamentos caben en una línea en escritorio */
+.cat-rapidas { max-width: 900px; }

@@ -110,9 +110,9 @@
     </div>
   </dialog>
 
-  {% if categorias_rapidas %}
-  <nav class="chips hero-chips cat-rapidas" aria-label="Categorías frecuentes">
-    {% for c in categorias_rapidas %}<a class="chip-cat" href="{% url 'comparacion:productos' %}?categoria={{ c.pk }}"><svg class="ico" aria-hidden="true"><use href="#{{ c|icono_categoria }}"/></svg>{{ c.nombre }}</a>{% endfor %}
+  {% if grupos_rapidos %}
+  <nav class="chips hero-chips cat-rapidas" aria-label="Departamentos">
+    {% for g in grupos_rapidos %}<a class="chip-cat" href="{% url 'comparacion:productos' %}?grupo={{ g.valor }}"><svg class="ico" aria-hidden="true"><use href="#{{ g.icono }}"/></svg>{{ g.etiqueta }}</a>{% endfor %}
     <a class="chip-cat" href="{% url 'comparacion:productos' %}"><svg class="ico" aria-hidden="true"><use href="#i-grid"/></svg>Más categorías</a>
   </nav>
   {% endif %}

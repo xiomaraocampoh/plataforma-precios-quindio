@@ -13,6 +13,7 @@ from .domain.coincidencia import (
     similitud_marca,
 )
 from .domain.duplicados import normalizar_nombre, son_posibles_duplicados
+from .domain.grupos import GRUPOS, grupo_por_valor
 from .models import Categoria, FotoProducto, Marca, Presentacion, Producto
 
 MIN_CARACTERES_BUSQUEDA = 2
@@ -134,7 +135,9 @@ def buscar_productos(texto: str, limite: int = 10):
     return productos.order_by("nombre", "marca__nombre")[:limite]
 
 
-def listar_productos(*, texto: str = "", marca: str = "", categoria_id: int | None = None):
+def listar_productos(
+    *, texto: str = "", marca: str = "", categoria_id: int | None = None, grupo: str = ""
+):
     """Listado con filtros de marca y categoría (RF-19, prioridad C). Orden alfabético."""
     activas = Presentacion.objects.filter(activa=True).order_by("unidad", "cantidad")
     productos = con_fotos(productos_publicos()).prefetch_related(
@@ -149,7 +152,13 @@ def listar_productos(*, texto: str = "", marca: str = "", categoria_id: int | No
         productos = productos.filter(marca__nombre_normalizado=normalizar_nombre(marca))
     if categoria_id:
         productos = productos.filter(categoria_id=categoria_id)
+    if grupo_por_valor(grupo) is not None:  # un departamento desconocido se ignora
+        productos = productos.filter(categoria__grupo=grupo)
     return productos.distinct().order_by("nombre", "marca__nombre")
+
+
+def _grupos_con_productos() -> set[str]:
+    return set(productos_publicos().values_list("categoria__grupo", flat=True).distinct())
 
 
 def opciones_de_filtro() -> dict:
@@ -162,6 +171,7 @@ def opciones_de_filtro() -> dict:
     return {
         "marcas": list(marcas),
         "categorias": list(Categoria.objects.filter(activa=True).order_by("nombre")),
+        "grupos": [g for g in GRUPOS if g.valor in _grupos_con_productos()],
     }
 
 

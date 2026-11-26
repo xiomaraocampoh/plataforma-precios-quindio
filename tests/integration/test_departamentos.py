@@ -70,7 +70,11 @@ def test_las_categorias_inactivas_no_cuentan(client, surtido):
 
 def test_el_listado_filtra_por_departamento(client, surtido):
     html = client.get(reverse("comparacion:productos"), {"grupo": "salud_belleza"}).content.decode()
-    assert "Crema Ponds" in html and "Detergente" not in html and "Arroz" not in html
+    resultados = html.split('aria-label="Productos"')[1].split("</ul>")[
+        0
+    ]  # sin las opciones del filtro
+    assert "Crema Ponds" in resultados and "Detergente" not in resultados
+    assert "Arroz" not in resultados
 
 
 def test_un_departamento_desconocido_se_ignora_y_muestra_todo(client, surtido):

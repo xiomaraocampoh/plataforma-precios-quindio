@@ -33,9 +33,9 @@ def test_la_migracion_asigna_el_departamento_a_las_categorias_existentes():
     ejecutor = MigrationExecutor(connection)
     antes = [("catalogo", "0010_descripcion_producto")]
     ejecutor.migrate(antes)
-    Vieja = ejecutor.loader.project_state(antes).apps.get_model("catalogo", "Categoria")
+    categoria_vieja = ejecutor.loader.project_state(antes).apps.get_model("catalogo", "Categoria")
     for nombre in ("Arroz", "Crema dental", "Leche", "Artículos varios"):
-        Vieja.objects.get_or_create(nombre=nombre)
+        categoria_vieja.objects.get_or_create(nombre=nombre)
 
     ejecutor = MigrationExecutor(connection)
     ejecutor.migrate(ejecutor.loader.graph.leaf_nodes())  # hasta la última
