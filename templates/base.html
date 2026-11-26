@@ -11,7 +11,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon-32.png' %}">
   <link rel="icon" type="image/png" sizes="64x64" href="{% static 'img/favicon.png' %}">
   <link rel="apple-touch-icon" href="{% static 'img/logo-192.png' %}">
-  <link rel="stylesheet" href="{% static 'css/app.css' %}?v=2026-11-26-portada1">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}?v=2026-11-26-portada2">
   {% block head %}{% endblock %}
   {# htmx servido localmente (sin CDN): funciona con red móvil limitada y sin terceros #}
   <script src="{% static 'vendor/htmx.min.js' %}" defer></script>
@@ -49,7 +49,10 @@
       {% endwith %}
       <div class="acciones">
         {# La acción principal siempre a la vista: no se esconde tras la hamburguesa (PUX-01, M-01) #}
+        {# En la portada el botón principal ya está en el centro: la barra queda limpia. En las demás páginas se conserva #}
+        {% if request.resolver_match.view_name != 'comparacion:inicio' %}
         <a class="btn btn-registrar" href="{% url 'precios:registrar' %}"{% if request.resolver_match.url_name == 'registrar' %} aria-current="page"{% endif %}><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg><span>Registrar<span class="reg-largo"> precio</span></span></a>
+        {% endif %}
         {% if user.is_authenticated %}
           <details class="menu-cuenta">
             <summary><svg class="ico" aria-hidden="true"><use href="#i-user"/></svg>{{ user.username }}<span class="sr-only">: menú de tu cuenta</span></summary>

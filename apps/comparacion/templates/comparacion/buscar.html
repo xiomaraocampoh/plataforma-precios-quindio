@@ -118,11 +118,8 @@
   {% endif %}
 
   <div class="hero-acciones">
-    {% if user.is_authenticated %}
-      <a class="btn btn-grande" href="{% url 'precios:registrar' %}">Registrar un precio</a>
-    {% else %}
-      <a class="btn btn-grande" href="{% url 'cuentas:registro' %}">Crear cuenta gratis</a>
-    {% endif %}
+    {# Sin cuenta, «Registrar precio» pasa por Ingresar y vuelve; crear la cuenta sigue en la barra #}
+    <a class="btn btn-grande" href="{% url 'precios:registrar' %}">Registrar precio</a>
     <a class="enlace-flecha" href="#como-funciona">Cómo funciona</a>
   </div>
 </section>
