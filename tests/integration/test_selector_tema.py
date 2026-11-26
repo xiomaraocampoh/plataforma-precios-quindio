@@ -10,12 +10,10 @@ def _inicio(client) -> str:
     return client.get(reverse("comparacion:inicio")).content.decode()
 
 
-def test_el_pie_ofrece_las_tres_apariencias_como_grupo_con_nombre(client):
+def test_el_pie_ya_no_repite_el_selector_de_apariencia(client):
     html = _inicio(client)
-    assert 'role="group" aria-label="Apariencia"' in html
-    for valor in ("auto", "light", "dark"):
-        assert f'data-tema="{valor}"' in html
-    assert html.count("aria-pressed=") >= 3  # estado visible para lectores de pantalla
+    pie = html.split('<footer class="pie"')[1].split("</footer>")[0]
+    assert "Apariencia" not in pie and "data-tema=" not in pie  # un solo control: el de la barra
 
 
 def test_la_cabecera_tiene_boton_con_nombre_accesible(client):
