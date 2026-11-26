@@ -66,7 +66,7 @@ def test_cada_tema_tiene_pasos_palabras_y_destinos_validos():
     ids = [t.id for t in TEMAS]
     assert len(ids) == len(set(ids)) and len(ids) >= 12
     for t in TEMAS:
-        assert t.titulo and len(t.pasos) >= 1 and t.palabras
+        assert t.titulo and len(t.pasos) >= 1 and t.patrones
         assert all(paso.strip() for paso in t.pasos)
         for texto, ruta in t.acciones:
             assert texto and ":" in ruta  # «app:nombre», para resolverla con reverse
