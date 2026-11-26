@@ -263,7 +263,7 @@ def test_cada_tarjeta_ofrece_registrar_el_precio_de_esa_tienda_y_presentacion(
     assert f"presentacion={p500.pk}" in html and f"establecimiento={tiendas[0].pk}" in html
 
 
-@pytest.mark.parametrize("ruta", ["comparacion:inicio", "comparacion:productos"])
+@pytest.mark.parametrize("ruta", ["comparacion:productos", "establecimientos:directorio"])
 def test_registrar_precio_esta_siempre_a_la_vista_fuera_del_menu(client, ruta):
     html = client.get(reverse(ruta)).content.decode()
     cabecera = html[html.index('<header class="cabecera"') : html.index("</header>")]
@@ -274,8 +274,15 @@ def test_registrar_precio_esta_siempre_a_la_vista_fuera_del_menu(client, ruta):
 
 def test_el_boton_de_registrar_tambien_esta_con_sesion_iniciada(client, reportante):
     client.force_login(reportante)
-    html = client.get(reverse("comparacion:inicio")).content.decode()
+    html = client.get(reverse("comparacion:productos")).content.decode()
     assert 'class="btn btn-registrar"' in html
+
+
+def test_en_la_portada_registrar_precio_es_el_boton_grande_del_centro(client):
+    # La barra queda limpia en la portada: el botón principal vive en el centro (PUX-01, M-01)
+    html = client.get(reverse("comparacion:inicio")).content.decode()
+    centro = html.split('class="hero-acciones"')[1].split("</div>")[0]
+    assert reverse("precios:registrar") in centro and "btn-grande" in centro
 
 
 # ───────────── La comparación muestra los precios primero ─────────────
