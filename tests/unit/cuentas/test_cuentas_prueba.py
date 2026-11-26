@@ -6,7 +6,11 @@ import pytest
 
 from apps.cuentas.domain.cuentas_prueba import (
     CUENTAS_PRUEBA,
+    VARIABLE_CORREO_BASE,
     ContrasenaDePruebaAusenteError,
+    CorreoBaseInvalidoError,
+    correo_de_prueba,
+    correos_de_prueba,
     exigir_contrasena_de_prueba,
 )
 from apps.cuentas.domain.segundo_factor import omitir_segundo_factor_de_prueba
@@ -55,6 +59,64 @@ class TestCatalogoDeCuentas:
 
     def test_cada_cuenta_dice_que_se_puede_probar(self):
         assert all(c.puede_probar.strip() for c in CUENTAS_PRUEBA)
+
+
+class TestCorreoBase:
+    """CUENTAS_PRUEBA_CORREO_BASE: los códigos del 2FA llegan a un buzón real del equipo."""
+
+    SUFIJOS = {
+        "admin_prueba": "admin",
+        "moderador_prueba": "moderador",
+        "editor_prueba": "editor",
+        "reportante_prueba": "reportante",
+        "reportante_ana": "ana",
+        "reportante_luis": "luis",
+        "comercio_prueba": "comercio",
+        "suspendido_prueba": "suspendido",
+    }
+
+    def test_cada_cuenta_tiene_su_sufijo(self):
+        assert {c.usuario: c.sufijo for c in CUENTAS_PRUEBA} == self.SUFIJOS
+
+    def test_base_valida_usa_parte_local_mas_sufijo(self):
+        correos = correos_de_prueba("equipo@correo.test")
+        assert correos == {u: f"equipo+{s}@correo.test" for u, s in self.SUFIJOS.items()}
+
+    def test_base_con_espacios_alrededor_se_recorta(self):
+        admin = _por_usuario()["admin_prueba"]
+        assert correo_de_prueba(admin, "  equipo@correo.test 	") == "equipo+admin@correo.test"
+
+    @pytest.mark.parametrize("base", [None, "", "   "])
+    def test_base_vacia_conserva_los_de_example_com(self, base):
+        assert correos_de_prueba(base) == {c.usuario: c.correo for c in CUENTAS_PRUEBA}
+        assert all(c.endswith("@example.com") for c in correos_de_prueba(base).values())
+
+    def test_base_sin_arroba_da_un_error_claro(self):
+        with pytest.raises(CorreoBaseInvalidoError, match=VARIABLE_CORREO_BASE) as error:
+            correos_de_prueba("equipo.correo.test")
+        assert "parte_local@dominio" in str(error.value)
+
+    @pytest.mark.parametrize(
+        "base",
+        [
+            "@correo.test",  # sin parte local
+            "equipo@",  # sin dominio
+            "equipo@@correo.test",
+            "a@b@correo.test",
+            "equipo@correo",  # dominio sin punto
+            "equi po@correo.test",
+            "equipo+otro@correo.test",  # ya trae etiqueta: el sufijo quedaría ambiguo
+        ],
+    )
+    def test_bases_mal_formadas_se_rechazan(self, base):
+        with pytest.raises(CorreoBaseInvalidoError, match=VARIABLE_CORREO_BASE):
+            correos_de_prueba(base)
+
+    @pytest.mark.parametrize("base", [None, "equipo@correo.test"])
+    def test_los_ocho_correos_son_distintos(self, base):
+        correos = list(correos_de_prueba(base).values())
+        assert len(correos) == len(CUENTAS_PRUEBA) == 8
+        assert len({c.lower() for c in correos}) == 8
 
 
 class TestContrasena:
