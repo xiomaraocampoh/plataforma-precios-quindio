@@ -40,6 +40,12 @@ def inicio(request):
     return render(request, "canasta/asistente.html", _contexto(request))
 
 
+@require_GET
+def cuerpo(request):
+    """El cuerpo del chat que se abre en el botón flotante (se pide al abrirlo, no antes)."""
+    return render(request, "canasta/partials/_panel.html", _contexto(request))
+
+
 @require_POST
 def enviar(request):
     texto = request.POST.get("mensaje", "")

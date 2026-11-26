@@ -140,6 +140,15 @@ def reconocer_producto(*, usuario, imagen: bytes, ip: str = "") -> PistaProducto
     return _crear_reconocedor().reconocer(imagen, tipo)
 
 
+def asistente_ia_activo() -> bool:
+    """K-nasta usa la IA (ADR-0030) solo con el interruptor y la clave.
+
+    Sin ellos funciona con reglas y no se anuncia como IA: la etiqueta «IA» nunca promete algo que
+    no está ocurriendo.
+    """
+    return reconocimiento_activo() and bool(settings.INTEGRACIONES["ASISTENTE_IA_ACTIVO"])
+
+
 def escaneo_vivo_activo() -> bool:
     """El escáner en vivo (ADR-0026) exige el interruptor y la clave; sin ellos queda la foto o el
     código de barras, que se lee en el teléfono."""

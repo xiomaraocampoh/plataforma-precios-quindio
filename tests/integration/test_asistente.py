@@ -56,7 +56,7 @@ def mercado(reportante, arroz, leche, tiendas):
 
 def test_la_pagina_saluda_e_invita_a_pasar_la_lista(client):
     html = client.get(reverse("canasta:inicio")).content.decode()
-    assert "Soy tu asistente de compras" in html and "lista de ejemplo" in html
+    assert "Soy K-nasta" in html and "lista de ejemplo" in html
     assert 'type="file"' in html and "<textarea" in html
 
 
@@ -121,7 +121,7 @@ def test_empezar_de_nuevo_limpia_la_conversacion(client, mercado):
 def test_nueva_conversacion_borra_todo(client, mercado):
     _decir(client, "arroz")
     html = client.post(reverse("canasta:enviar"), {"reiniciar": "1"}).content.decode()
-    assert "Soy tu asistente de compras" in html and "Tienda Doña Rosa" not in html
+    assert "Soy K-nasta" in html and "Tienda Doña Rosa" not in html
 
 
 def test_con_htmx_devuelve_solo_la_conversacion(client, mercado):
@@ -142,9 +142,75 @@ def test_la_respuesta_no_expone_datos_de_quien_reporto(client, reportante, merca
 
 def test_un_mensaje_vacio_no_hace_nada(client):
     html = _decir(client, "   ").content.decode()
-    assert "Soy tu asistente de compras" in html
+    assert "Soy K-nasta" in html
 
 
 def test_cantidad_con_unidad_que_no_corresponde_avisa_y_usa_la_del_producto(client, mercado):
     html = _decir(client, "2 litros de arroz").content.decode()
     assert "no se mide en L; usé kg" in html
+
+
+# --- disponible en cualquier página (botón flotante) -------------------------------------------
+@pytest.mark.parametrize(
+    "ruta",
+    [
+        "comparacion:inicio",
+        "comparacion:productos",
+        "establecimientos:directorio",
+        "cuentas:ingresar",
+    ],
+)
+def test_el_boton_del_asistente_esta_en_cualquier_pagina(client, ruta):
+    html = client.get(reverse(ruta)).content.decode()
+    assert "asistente-lanzador" in html and 'href="/asistente/"' in html  # enlace sin JavaScript
+    assert 'aria-controls="asistente-panel"' in html and 'role="dialog"' in html
+
+
+def test_el_asistente_no_es_un_modulo_del_menu(client):
+    html = client.get(reverse("comparacion:inicio")).content.decode()
+    menu = html.split('id="nav-principal"')[1].split("</nav>")[0]
+    assert "Asistente" not in menu
+
+
+def test_el_cuerpo_del_chat_se_pide_al_abrirlo_no_en_la_carga(client):
+    html = client.get(reverse("comparacion:inicio")).content.decode()
+    assert 'hx-trigger="asistente:abrir once"' in html
+    assert "chat-mensaje" not in html  # el formulario aún no viaja con la página
+    panel = client.get(reverse("canasta:cuerpo")).content.decode()
+    assert "chat-mensaje" in panel and "<html" not in panel
+
+
+def test_en_la_pagina_completa_del_asistente_no_se_duplica_el_boton(client):
+    html = client.get(reverse("canasta:inicio")).content.decode()
+    assert "asistente-lanzador" not in html and html.count('id="chat-hilo"') == 1
+
+
+def test_la_conversacion_sigue_al_cambiar_de_pagina(client, mercado):
+    _decir(client, "2 kg arroz, 1 L leche")
+    panel = client.get(reverse("canasta:cuerpo")).content.decode()
+    assert "Te conviene Súper Quindío" in panel
+
+
+# --- nombre y etiqueta «IA» (honestidad: solo cuando de verdad usa IA) --------------------------
+def test_se_llama_k_nasta_y_trae_su_ilustracion(client):
+    html = client.get(reverse("comparacion:inicio")).content.decode()
+    assert "K-nasta" in html and "knasta-96.png" in html
+    pagina = client.get(reverse("canasta:inicio")).content.decode()
+    assert "<h1" in pagina and "K-nasta" in pagina
+
+
+def test_sin_ia_activa_no_se_muestra_la_etiqueta_ia(client, settings):
+    settings.INTEGRACIONES = {**settings.INTEGRACIONES, "ASISTENTE_IA_ACTIVO": True}  # sin clave
+    settings.INTEGRACIONES["ANTHROPIC_API_KEY"] = ""
+    html = client.get(reverse("comparacion:inicio")).content.decode()
+    assert "etiqueta-ia" not in html
+
+
+def test_con_ia_activa_la_etiqueta_aparece_en_el_boton_y_el_encabezado(client, settings):
+    settings.INTEGRACIONES = {
+        **settings.INTEGRACIONES,
+        "ASISTENTE_IA_ACTIVO": True,
+        "ANTHROPIC_API_KEY": "clave-de-prueba",
+    }
+    html = client.get(reverse("comparacion:inicio")).content.decode()
+    assert html.count('class="etiqueta-ia"') == 2

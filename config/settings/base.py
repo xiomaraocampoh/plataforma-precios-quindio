@@ -107,6 +107,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "apps.administracion.context_processors.panel",
+                "apps.canasta.context_processors.asistente",
             ],
         },
     },
@@ -240,6 +241,7 @@ INTEGRACIONES = {
     # Escáner en vivo (ADR-0026): apagado por defecto; además exige ANTHROPIC_API_KEY. Cada
     # fotograma enviado consume el mismo cupo por hora y por día que una foto.
     "ESCANEO_VIVO_ACTIVO": env.bool("ESCANEO_VIVO_ACTIVO", default=False),
+    "ASISTENTE_IA_ACTIVO": env.bool("ASISTENTE_IA_ACTIVO", default=False),  # ADR-0030
     "RECONOCIMIENTO_MODELO_VIVO": env.str("RECONOCIMIENTO_MODELO_VIVO", default="claude-haiku-5-5"),
     "RECONOCIMIENTO_TIMEOUT_VIVO_S": env.int("RECONOCIMIENTO_TIMEOUT_VIVO_S", default=6),
     "ESCANEO_MAX_FOTOGRAMAS_SESION": env.int("ESCANEO_MAX_FOTOGRAMAS_SESION", default=20),

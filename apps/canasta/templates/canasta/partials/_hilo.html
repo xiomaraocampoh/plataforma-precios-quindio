@@ -1,9 +1,9 @@
 {% load static %}
 {% if not mensajes %}
 <div class="burbuja asistente">
-  <span class="avatar" aria-hidden="true"><img src="{% static 'img/logo-192.png' %}" alt="" width="32" height="32"></span>
+  <span class="avatar" aria-hidden="true"><img src="{% static 'img/knasta-96.png' %}" alt="" width="32" height="32"></span>
   <div class="cuerpo">
-    <p>¡Hola! Soy tu asistente de compras. Pásame tu lista del mercado, escrita o pegada, y te digo en qué tienda te sale más barato comprarlo todo.</p>
+    <p>¡Hola! Soy K-nasta, tu asistente de compras. Pásame tu lista del mercado, escrita o pegada, y te digo en qué tienda te sale más barato comprarlo todo.</p>
     <p class="suave">Por ejemplo: <em>2 kg arroz, 1 L leche, 12 huevos</em>. También puedes adjuntar un archivo de texto con tu lista.</p>
     <form method="post" action="{% url 'canasta:enviar' %}" hx-post="{% url 'canasta:enviar' %}" hx-target="#chat-hilo" hx-swap="innerHTML">
       {% csrf_token %}<input type="hidden" name="mensaje" value="{{ ejemplo }}">
@@ -14,7 +14,7 @@
 {% endif %}
 {% for m in mensajes %}
 <div class="burbuja {{ m.rol }}">
-  {% if m.rol == "asistente" %}<span class="avatar" aria-hidden="true"><img src="{% static 'img/logo-192.png' %}" alt="" width="32" height="32"></span>{% endif %}
+  {% if m.rol == "asistente" %}<span class="avatar" aria-hidden="true"><img src="{% static 'img/knasta-96.png' %}" alt="" width="32" height="32"></span>{% endif %}
   <div class="cuerpo">
     <p><span class="sr-only">{% if m.rol == "asistente" %}Asistente: {% else %}Tú: {% endif %}</span>{{ m.texto|linebreaksbr }}</p>
     {% if forloop.counter0 == indice_tarjeta and resultado %}{% include "canasta/partials/_tarjeta.html" %}{% endif %}

@@ -1,0 +1,27 @@
+{% load static %}{% comment %}
+Asistente de compras disponible en cualquier página: botón flotante + panel de chat (mejora progresiva).
+Sin JavaScript el botón es un enlace a la página completa del asistente. El cuerpo del chat se pide
+al abrirlo por primera vez, así que no pesa en la carga de ninguna página.
+{% endcomment %}
+<div class="asistente-widget" data-asistente>
+  <a class="asistente-lanzador" href="{% url 'canasta:inicio' %}" aria-controls="asistente-panel" aria-expanded="false" data-lanzador>
+    <img class="knasta-avatar" src="{% static 'img/knasta-96.png' %}" alt="" width="36" height="36">
+    <span class="knasta-nombre">K-nasta</span>{% if asistente_ia %}<span class="etiqueta-ia">IA</span>{% endif %}
+  </a>
+  <section class="asistente-panel" id="asistente-panel" role="dialog" aria-modal="false" aria-labelledby="asistente-titulo" tabindex="-1" hidden data-panel>
+    <header class="asistente-cab">
+      <img class="knasta-avatar" src="{% static 'img/knasta-96.png' %}" alt="" width="40" height="40">
+      <div class="asistente-titulos">
+        <h2 id="asistente-titulo">K-nasta{% if asistente_ia %} <span class="etiqueta-ia">IA</span>{% endif %}</h2>
+        <p class="suave">Dime qué llevas y te digo dónde sale más barato.</p>
+      </div>
+      <div class="asistente-acciones">
+        {% include "canasta/partials/_reiniciar.html" %}
+        <button class="asistente-cerrar" type="button" data-cerrar aria-label="Cerrar el asistente"><svg class="ico" aria-hidden="true"><use href="#i-x"/></svg></button>
+      </div>
+    </header>
+    <div class="asistente-cuerpo" data-cuerpo hx-get="{% url 'canasta:cuerpo' %}" hx-trigger="asistente:abrir once" hx-swap="innerHTML">
+      <p class="suave asistente-cargando">Cargando…</p>
+    </div>
+  </section>
+</div>
