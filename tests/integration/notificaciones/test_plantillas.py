@@ -24,7 +24,8 @@ def test_cada_correo_tiene_html_y_texto(db, tipo):
     assert "background-color:#f5f5f7" in html and "#0071e3" in html
     assert "AhorraPues · Armenia, Quindío" in html
     assert "display:none" in html  # preheader oculto con el resumen
-    assert "<img" not in html  # nada de información solo en imágenes
+    # Nada de información solo en imágenes: la única es el logo, con alt (test_logo_correo.py)
+    assert html.count("<img") == 1 and 'alt="AhorraPues"' in html
     assert "{{" not in html and "{%" not in html
     # Texto: siempre presente y sin etiquetas
     assert texto.strip()
