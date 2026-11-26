@@ -13,7 +13,7 @@ from .domain.coincidencia import (
     similitud_marca,
 )
 from .domain.duplicados import normalizar_nombre, son_posibles_duplicados
-from .models import Categoria, Marca, Presentacion, Producto
+from .models import Categoria, FotoProducto, Marca, Presentacion, Producto
 
 MIN_CARACTERES_BUSQUEDA = 2
 TOPE_PRESELECCION = 200  # candidatos que se puntúan en Python (búsqueda por foto)
@@ -130,14 +130,16 @@ def buscar_productos(texto: str, limite: int = 10):
         if len(normalizar_nombre(texto)) < MIN_CARACTERES_BUSQUEDA:
             return Producto.objects.none()
         filtro = _por_texto(texto)
-    productos = productos_publicos().filter(filtro).distinct()
+    productos = con_fotos(productos_publicos()).filter(filtro).distinct()
     return productos.order_by("nombre", "marca__nombre")[:limite]
 
 
 def listar_productos(*, texto: str = "", marca: str = "", categoria_id: int | None = None):
     """Listado con filtros de marca y categoría (RF-19, prioridad C). Orden alfabético."""
     activas = Presentacion.objects.filter(activa=True).order_by("unidad", "cantidad")
-    productos = productos_publicos().prefetch_related(Prefetch("presentaciones", queryset=activas))
+    productos = con_fotos(productos_publicos()).prefetch_related(
+        Prefetch("presentaciones", queryset=activas)
+    )
     texto = (texto or "").strip()
     if es_codigo_de_barras(texto):
         productos = productos.filter(presentaciones__codigo_barras=texto)
@@ -166,7 +168,7 @@ def opciones_de_filtro() -> dict:
 def obtener_producto(producto_id: int) -> Producto | None:
     activas = Presentacion.objects.filter(activa=True)
     return (
-        productos_publicos()
+        con_fotos(productos_publicos())
         .prefetch_related(Prefetch("presentaciones", queryset=activas))
         .filter(pk=producto_id)
         .first()
@@ -203,3 +205,37 @@ def productos_similares(nombre: str, marca: str = "", limite: int = 5) -> list[P
         if son_posibles_duplicados(buscado, str(p)) or son_posibles_duplicados(nombre, p.nombre)
     ]
     return sorted(similares, key=lambda p: (p.nombre, str(p.marca or "")))[:limite]
+
+
+def foto_de(producto_id: int) -> tuple[bytes, str, str] | None:
+    """(bytes, tipo, versión) de la foto de un producto público; None si no hay o está retirado."""
+    fila = (
+        FotoProducto.objects.filter(
+            producto_id=producto_id, producto__activo=True, producto__categoria__activa=True
+        )
+        .values_list("contenido", "tipo_contenido", "version")
+        .first()
+    )
+    if fila is None:
+        return None
+    contenido, tipo, version = fila
+    return bytes(contenido), tipo, version  # PostgreSQL entrega memoryview
+
+
+def con_fotos(productos):
+    """Agrega la foto de cada producto en el mismo query, SIN traer los bytes (sin N+1, EC-01)."""
+    return productos.select_related("foto").defer("foto__contenido")
+
+
+def productos_por_nombre_de_archivo(texto: str) -> list[Producto]:
+    """Productos públicos cuyo «nombre + marca» coincide con el texto; si no, solo por nombre.
+
+    Sirve para asignar fotos por el nombre del archivo («arroz-blanco_diana.jpg»). Puede devolver
+    varios: quien llama decide qué hacer con la ambigüedad.
+    """
+    clave = normalizar_nombre(texto.replace("_", " ").replace("-", " "))
+    if not clave:
+        return []
+    candidatos = list(con_fotos(productos_publicos()))
+    con_marca = [p for p in candidatos if normalizar_nombre(f"{p.nombre} {p.marca or ''}") == clave]
+    return con_marca or [p for p in candidatos if p.nombre_normalizado == clave]

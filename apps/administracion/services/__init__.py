@@ -22,7 +22,7 @@ Accion = RegistroAuditoria.Accion
 CAMPOS = {
     "marca": ("nombre", "activa"),
     "categoria": ("nombre", "perecedera", "activa"),
-    "producto": ("nombre", "marca", "categoria", "activo"),
+    "producto": ("nombre", "marca", "categoria", "descripcion", "activo"),
     "establecimiento": (
         "nombre",
         "tipo",
@@ -49,6 +49,7 @@ def _campo_activo(objeto) -> str:
 def instantanea(entidad: str, objeto) -> dict:
     datos = {campo: getattr(objeto, campo) for campo in CAMPOS[entidad]}
     if entidad == "producto":
+        datos["foto"] = objeto.foto_version or "sin foto"  # versión, no los bytes
         datos["presentaciones"] = sorted(
             f"{formatear_cantidad(p.cantidad)} {p.unidad}"
             + (f" · {p.codigo_barras}" if p.codigo_barras else "")

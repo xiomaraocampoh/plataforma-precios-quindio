@@ -1,12 +1,17 @@
 {% extends "administracion/_base_panel.html" %}
+{% load static %}
 {% block titulo_panel %}{% if objeto %}Editar {{ objeto }}{% else %}{{ seccion.nuevo|capfirst }}{% endif %}{% endblock %}
 {% block migas %}<span aria-hidden="true">/</span><a href="{% url 'panel:lista' seccion.slug %}">{{ seccion.titulo }}</a><span aria-hidden="true">/</span><span aria-current="page">{% if objeto %}Editar{% else %}{{ seccion.nuevo|capfirst }}{% endif %}</span>{% endblock %}
+{% block head %}{{ block.super }}<script src="{% static 'js/zona-foto.js' %}?v=1" defer></script>{% endblock %}
 {% block panel %}
 <section class="tile panel-formulario" aria-labelledby="titulo-form">
   <h1 id="titulo-form">{% if objeto %}Editar {{ seccion.singular }} «{{ objeto }}»{% else %}{{ seccion.nuevo|capfirst }}{% endif %}</h1>
-  <form method="post" novalidate hx-disabled-elt="find button[type=submit]">
+  <form method="post" novalidate enctype="multipart/form-data" hx-disabled-elt="find button[type=submit]">
     {% csrf_token %}
     {% include "partials/_errores_generales.html" %}
+    {% if seccion.slug == "productos" and objeto and objeto.foto_version %}
+    <div class="foto-actual"><img src="{% url 'catalogo:foto' objeto.pk %}?v={{ objeto.foto_version }}" alt="Foto actual de {{ objeto }}" width="120" height="120"></div>
+    {% endif %}
     {% for campo in form.visible_fields %}{% include "partials/_campo.html" %}{% endfor %}
     {% if formset %}
     <fieldset class="presentaciones">

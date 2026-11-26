@@ -51,3 +51,25 @@ def tiendas(db):
         )
 
     return crear("Tienda Doña Rosa", "tienda"), crear("Súper Quindío", "supermercado")
+
+
+@pytest.fixture
+def imagen():
+    """imagen(formato="JPEG", tamano=(800, 600), exif=False) → bytes de una foto de prueba."""
+
+    def crear(formato="JPEG", tamano=(800, 600), color=(200, 40, 40), exif=False) -> bytes:
+        from io import BytesIO
+
+        from PIL import Image
+
+        buffer = BytesIO()
+        extra = {}
+        if exif:  # una foto de celular lleva datos de la cámara (y a veces la ubicación)
+            datos = Image.Exif()
+            datos[0x010F] = "Camara de prueba"
+            datos[0x0132] = "2026:11:19 10:00:00"
+            extra["exif"] = datos
+        Image.new("RGB", tamano, color).save(buffer, formato, **extra)
+        return buffer.getvalue()
+
+    return crear

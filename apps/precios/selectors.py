@@ -85,7 +85,7 @@ def productos_para_registrar(limite: int = 8) -> list:
     """
     presentaciones = catalogo.presentaciones_publicas().filter(producto=OuterRef("pk"))
     return list(
-        catalogo.productos_publicos()
+        catalogo.con_fotos(catalogo.productos_publicos())
         .filter(Exists(presentaciones))
         .annotate(
             n_reportes=Count(

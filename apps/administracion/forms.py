@@ -4,7 +4,9 @@ import re
 
 from django import forms
 
+from apps.catalogo import services as catalogo
 from apps.catalogo.domain.duplicados import normalizar_nombre
+from apps.catalogo.domain.fotos import MAX_BYTES_SUBIDA, FotoInvalidaError
 from apps.catalogo.domain.normalizacion import Unidad
 from apps.catalogo.models import Categoria, Marca, Presentacion, Producto
 from apps.cuentas.domain.roles import GRUPOS
@@ -57,12 +59,49 @@ class CategoriaForm(forms.ModelForm):
 class ProductoForm(forms.ModelForm):
     class Meta:
         model = Producto
-        fields = ["nombre", "marca", "categoria"]
-        labels = {"nombre": "Nombre del producto", "marca": "Marca", "categoria": "Categoría"}
-        help_texts = {"nombre": "Como aparece en el empaque, sin la marca. Ej.: Arroz blanco."}
+        fields = ["nombre", "marca", "categoria", "descripcion"]
+        labels = {
+            "nombre": "Nombre del producto",
+            "marca": "Marca",
+            "categoria": "Categoría",
+            "descripcion": "Descripción (opcional)",
+        }
+        help_texts = {
+            "nombre": "Como aparece en el empaque, sin la marca. Ej.: Arroz blanco.",
+            "descripcion": "Una o dos frases útiles para reconocerlo (hasta 500 caracteres). "
+            "Sin precios ni mensajes comerciales.",
+        }
+        widgets = {"descripcion": forms.Textarea(attrs={"rows": 3, "maxlength": 500})}
+
+    foto = forms.FileField(
+        required=False,
+        label="Foto del producto",
+        help_text=(
+            "Arrastra la imagen aquí, pégala con Ctrl+V (o ⌘+V) tras copiarla, o busca el archivo. "
+            "JPG, PNG o WebP, de hasta 5 MB y al menos 200 px. Se recorta cuadrada y se reduce "
+            "sola. Usa una foto del empaque de frente, sin personas ni datos personales."
+        ),
+        widget=forms.FileInput(
+            attrs={"accept": "image/jpeg,image/png,image/webp", "data-zona-foto": ""}
+        ),
+    )
+    quitar_foto = forms.BooleanField(required=False, label="Quitar la foto actual")
+
+    def clean_foto(self):
+        archivo = self.cleaned_data.get("foto")
+        if not archivo:
+            return None
+        if archivo.size > MAX_BYTES_SUBIDA:  # antes de leerla entera en memoria
+            raise forms.ValidationError(f"El archivo pesa más de {MAX_BYTES_SUBIDA // 1024**2} MB.")
+        try:
+            return catalogo.preparar_foto(archivo.read())  # ya procesada: se valida una sola vez
+        except FotoInvalidaError as exc:
+            raise forms.ValidationError(str(exc)) from exc
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if not self.instance.foto_version:
+            del self.fields["quitar_foto"]  # no hay foto que quitar
         marca = self.fields["marca"]
         marca.queryset = _activos_o_actual(Marca.objects.all(), self.instance.marca_id)
         marca.empty_label = "Sin marca"

@@ -110,10 +110,11 @@
     </div>
   </dialog>
 
-  {% if destacados %}
-  <div class="chips hero-chips" role="group" aria-label="Productos frecuentes">
-    {% for p in destacados|slice:":6" %}<a class="chip" href="{% url 'comparacion:comparar' p.pk %}">{{ p }}</a>{% endfor %}
-  </div>
+  {% if categorias_rapidas %}
+  <nav class="chips hero-chips cat-rapidas" aria-label="Categorías frecuentes">
+    {% for c in categorias_rapidas %}<a class="chip-cat" href="{% url 'comparacion:productos' %}?categoria={{ c.pk }}"><svg class="ico" aria-hidden="true"><use href="#{{ c|icono_categoria }}"/></svg>{{ c.nombre }}</a>{% endfor %}
+    <a class="chip-cat" href="{% url 'comparacion:productos' %}"><svg class="ico" aria-hidden="true"><use href="#i-grid"/></svg>Más categorías</a>
+  </nav>
   {% endif %}
 
   <div class="hero-acciones">
@@ -141,46 +142,54 @@
     <h2 id="t-valor">Todo lo que necesitas para comprar mejor.</h2>
     <p>Información clara, hecha por tu comunidad y sin letra pequeña.</p>
   </div>
-  <div class="bento">
-
-    <article class="tile tile-oscuro tile-4" aria-labelledby="t-ejemplo">
-      <p class="etiqueta">Comparación real{% if ejemplo_producto %} · {{ ejemplo_producto }}{% endif %}</p>
-      <h3 class="titular" id="t-ejemplo">Mira la diferencia antes de salir de casa.</h3>
+  <div class="vitrina">
+    <article class="card-comparacion" aria-labelledby="t-ejemplo">
       {% if ejemplo %}
-      <ol class="barras" style="list-style:none;padding:0" aria-label="Precio por {{ ejemplo.0.unidad_base }}, de menor a mayor">
+      <span class="cc-insignia"><svg class="ico" aria-hidden="true"><use href="#i-arrow-abajo"/></svg>Mejor precio</span>
+      <header class="cc-cabecera">
+        {% include "partials/_foto_producto.html" with producto=ejemplo_producto clase="foto-chica" %}
+        <div>
+          <p class="cc-etiqueta">Comparación real</p>
+          <h3 id="t-ejemplo">{{ ejemplo_producto }}</h3>
+        </div>
+      </header>
+      <ol class="cc-filas" aria-label="Precio por {{ ejemplo.0.unidad_base }}, de menor a mayor">
         {% for f in ejemplo %}
-        <li class="barra-fila {% if forloop.first %}es-primero{% endif %}">
-          <span class="quien">{{ f.establecimiento }} <span class="suave">· {{ f.presentacion }}</span></span>
-          <span class="valor">${{ f.precio_unitario|floatformat:0 }}/{{ f.unidad_base }}</span>
-          <span class="barra-pista" aria-hidden="true"><span class="barra-relleno" style="width:{{ f.porcentaje }}%"></span></span>
+        <li class="cc-fila{% if forloop.first %} es-primero{% endif %}">
+          <span class="quien">{{ f.establecimiento }}<span class="suave">{{ f.presentacion }}</span></span>
+          <span class="valor">${{ f.precio_unitario|floatformat:0 }}<span class="unidad">/{{ f.unidad_base }}</span></span>
         </li>
         {% endfor %}
       </ol>
       <a class="enlace-flecha" href="{% url 'comparacion:comparar' ejemplo_producto.pk %}">Ver la comparación completa</a>
       {% else %}
+      <h3 id="t-ejemplo">Mira la diferencia antes de salir de casa.</h3>
       <p class="suave">Cuando haya precios reportados, aquí verás un ejemplo real.</p>
       {% endif %}
     </article>
+  </div>
 
-    <article class="tile tile-2" aria-labelledby="t-unidad">
+  <div class="bento cuatro">
+
+    <article class="tile tile-1" aria-labelledby="t-unidad">
       <span class="icono-caja" aria-hidden="true"><svg class="ico"><use href="#i-scale"/></svg></span>
       <h3 class="titular" id="t-unidad">Precio por unidad.</h3>
       <p class="suave">500 g contra 1 kg, sin hacer cuentas. Comparamos lo que de verdad cuesta cada kilo o litro.</p>
     </article>
 
-    <article class="tile tile-2 tile-marca" aria-labelledby="t-neutral">
+    <article class="tile tile-1 tile-marca" aria-labelledby="t-neutral">
       <span class="icono-caja" aria-hidden="true"><svg class="ico"><use href="#i-check"/></svg></span>
       <h3 class="titular" id="t-neutral">Orden neutral.</h3>
       <p class="suave">Nadie paga por salir primero. Las promociones se señalan, pero no suben posiciones.</p>
     </article>
 
-    <article class="tile tile-2" aria-labelledby="t-anonimo">
+    <article class="tile tile-1" aria-labelledby="t-anonimo">
       <span class="icono-caja" aria-hidden="true"><svg class="ico"><use href="#i-shield"/></svg></span>
       <h3 class="titular" id="t-anonimo">Reportes anónimos.</h3>
       <p class="suave">Nunca mostramos quién reportó un precio ni dónde estaba.</p>
     </article>
 
-    <article class="tile tile-2" aria-labelledby="t-vigente">
+    <article class="tile tile-1" aria-labelledby="t-vigente">
       <span class="icono-caja" aria-hidden="true"><svg class="ico"><use href="#i-clock"/></svg></span>
       <h3 class="titular" id="t-vigente">Siempre al día.</h3>
       <p class="suave">Los precios viejos dejan de mostrarse como vigentes.</p>
@@ -199,6 +208,7 @@
   <div class="tarjetas">
     {% for p in destacados %}
     <a class="tarjeta" href="{% url 'comparacion:comparar' p.pk %}">
+      {% include "partials/_foto_producto.html" with producto=p clase="foto-grande" %}
       <span class="meta"><svg class="ico ico-cat-chico" aria-hidden="true"><use href="#{{ p.categoria|icono_categoria }}"/></svg>{{ p.categoria }}</span>
       <span class="nombre">{{ p }}</span>
       <span class="meta">{{ p.n_reportes }} precio{{ p.n_reportes|pluralize }}</span>

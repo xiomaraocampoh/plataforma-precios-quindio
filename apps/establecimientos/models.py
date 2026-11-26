@@ -9,7 +9,7 @@ class Establecimiento(ModeloConMarcasDeTiempo):
         TIENDA_BARRIO = "tienda", "Tienda de barrio"
         MINIMERCADO = "minimercado", "Minimercado"
         SUPERMERCADO = "supermercado", "Supermercado"
-        DISCOUNT = "discount", "Tienda de descuento (discount)"
+        DISCOUNT = "discount", "Tienda de descuento"
         PLAZA = "plaza", "Plaza de mercado"
 
     class Estado(models.TextChoices):

@@ -1,4 +1,3 @@
-{% load categorias %}
 {% comment %}Paso 2: con producto, solo sus presentaciones como botones; sin producto (reenvío de la cola
 o error sin presentación), la lista completa de siempre. Mismos nombres de campo: la cola sin conexión
 (ADR-009) y el servidor no cambian.{% endcomment %}
@@ -12,7 +11,7 @@ o error sin presentación), la lista completa de siempre. Mismos nombres de camp
   {% if producto %}
   <div class="producto-elegido">
     <div class="fila-producto">
-      <span class="icono-cat" aria-hidden="true"><svg class="ico" aria-hidden="true"><use href="#{{ producto.categoria|icono_categoria }}"/></svg></span>
+      {% include "partials/_foto_producto.html" with producto=producto clase="foto-chica" %}
       <div><p class="etiqueta">Producto</p><p class="producto-nombre">{{ producto }}</p></div>
     </div>
     <a class="btn-texto" href="{{ url_registro }}">Cambiar producto<span class="sr-only"> (volver a buscar)</span></a>

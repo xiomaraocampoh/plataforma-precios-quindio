@@ -3,31 +3,22 @@
 {% if error_precio %}<p class="error" role="alert" id="error-precio">{{ error_precio }}</p>{% endif %}
 {% if filtro.activo or filtro_precio.activo %}<p class="suave" role="status">Mostrando {{ filas|length }} resultado{{ filas|length|pluralize }}{% if filtro.municipio %} en {{ filtro.municipio }}{% endif %}{% if filtro.barrio %}{% if filtro.municipio %}, {% else %} en el {% endif %}barrio {{ filtro.barrio }}{% endif %}{% if filtro_precio.activo %}{% if filtro.activo %}, {% else %} {% endif %}{% if filtro_precio.minimo is not None and filtro_precio.maximo is not None %}entre ${{ filtro_precio.minimo|floatformat:0 }} y ${{ filtro_precio.maximo|floatformat:0 }}{% elif filtro_precio.minimo is not None %}desde ${{ filtro_precio.minimo|floatformat:0 }}{% else %}hasta ${{ filtro_precio.maximo|floatformat:0 }}{% endif %}{% endif %}.</p>{% endif %}
 {% if filas %}
-<ol class="bento" style="padding:0" aria-label="Precios vigentes por establecimiento, en orden">
-  {% for fila in filas %}{% with r=fila.resultado %}
-  <li class="tile tarjeta-precio {% if forloop.first %}tile-oscuro tile-4{% else %}tile-2{% endif %}" aria-labelledby="{{ fila.ancla }}">
-    {% include "comparacion/partials/_tarjeta_precio.html" with destacada=forloop.first numero=forloop.counter %}
+<div class="resumen-precios tile tile-tenue">
+  <p><strong>{{ resumen.cantidad }} establecimiento{{ resumen.cantidad|pluralize }}</strong>{% if filas|length > 1 %} · del más barato ({{ filas.0.por_unidad_texto }}) al más caro ({% with ultima=filas|last %}{{ ultima.por_unidad_texto }}{% endwith %}){% if resumen.diferencia_pct is not None %} · {{ resumen.diferencia_pct }}% de diferencia{% endif %}{% endif %}</p>
+  <p class="suave">El precio por unidad sirve para comparar empaques de distinto tamaño.</p>
+</div>
+<ol class="lista-precios" aria-label="Precios vigentes por establecimiento, en orden">
+  {% for fila in filas %}
+  <li class="tile tarjeta-precio fila-precio{% if forloop.first %} es-primera{% endif %}" aria-labelledby="tp-{{ fila.reporte_id }}">
+    {% include "comparacion/partials/_fila_precio.html" with destacada=forloop.first numero=forloop.counter %}
   </li>
-  {% if forloop.first %}
-  <li class="tile tile-2 tile-marca">
-    <span class="icono-caja" aria-hidden="true" style="background:var(--superficie)"><svg class="ico"><use href="#i-chart"/></svg></span>
-    {% if resumen.diferencia_pct is not None %}
-      <p class="cifra">{{ resumen.diferencia_pct }}%</p>
-      <p class="suave">de diferencia entre el más barato y el más caro (por {{ resumen.unidad_base }}).</p>
-    {% else %}
-      <p class="cifra">{{ resumen.cantidad }}</p>
-      <p class="suave">establecimiento{{ resumen.cantidad|pluralize }} con precio vigente.</p>
-    {% endif %}
-  </li>
-  {% endif %}
-  {% endwith %}{% endfor %}
-
-  <li class="tile tile-6 tile-tenue criterio">
-    <svg class="ico" aria-hidden="true" style="color:var(--marca);margin-top:.2rem"><use href="#i-info"/></svg>
-    {# Criterio de orden explícito para el usuario (neutralidad, EC-06) #}
-    <p><strong>Orden:</strong> {{ criterio }} <span class="suave">Las promociones se señalan, pero no cambian la posición.{% if filtro.activo %} Los filtros solo ocultan resultados; no cambian el orden.{% endif %}</span></p>
-  </li>
+  {% endfor %}
 </ol>
+<p class="tile tile-tenue criterio">
+  <svg class="ico" aria-hidden="true" style="color:var(--marca);margin-top:.2rem"><use href="#i-info"/></svg>
+  {# Criterio de orden explícito para el usuario (neutralidad, EC-06) #}
+  <span><strong>Orden:</strong> {{ criterio }} <span class="suave">Las promociones se señalan, pero no cambian la posición.{% if filtro.activo %} Los filtros solo ocultan resultados; no cambian el orden.{% endif %}</span></span>
+</p>
 {% else %}
 <div class="bento">
   <section class="tile tile-6 tile-marca vacio-estado">

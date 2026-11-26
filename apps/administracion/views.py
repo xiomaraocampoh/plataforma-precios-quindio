@@ -110,7 +110,7 @@ def lista(request, seccion: str):
 
 
 def _formulario(request, s, objeto=None):
-    form = s.formulario(request.POST or None, instance=objeto)
+    form = s.formulario(request.POST or None, request.FILES or None, instance=objeto)
     formset = (
         s.formset(request.POST or None, instance=objeto, prefix="presentaciones")
         if s.formset

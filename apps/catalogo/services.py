@@ -1,5 +1,6 @@
 """Casos de uso de escritura del catálogo (RF-06, D-05)."""
 
+import hashlib
 from decimal import Decimal
 
 from django.db import transaction
@@ -9,8 +10,9 @@ from django.utils import timezone
 from core.cache import invalidar_comparacion
 from core.errores import EnUsoError
 
+from . import imagenes
 from .domain.duplicados import normalizar_nombre, son_posibles_duplicados
-from .models import Categoria, Marca, Presentacion, Producto, SolicitudCatalogo
+from .models import Categoria, FotoProducto, Marca, Presentacion, Producto, SolicitudCatalogo
 
 
 def solicitar_producto(
@@ -147,10 +149,54 @@ def _invalidar_si_es_producto(objeto) -> None:
         transaction.on_commit(lambda: invalidar_comparacion(producto_id))
 
 
+def _olvidar_foto_en_memoria(producto: Producto) -> None:
+    """Que `producto.foto_version` lea la BD otra vez (no la relación que ya traía en memoria)."""
+    relacion = Producto._meta.get_field("foto")
+    if relacion.is_cached(producto):
+        relacion.delete_cached_value(producto)
+
+
+def preparar_foto(datos: bytes) -> bytes:
+    """Valida lo que subió una persona y devuelve la miniatura WebP cuadrada (FotoInvalidaError)."""
+    return imagenes.procesar(datos)
+
+
+@transaction.atomic
+def guardar_foto(producto: Producto, miniatura: bytes) -> Producto:
+    """Guarda (o reemplaza) la foto del producto. Recibe la miniatura ya preparada.
+
+    La versión es una huella del contenido: la misma foto da la misma URL, una distinta la cambia
+    y el navegador no sigue mostrando la anterior.
+    """
+    FotoProducto.objects.update_or_create(
+        producto=producto,
+        defaults={
+            "contenido": miniatura,
+            "tipo_contenido": "image/webp",
+            "version": hashlib.sha256(miniatura).hexdigest()[:12],
+        },
+    )
+    _olvidar_foto_en_memoria(producto)
+    return producto
+
+
+@transaction.atomic
+def quitar_foto(producto: Producto) -> Producto:
+    """Quita la foto del producto (sin foto se muestra el ícono de su categoría)."""
+    FotoProducto.objects.filter(producto=producto).delete()
+    _olvidar_foto_en_memoria(producto)
+    return producto
+
+
 @transaction.atomic
 def guardar_formulario(form, formset=None):
     """Guarda un formulario del catálogo ya validado y, si hay, sus presentaciones."""
     objeto = form.save()
+    if isinstance(objeto, Producto):
+        if form.cleaned_data.get("foto"):
+            guardar_foto(objeto, form.cleaned_data["foto"])
+        elif form.cleaned_data.get("quitar_foto"):
+            quitar_foto(objeto)
     if formset is not None:
         formset.instance = objeto
         try:

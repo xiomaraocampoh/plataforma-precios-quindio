@@ -17,7 +17,7 @@ from django.utils import timezone
 
 from apps.catalogo import selectors as catalogo
 from apps.catalogo.domain.normalizacion import a_unidad_base, formatear_cantidad, precio_por_unidad
-from apps.catalogo.models import Presentacion, Producto
+from apps.catalogo.models import Categoria, Presentacion, Producto
 from apps.establecimientos.domain.mapas import enlace_mapa
 from apps.establecimientos.models import Establecimiento
 from apps.establecimientos.selectors import establecimiento_de_etiqueta
@@ -84,6 +84,7 @@ class FilaComparacion:
     ultima_confirmacion: datetime | None
     producto: str = ""
     presentacion_id: int = 0  # precarga «Registrar precio aquí»
+    producto_id: int = 0
     marca: str = ""
     cantidad: Decimal = Decimal("0")
     unidad: str = ""
@@ -138,17 +139,22 @@ class FilaComparacion:
         return antiguedad(self.resultado.fecha_observacion, timezone.now())
 
 
-def _reportes_candidatos(producto_ids: list[int], desde: datetime):
+def _reportes_candidatos(
+    producto_ids: list[int] | None, desde: datetime, establecimiento_id: int | None = None
+):
     # Un reporte viejo confirmado hace poco con «Sigue igual» sigue siendo candidato (RF-14)
+    candidatos = ReportePrecio.objects.filter(
+        Q(fecha_observacion__gte=desde) | Q(confirmaciones__creado_en__gte=desde),
+        presentacion__activa=True,  # una presentación retirada del catálogo no se compara
+        estado=ReportePrecio.Estado.PUBLICADO,
+        establecimiento__activo=True,
+    )
+    if producto_ids is not None:
+        candidatos = candidatos.filter(presentacion__producto_id__in=producto_ids)
+    if establecimiento_id is not None:
+        candidatos = candidatos.filter(establecimiento_id=establecimiento_id)
     return (
-        ReportePrecio.objects.filter(
-            Q(fecha_observacion__gte=desde) | Q(confirmaciones__creado_en__gte=desde),
-            presentacion__producto_id__in=producto_ids,
-            presentacion__activa=True,  # una presentación retirada del catálogo no se compara
-            estado=ReportePrecio.Estado.PUBLICADO,
-            establecimiento__activo=True,
-        )
-        .select_related(
+        candidatos.select_related(
             "presentacion__producto__categoria", "presentacion__producto__marca", "establecimiento"
         )
         .order_by("establecimiento_id", "presentacion_id", "-fecha_observacion")
@@ -188,6 +194,7 @@ def _fila_de(
         ultima_confirmacion=ultima,
         producto=presentacion.producto.nombre,
         presentacion_id=presentacion.pk,
+        producto_id=presentacion.producto_id,
         marca=presentacion.producto.marca.nombre if presentacion.producto.marca else "",
         cantidad=presentacion.cantidad,
         unidad=presentacion.unidad,
@@ -340,6 +347,29 @@ def _calcular_filas_de(producto_ids: list[int]) -> dict[int, list[FilaComparacio
     }
 
 
+def filas_de_establecimiento(establecimiento_id: int) -> list[FilaComparacion]:
+    """Precios vigentes de UN comercio, en orden alfabético por producto.
+
+    No es un ranking: no compara comercios entre sí (eso es `comparar_filas` y su orden neutral,
+    EC-06). Reutiliza el cálculo de la comparación (incluido el precio oficial, ADR-018), así que
+    esta página y la comparación nunca muestran precios distintos para el mismo comercio.
+    """
+    politica = politica_vigencia()
+    desde = timezone.now() - timedelta(days=max(politica.dias_reporte, politica.dias_oficial))
+    productos = {
+        r.presentacion.producto_id for r in _reportes_candidatos(None, desde, establecimiento_id)
+    }
+    filas = [
+        fila
+        for por_producto in _calcular_filas_de(sorted(productos)).values()
+        for fila in por_producto
+        if fila.resultado.establecimiento_id == establecimiento_id
+    ]
+    return sorted(
+        filas, key=lambda f: (f.producto.casefold(), f.marca.casefold(), f.unidad, f.cantidad)
+    )
+
+
 def _calcular_filas(producto_id: int) -> list[FilaComparacion]:
     return _calcular_filas_de([producto_id])[producto_id]
 
@@ -418,10 +448,31 @@ def resumen_plataforma() -> dict[str, int]:
     return cache.get_or_set(clave_resumen(), _calcular_resumen_plataforma, ttl_comparacion())
 
 
+def categorias_frecuentes(limite: int = 4):
+    """Categorías con más precios publicados, para los accesos rápidos de la portada.
+
+    Solo mide la actividad de la comunidad (sin criterio comercial); empata por nombre.
+    """
+    return list(
+        Categoria.objects.filter(activa=True)
+        .annotate(
+            n_reportes=Count(
+                "productos__presentaciones__reportes",
+                filter=Q(
+                    productos__activo=True,
+                    productos__presentaciones__reportes__estado=ReportePrecio.Estado.PUBLICADO,
+                ),
+            )
+        )
+        .filter(n_reportes__gt=0)
+        .order_by("-n_reportes", "nombre")[:limite]
+    )
+
+
 def productos_destacados(limite: int = 8):
     """Productos con más reportes publicados (un solo query; sin criterio comercial)."""
     return list(
-        catalogo.productos_publicos()
+        catalogo.con_fotos(catalogo.productos_publicos())
         .annotate(
             n_reportes=Count(
                 "presentaciones__reportes",

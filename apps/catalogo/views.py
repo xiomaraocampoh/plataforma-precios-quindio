@@ -4,6 +4,7 @@ from decimal import Decimal, InvalidOperation
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http import Http404, HttpResponse, HttpResponseNotModified
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_http_methods
 
@@ -65,3 +66,27 @@ def similares(request):
     )
     contexto = {"similares": productos, "nombre": request.GET.get("nombre", "").strip()}
     return render(request, "catalogo/partials/_similares.html", contexto)
+
+
+@require_GET
+def foto(request, producto_id: int):
+    """Miniatura de un producto público. Pública y cacheable: no depende de quién la pida.
+
+    Con la versión correcta en la dirección (`?v=`) el navegador la guarda un año; sin ella, solo
+    unos minutos, para no dejar una foto vieja. ETag: si no cambió, responde 304 sin cuerpo.
+    """
+    datos = selectors.foto_de(producto_id)
+    if datos is None:
+        raise Http404("Este producto no tiene foto.")
+    contenido, tipo, version = datos
+    etag = f'"{version}"'
+    if request.META.get("HTTP_IF_NONE_MATCH") == etag:
+        respuesta = HttpResponseNotModified()
+    else:
+        respuesta = HttpResponse(contenido, content_type=tipo)
+    respuesta["ETag"] = etag
+    inmutable = request.GET.get("v") == version
+    respuesta["Cache-Control"] = (
+        "public, max-age=31536000, immutable" if inmutable else "public, max-age=300"
+    )
+    return respuesta

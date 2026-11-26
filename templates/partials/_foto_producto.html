@@ -1,0 +1,5 @@
+{% load categorias %}{% comment %}
+Foto del producto, o el ícono de su categoría si aún no tiene (respaldo). Parámetros: producto, clase
+(foto-mini | foto-chica | foto-encabezado | foto-grande). Decorativa (alt vacío): el nombre del
+producto ya está en el texto. Tamaño fijo y carga diferida: sin saltos de diseño y liviana en 3G.
+{% endcomment %}<span class="foto-producto {{ clase }}" aria-hidden="true">{% if producto.foto_version %}<img src="{% url 'catalogo:foto' producto.pk %}?v={{ producto.foto_version }}" alt="" width="480" height="480" loading="lazy" decoding="async">{% else %}<svg class="ico" aria-hidden="true"><use href="#{{ producto.categoria|icono_categoria }}"/></svg>{% endif %}</span>

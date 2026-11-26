@@ -11,6 +11,8 @@ from rest_framework.throttling import ScopedRateThrottle
 
 from apps.catalogo import selectors as catalogo
 from apps.catalogo.domain.codigo_barras import es_gtin_valido, normalizar_codigo
+from apps.catalogo.domain.normalizacion import formatear_cantidad
+from apps.establecimientos import selectors as establecimientos
 from apps.integraciones import services as integraciones
 from apps.integraciones.domain.reconocimiento import (
     ImagenInvalidaError,
@@ -23,10 +25,12 @@ from .domain.ranking import CRITERIO_DECLARADO
 from .selectors import (
     MIN_CARACTERES_BUSQUEDA,
     buscar_productos,
+    categorias_frecuentes,
     comparar_con_resumen,
     comparar_filas,
     ejemplo_comparacion,
     estado_del_usuario,
+    filas_de_establecimiento,
     productos_destacados,
     propuesta_de_escaneo,
     resumen_plataforma,
@@ -41,6 +45,7 @@ def inicio(request):
     contexto = {
         "resumen": resumen_plataforma(),
         "destacados": destacados,
+        "categorias_rapidas": categorias_frecuentes(),
         "ejemplo_producto": destacados[0] if destacados else None,
         "ejemplo": ejemplo_comparacion(destacados[0].pk) if destacados else [],
         "foto_activa": integraciones.reconocimiento_activo(),
@@ -178,6 +183,12 @@ def comparar(request, producto_id: int):
     filas, resumen = comparar_con_resumen(producto_id, filtro, filtro_precio)
     todas = comparar_filas(producto_id)
     ids = [f.reporte_id for f in filas]
+    presentaciones = [
+        {"texto": f"{formatear_cantidad(p.cantidad)} {p.unidad}", "codigo": p.codigo_barras}
+        for p in catalogo.presentaciones_publicas()
+        .filter(producto=producto)
+        .order_by("unidad", "cantidad")
+    ]
     contexto = {
         "producto": producto,
         "filas": filas,
@@ -189,6 +200,8 @@ def comparar(request, producto_id: int):
         "precio_min": request.GET.get("precio_min", ""),
         "precio_max": request.GET.get("precio_max", ""),
         "total": len(todas),
+        "presentaciones": presentaciones,
+        "con_codigo": [p for p in presentaciones if p["codigo"]],
         **ubicaciones_de(todas),
         **estado_del_usuario(request.user, ids),
         "referencia": referencia_sipsa(producto_id),
@@ -197,6 +210,28 @@ def comparar(request, producto_id: int):
         "comparacion/partials/_resultados.html" if request.htmx else "comparacion/comparar.html"
     )
     return render(request, plantilla, contexto)
+
+
+@require_GET
+def establecimiento(request, establecimiento_id: int):
+    """Precios vigentes registrados en un comercio, en orden alfabético (no es un ranking)."""
+    local = establecimientos.establecimiento_publico(establecimiento_id)
+    if local is None:
+        raise Http404("Establecimiento no encontrado.")
+    filas = filas_de_establecimiento(local.pk)
+    productos_de = {  # con su foto en el mismo query, sin traer los bytes
+        p.pk: p
+        for p in catalogo.con_fotos(catalogo.productos_publicos()).filter(
+            pk__in={f.producto_id for f in filas}
+        )
+    }
+    tarjetas = [(productos_de[f.producto_id], f) for f in filas if f.producto_id in productos_de]
+    contexto = {
+        "local": local,
+        "tarjetas": tarjetas,
+        **estado_del_usuario(request.user, [f.reporte_id for _, f in tarjetas]),
+    }
+    return render(request, "comparacion/establecimiento.html", contexto)
 
 
 @require_GET

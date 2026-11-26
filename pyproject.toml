@@ -20,6 +20,7 @@ dependencies = [
   "django-anymail[brevo]==15.2",
   "gunicorn==23.0.0",
   "whitenoise==6.11.0",
+  "pillow==13.0.0",
 ]
 
 # ── Ruff: linter + formateador (PEP 8) ────────────────
