@@ -63,3 +63,6 @@ node_modules/
 
 # ── Vercel (ADR-0031) ────────────────────────────────
 .vercel/
+
+.vercel
+.env*
