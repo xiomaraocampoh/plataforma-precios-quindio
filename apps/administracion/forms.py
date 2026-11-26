@@ -7,6 +7,7 @@ from django import forms
 from apps.catalogo import services as catalogo
 from apps.catalogo.domain.duplicados import normalizar_nombre
 from apps.catalogo.domain.fotos import MAX_BYTES_SUBIDA, FotoInvalidaError
+from apps.catalogo.domain.grupos import grupo_sugerido
 from apps.catalogo.domain.normalizacion import Unidad
 from apps.catalogo.models import Categoria, Marca, Presentacion, Producto
 from apps.cuentas.domain.roles import GRUPOS
@@ -44,9 +45,33 @@ class MarcaForm(forms.ModelForm):
 class CategoriaForm(forms.ModelForm):
     class Meta:
         model = Categoria
-        fields = ["nombre", "perecedera"]
-        labels = {"nombre": "Nombre de la categoría", "perecedera": "Es perecedera"}
-        help_texts = {"perecedera": "Sus precios vencen antes (3 días en lugar de 7)."}
+        fields = ["nombre", "grupo", "perecedera"]
+        labels = {
+            "nombre": "Nombre de la categoría",
+            "grupo": "Departamento",
+            "perecedera": "Es perecedera",
+        }
+        help_texts = {
+            "grupo": "El grupo amplio donde aparece en la portada (Mercado, Salud y belleza…). "
+            "Si lo dejas automático, se elige según el nombre.",
+            "perecedera": "Sus precios vencen antes (3 días en lugar de 7).",
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["grupo"].required = False
+        self.fields["grupo"].choices = [
+            ("", "Automático (según el nombre)"),
+            *Categoria.Grupo.choices,
+        ]
+        if self.instance.pk:  # al editar, se muestra el departamento que ya tiene
+            self.initial.setdefault("grupo", self.instance.grupo)
+
+    def clean(self):
+        datos = super().clean()
+        if not datos.get("grupo") and datos.get("nombre"):
+            datos["grupo"] = grupo_sugerido(datos["nombre"])
+        return datos
 
     def clean_nombre(self):
         nombre = " ".join(self.cleaned_data["nombre"].split())

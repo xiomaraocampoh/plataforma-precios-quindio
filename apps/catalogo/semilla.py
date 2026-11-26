@@ -17,6 +17,7 @@ from apps.administracion.domain.datos_prueba import leer_presentacion, leer_si_n
 from core.semilla import Resumen, filas, validar
 
 from .domain.duplicados import normalizar_nombre, son_posibles_duplicados
+from .domain.grupos import grupo_sugerido
 
 
 def _limpio(texto: str) -> str:
@@ -28,9 +29,13 @@ def _categorias(apps, directorio: Path, resumen: Resumen) -> dict:
     resultado = {}
     for donde, fila in filas(directorio, "categorias.csv"):
         perecedera = validar(donde, lambda f: leer_si_no(f["perecedera"], campo="perecedera"), fila)
-        categoria, creada = Categoria.objects.get_or_create(
-            nombre=_limpio(fila["nombre"]), defaults={"perecedera": perecedera}
-        )
+        nombre = _limpio(fila["nombre"])
+        valores = {"perecedera": perecedera}
+        if "grupo" in {
+            c.name for c in Categoria._meta.get_fields()
+        }:  # no existe en las migraciones viejas
+            valores["grupo"] = grupo_sugerido(nombre)
+        categoria, creada = Categoria.objects.get_or_create(nombre=nombre, defaults=valores)
         resultado[categoria.nombre] = categoria
         resumen.sumar("categorias", creada)
     return resultado

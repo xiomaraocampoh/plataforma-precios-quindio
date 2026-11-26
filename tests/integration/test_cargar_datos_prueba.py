@@ -207,6 +207,7 @@ def test_una_fila_invalida_no_deja_nada_a_medias(db, tmp_path):
     assert not Producto.objects.exists() and not ReportePrecio.objects.exists()
 
 
+@pytest.mark.django_db
 def test_los_datos_de_prueba_quedan_en_sus_departamentos():
     from django.core.management import call_command
 
