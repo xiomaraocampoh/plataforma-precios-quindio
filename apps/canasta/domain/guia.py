@@ -274,7 +274,7 @@ TEMAS: tuple[Tema, ...] = (
             ),
             un_paso(
                 "Tu reporte es anónimo: guardamos tu autoría solo para evitar abusos.",
-                icono("i-shield", "Tu reporte es anónimo"),
+                icono("i-shield", "Sin tu nombre"),
             ),
         ],
         [

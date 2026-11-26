@@ -184,8 +184,7 @@ def _acciones_de(tema: Tema) -> list[dict]:
 
 
 def _texto_de_tema(tema: Tema) -> str:
-    pasos = "\n".join(f"{n}. {paso}" for n, paso in enumerate(tema.pasos, 1))
-    return f"**{tema.titulo}**\n{pasos}"
+    return f"**{tema.titulo}**\nTe lo explico paso a paso:"
 
 
 def _sugerir(estado: dict, temas, **extras) -> None:
@@ -198,7 +197,7 @@ def _sugerir(estado: dict, temas, **extras) -> None:
 
 
 def _responder_tema(estado: dict, tema: Tema, relacionados=()) -> tuple[str, bool]:
-    _sugerir(estado, relacionados, acciones=_acciones_de(tema))
+    _sugerir(estado, relacionados, acciones=_acciones_de(tema), tema=tema.id)
     return _texto_de_tema(tema), False
 
 

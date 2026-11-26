@@ -119,14 +119,15 @@ def _guia(args: dict, estado: dict) -> dict:
             "error": "La guía no cubre eso.",
             "temas_disponibles": [t.titulo for t in TEMAS],
         }
-    # Los botones de acceso directo los pone el sistema (no la IA): solo rutas que existen
+    # Los botones y el paso a paso los pone el sistema (no la IA): solo rutas y temas reales
     estado["_extras"] = {
-        "acciones": [{"texto": texto, "url": reverse(ruta)} for texto, ruta in temas[0].acciones]
+        "acciones": [{"texto": texto, "url": reverse(ruta)} for texto, ruta in temas[0].acciones],
+        "tema": temas[0].id,
     }
     return {
         "ok": True,
         "temas": [
-            {"titulo": t.titulo, "pasos": list(t.pasos), "botones": [a[0] for a in t.acciones]}
+            {"titulo": t.titulo, "pasos": t.textos, "botones": [a[0] for a in t.acciones]}
             for t in temas
         ],
     }

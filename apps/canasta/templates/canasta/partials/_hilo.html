@@ -18,6 +18,7 @@
   {% if m.rol == "asistente" %}<span class="avatar" aria-hidden="true"><img src="{% static 'img/knasta-96.png' %}" alt="" width="32" height="32"></span>{% endif %}
   <div class="cuerpo">
     <p><span class="sr-only">{% if m.rol == "asistente" %}Asistente: {% else %}Tú: {% endif %}</span>{{ m.texto|texto_chat }}</p>
+    {% if m.tema %}{% with tema=m.tema|tema_guia %}{% if tema %}{% include "canasta/partials/_tutorial.html" %}{% endif %}{% endwith %}{% endif %}
     {% if forloop.counter0 == indice_tarjeta and resultado %}{% include "canasta/partials/_tarjeta.html" %}{% endif %}
     {% if m.acciones or m.sugerencias and forloop.last %}
     <div class="respuestas-rapidas">
