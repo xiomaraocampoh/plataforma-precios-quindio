@@ -6,7 +6,8 @@ vienen del selector (FilaComparacion) y el orden de las tarjetas, de ordenar_neu
 Nunca hay datos del autor (M-15, EC-15). Un precio «Oficial» lo publicó un comercio verificado
 (ADR-018); sus promociones son solo etiqueta y no cambian el orden (ADR-014, EC-06).
 Parámetros: fila, destacada, numero (puesto en el orden), etiqueta (opcional), propios, denunciados,
-sin_comercio (opcional: oculta el bloque del comercio cuando la página ya es de ese comercio).
+sin_comercio (opcional: oculta el bloque del comercio cuando la página ya es de ese comercio),
+resumen (opcional: en el listado omite confirmar y denunciar, que viven en la comparación).
 {% endcomment %}
 {% with r=fila.resultado %}
 <span class="{% if destacada %}etiqueta{% else %}puesto{% endif %}">{% if icono %}<svg class="ico ico-cat-chico" aria-hidden="true"><use href="#{{ icono }}"/></svg>{% endif %}{% if etiqueta %}{{ etiqueta }}{% elif destacada %}Primero en el orden · menor precio por unidad{% else %}N.º {{ numero }}{% endif %}</span>
@@ -28,7 +29,7 @@ sin_comercio (opcional: oculta el bloque del comercio cuando la página ya es de
   </li>
   {% if r.es_promocion %}<li class="chip chip-promo">Promoción</li>{% endif %}
   {% if fila.usuarios_reportan_texto %}<li class="chip chip-alerta"><svg class="ico" aria-hidden="true"><use href="#i-info"/></svg>{{ fila.usuarios_reportan_texto }}</li>{% endif %}
-  {% if fila.ultima_confirmacion %}<li class="chip chip-positivo"><time datetime="{{ fila.ultima_confirmacion|date:'c' }}">confirmado hace {{ fila.ultima_confirmacion|hace }}</time></li>{% endif %}
+  {% if fila.ultima_confirmacion and not resumen %}<li class="chip chip-positivo"><time datetime="{{ fila.ultima_confirmacion|date:'c' }}">confirmado hace {{ fila.ultima_confirmacion|hace }}</time></li>{% endif %}
 </ul>
 <p class="tp-explicacion{% if r.confianza != 'baja' and not fila.usuarios_reportan_texto %} sr-only{% endif %}">{{ fila.confianza.1 }}{% if fila.usuarios_reportan_texto %} Varias personas vieron otro precio esta semana: verifica antes de ir.{% endif %}</p>
 {% if fila.promociones %}
@@ -46,6 +47,8 @@ sin_comercio (opcional: oculta el bloque del comercio cuando la página ya es de
   <a class="btn btn-pequeno" href="{% url 'precios:registrar' %}?presentacion={{ fila.presentacion_id }}&amp;establecimiento={{ r.establecimiento_id }}">Registrar precio aquí<span class="sr-only"> en {{ r.establecimiento }}</span></a>
   {% if fila.es_oficial %}
     <p class="suave">Precio publicado por el comercio. Si ves otro en la tienda, regístralo.</p>
+  {% elif resumen %}
+    {# En el listado solo se registra: confirmar o denunciar se hace en la comparación del producto #}
   {% elif not user.is_authenticated %}
     <a class="btn btn-sec btn-pequeno" href="{% url 'cuentas:ingresar' %}?next={{ request.get_full_path|urlencode }}">Ingresa para confirmar o denunciar<span class="sr-only"> el precio de {{ r.establecimiento }}</span></a>
   {% elif fila.reporte_id in propios %}

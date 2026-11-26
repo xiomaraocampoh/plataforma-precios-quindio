@@ -3,15 +3,21 @@
 {% if tarjetas %}
 <ul class="tarjetas tarjetas-precio" aria-label="Productos">
   {% for p, fila in tarjetas %}
-  <li class="tarjeta tarjeta-precio" aria-labelledby="{% if fila %}{{ fila.ancla }}{% else %}tp-sin-{{ p.pk }}{% endif %}">
+  <li class="tarjeta tarjeta-precio tp-resumen" aria-labelledby="{% if fila %}{{ fila.ancla }}{% else %}tp-sin-{{ p.pk }}{% endif %}">
     {% include "partials/_foto_producto.html" with producto=p clase="foto-grande" %}
     {% if fila %}
-      {% include "comparacion/partials/_tarjeta_precio.html" with destacada=False etiqueta=p.categoria.nombre icono=p.categoria|icono_categoria %}
+      {% include "comparacion/partials/_tarjeta_precio.html" with destacada=False resumen=True etiqueta=p.categoria.nombre icono=p.categoria|icono_categoria %}
     {% else %}
       <span class="puesto"><svg class="ico ico-cat-chico" aria-hidden="true"><use href="#{{ p.categoria|icono_categoria }}"/></svg>{{ p.categoria }}</span>
       <h2 class="tp-producto" id="tp-sin-{{ p.pk }}">{{ p.nombre }}{% if p.marca %} <span class="tp-marca">{{ p.marca }}</span>{% endif %}</h2>
       <p class="tp-presentacion"><span class="sr-only">Presentaciones: </span>{% for pr in p.presentaciones.all %}{{ pr.cantidad|floatformat:"-3" }} {{ pr.unidad }}{% if not forloop.last %} · {% endif %}{% endfor %}</p>
       <p class="suave">Aún no hay precios vigentes.</p>
+      {% with primera=p.presentaciones.all.0 %}{% if primera %}
+      <div class="acciones-fila">
+        {# Invita a aportar: producto y presentación ya van elegidos, solo falta la tienda y el precio #}
+        <a class="btn btn-sec btn-pequeno" href="{% url 'precios:registrar' %}?presentacion={{ primera.pk }}">Registrar el primer precio<span class="sr-only"> de {{ p }}</span></a>
+      </div>
+      {% endif %}{% endwith %}
     {% endif %}
     <a class="ir" href="{% url 'comparacion:comparar' p.pk %}">{% if fila %}Ver todos los precios{% else %}Ver el producto{% endif %}<span class="sr-only"> de {{ p }}</span></a>
   </li>
