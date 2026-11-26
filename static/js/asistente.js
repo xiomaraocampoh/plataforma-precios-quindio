@@ -147,6 +147,18 @@
     }
   });
 
+  // «Enviar mi mercado»: lleva el cursor a la caja (sin JS es un enlace a la caja)
+  document.addEventListener("click", (e) => {
+    const boton = e.target.closest && e.target.closest("[data-enviar-mercado]");
+    const c = caja();
+    if (!boton || !c) return;
+    e.preventDefault();
+    c.focus();
+    const forma = c.closest(".chat-entrada");
+    if (forma) { forma.classList.remove("llamar"); void forma.offsetWidth; forma.classList.add("llamar"); }
+    anunciar("Escribe, pega o adjunta tu lista del mercado en la caja de abajo.");
+  });
+
   document.addEventListener("input", (e) => { if (e.target.id === "chat-mensaje") ajustar(); });
   document.addEventListener("keydown", (e) => {
     if (e.target.id === "chat-mensaje" && e.key === "Enter" && !e.shiftKey && !e.isComposing) {

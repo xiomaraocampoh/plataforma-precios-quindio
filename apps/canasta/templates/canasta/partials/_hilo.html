@@ -9,7 +9,7 @@
     <div class="atajos">
       {% for atajo in atajos %}{% include "canasta/partials/_chip_mensaje.html" with texto=atajo.texto tema=atajo.tema etiqueta=atajo.etiqueta icono=atajo.icono clase="atajo-form" boton="atajo" %}{% endfor %}
     </div>
-    {% include "canasta/partials/_chip_mensaje.html" with texto=ejemplo etiqueta="Probar con una lista de ejemplo" icono="i-box" clase="atajo-ancho" boton="atajo ejemplo" %}
+    <a class="atajo mercado" href="#chat-mensaje" data-enviar-mercado><svg class="ico" aria-hidden="true"><use href="#i-enviar"/></svg><span>Enviar mi mercado</span></a>
   </div>
 </div>
 {% endif %}

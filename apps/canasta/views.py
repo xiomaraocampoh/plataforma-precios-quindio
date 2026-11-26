@@ -8,7 +8,6 @@ from .domain.guia import tema_por_id
 
 EXTENSIONES_TEXTO = (".txt", ".csv", ".md")
 MAX_IMAGEN = 5_000_001  # un byte más del tope: así se detecta una imagen demasiado grande
-EJEMPLO = "2 kg arroz\n1 L leche\n12 huevos\n1 kg azúcar\n500 g café"
 
 
 def _contexto(request) -> dict:
@@ -22,7 +21,6 @@ def _contexto(request) -> dict:
         "mensajes": mensajes,
         "indice_tarjeta": ultima,
         "resultado": resultado,
-        "ejemplo": EJEMPLO,
         "atajos": [
             {"texto": t.titulo, "tema": t.id, "etiqueta": t.corto, "icono": t.icono}
             for t in (tema_por_id(i) for i in services.PRINCIPALES)

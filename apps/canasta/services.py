@@ -176,7 +176,7 @@ def _ordenar(estado: dict, criterio: str) -> tuple[str, bool]:
     return _texto_resultado(res, [], []), True
 
 
-PRINCIPALES = ("registrar", "comparar", "cuenta", "canasta")  # lo que se sugiere al empezar
+PRINCIPALES = ("registrar", "comparar", "cuenta", "escanear")  # lo que se sugiere al empezar
 
 
 def _acciones_de(tema: Tema) -> list[dict]:
