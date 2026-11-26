@@ -37,7 +37,7 @@
   if (lanzador && panel) {
     lanzador.setAttribute("role", "button");
     lanzador.addEventListener("click", (e) => { e.preventDefault(); panel.hidden ? abrir() : cerrar(); });
-    panel.querySelector("[data-cerrar]").addEventListener("click", () => cerrar());
+    panel.querySelector("[data-asistente-cerrar]").addEventListener("click", () => cerrar());
     // Esc cierra el panel estés donde estés, salvo que haya otro diálogo abierto (p. ej. el escáner)
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && !panel.hidden && !document.querySelector("dialog[open]")) cerrar();

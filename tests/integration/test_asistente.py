@@ -5,6 +5,7 @@ cifras salen del dominio).
 """
 
 from decimal import Decimal
+from pathlib import Path
 
 import pytest
 from django.core.cache import cache
@@ -214,3 +215,13 @@ def test_con_ia_activa_la_etiqueta_aparece_en_el_boton_y_el_encabezado(client, s
     }
     html = client.get(reverse("comparacion:inicio")).content.decode()
     assert html.count('class="etiqueta-ia"') == 2
+
+
+def test_el_boton_se_esconde_mientras_el_chat_esta_abierto():
+    css = (Path(__file__).resolve().parents[2] / "static/css/app.css").read_text(encoding="utf-8")
+    assert "body.asistente-abierto .asistente-lanzador { display: none; }" in css
+
+
+def test_el_cierre_del_asistente_no_comparte_atributo_con_el_escaner(client):
+    html = client.get(reverse("comparacion:inicio")).content.decode()
+    assert "data-asistente-cerrar" in html

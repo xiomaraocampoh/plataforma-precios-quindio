@@ -1,4 +1,4 @@
-<form method="post" action="{% url 'canasta:enviar' %}" hx-post="{% url 'canasta:enviar' %}" hx-target="#chat-hilo" hx-swap="innerHTML">
+<form class="asistente-reiniciar" method="post" action="{% url 'canasta:enviar' %}" hx-post="{% url 'canasta:enviar' %}" hx-target="#chat-hilo" hx-swap="innerHTML">
   {% csrf_token %}<input type="hidden" name="reiniciar" value="1">
-  <button class="btn btn-sec btn-pequeno" type="submit">Nueva conversación</button>
+  <button class="asistente-icono" type="submit" title="Reiniciar el chat" aria-label="Reiniciar el chat"><svg class="ico" aria-hidden="true"><use href="#i-reiniciar"/></svg></button>
 </form>
