@@ -225,3 +225,19 @@ def test_el_boton_se_esconde_mientras_el_chat_esta_abierto():
 def test_el_cierre_del_asistente_no_comparte_atributo_con_el_escaner(client):
     html = client.get(reverse("comparacion:inicio")).content.decode()
     assert "data-asistente-cerrar" in html
+
+
+# --- el detalle de cada producto se explica solo ------------------------------------------------
+def test_el_detalle_dice_cuanto_pediste_y_cuantos_empaques_llevas(client, reportante, arroz, tiendas):
+    _, p500, _ = arroz
+    _precio(reportante, p500, tiendas[0], 2650)  # empaque de 500 g
+    html = _decir(client, "1 kg arroz").content.decode()
+    assert "pediste 1 kg" in html and "llevas 2 empaques de 500 g" in html
+    assert "paga el empaque completo" in html  # aclara que el costo es por tu cantidad
+
+
+def test_si_el_empaque_alcanza_exacto_no_habla_de_varios(client, reportante, arroz, tiendas):
+    _, _, p1kg = arroz
+    _precio(reportante, p1kg, tiendas[0], 8000)
+    html = _decir(client, "1 kg arroz").content.decode()
+    assert "pediste 1 kg" in html and "empaque de 1 kg" in html and "llevas 2" not in html
