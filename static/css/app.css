@@ -1047,3 +1047,8 @@ select:disabled { cursor: not-allowed; opacity: .6; }
    (si ambos tuvieran margen automático se repartirían el sobrante y el botón quedaría a alturas distintas). */
 .tarjeta-precio .acciones-fila { margin-top: auto; }
 .tarjeta-precio .acciones-fila + .ir { margin-top: .5rem; }
+
+/* Bloque final de la portada: ilustración ancha (íconos en las esquinas, centro libre para el texto);
+   en celular, una versión con los dos lados de la ilustración juntos (el bloque es angosto). */
+.tile-oscuro.cta-final { background: #0c0e16 url("../img/fondo-cta.webp") center / cover no-repeat; }
+@media (max-width: 700px) { .tile-oscuro.cta-final { background-image: radial-gradient(ellipse 80% 55% at 50% 50%, rgb(12 14 22 / .82), rgb(12 14 22 / 0) 100%), url("../img/fondo-cta-movil.webp"); min-height: 22rem; justify-content: center; } }
