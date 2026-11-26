@@ -10,7 +10,11 @@ from django.core.management.base import CommandError
 from django.test import override_settings
 from django.urls import reverse
 
-from apps.cuentas.domain.cuentas_prueba import CUENTAS_PRUEBA, VARIABLE_CONTRASENA
+from apps.cuentas.domain.cuentas_prueba import (
+    CUENTAS_PRUEBA,
+    VARIABLE_CONTRASENA,
+    VARIABLE_CORREO_BASE,
+)
 from apps.cuentas.models import Usuario
 from apps.cuentas.views.ingreso import FLAG, PRUEBA_LOCAL
 
@@ -24,9 +28,9 @@ def clave(monkeypatch):
     return valor
 
 
-def _crear() -> str:
+def _crear(*opciones) -> str:
     salida = StringIO()
-    call_command("crear_cuentas_prueba", stdout=salida)
+    call_command("crear_cuentas_prueba", *opciones, stdout=salida)
     return salida.getvalue()
 
 
@@ -112,6 +116,63 @@ def test_la_cuenta_suspendida_no_puede_ingresar(client, db, clave):
     _crear()
     _ingresar(client, "suspendido_prueba", clave)
     assert not _sesion_abierta(client)
+
+
+# ---------- CUENTAS_PRUEBA_CORREO_BASE y --solo-correos ----------
+
+BASE = "equipo@correo.test"
+
+
+def _correos() -> dict[str, str]:
+    return dict(Usuario.objects.filter(es_cuenta_prueba=True).values_list("username", "email"))
+
+
+@override_settings(CUENTAS_PRUEBA_CORREO_BASE=BASE)
+def test_con_correo_base_cada_cuenta_usa_su_sufijo(db, clave):
+    _crear()
+    assert _correos() == {c.usuario: f"equipo+{c.sufijo}@correo.test" for c in CUENTAS_PRUEBA}
+
+
+@override_settings(CUENTAS_PRUEBA_CORREO_BASE="sin-arroba")
+def test_correo_base_invalido_se_detiene_sin_crear_nada(db, clave):
+    with pytest.raises(CommandError, match=VARIABLE_CORREO_BASE):
+        _crear()
+    assert not Usuario.objects.filter(es_cuenta_prueba=True).exists()
+
+
+def test_solo_correos_actualiza_el_correo_sin_tocar_contrasena_ni_rol(db, clave, monkeypatch):
+    _crear()
+    Usuario.objects.filter(username="editor_prueba").update(rol="reportante")  # cambio a mano
+    monkeypatch.delenv(VARIABLE_CONTRASENA)  # --solo-correos no necesita la contraseña
+    with override_settings(CUENTAS_PRUEBA_CORREO_BASE=BASE):
+        salida = _crear("--solo-correos")
+    assert _correos() == {c.usuario: f"equipo+{c.sufijo}@correo.test" for c in CUENTAS_PRUEBA}
+    assert all(u.check_password(clave) for u in Usuario.objects.filter(es_cuenta_prueba=True))
+    assert Usuario.objects.get(username="editor_prueba").rol == "reportante"
+    assert "equipo+admin@correo.test" in salida and clave not in salida
+
+
+def test_solo_correos_sin_base_vuelve_a_example_com(db, clave):
+    with override_settings(CUENTAS_PRUEBA_CORREO_BASE=BASE):
+        _crear()
+    _crear("--solo-correos")
+    assert _correos() == {c.usuario: c.correo for c in CUENTAS_PRUEBA}
+
+
+@override_settings(CUENTAS_PRUEBA_CORREO_BASE=BASE)
+def test_solo_correos_no_crea_cuentas_ni_toca_otras(db, django_user_model):
+    real = django_user_model.objects.create_user(username="admin_prueba", email="real@x.test")
+    salida = _crear("--solo-correos")
+    real.refresh_from_db()
+    assert real.email == "real@x.test"  # no está marcada como cuenta de prueba
+    assert not Usuario.objects.filter(es_cuenta_prueba=True).exists()
+    assert "0 de 8" in salida
+
+
+@override_settings(CUENTAS_PRUEBA_CORREO_BASE="sin-arroba")
+def test_solo_correos_con_base_invalida_se_detiene(db, clave):
+    with pytest.raises(CommandError, match=VARIABLE_CORREO_BASE):
+        _crear("--solo-correos")
 
 
 # ---------- PERMITIR_PRUEBA_SIN_2FA ----------

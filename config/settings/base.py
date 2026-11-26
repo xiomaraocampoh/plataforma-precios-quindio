@@ -194,6 +194,9 @@ PERMITIR_PRUEBA_SIN_2FA = env.bool("PERMITIR_PRUEBA_SIN_2FA", default=False)
 # cuentas con rol conocido y una contraseña compartida (CUENTAS_PRUEBA_PASSWORD).
 SEMBRAR_DATOS_PRUEBA = env.bool("SEMBRAR_DATOS_PRUEBA", default=False)
 SEMBRAR_CUENTAS_PRUEBA = env.bool("SEMBRAR_CUENTAS_PRUEBA", default=False)
+# Buzón real del equipo para las cuentas de prueba (parte_local+sufijo@dominio): ahí llegan los
+# códigos del 2FA. Vacío: correos @example.com (apps/cuentas/domain/cuentas_prueba.py).
+CUENTAS_PRUEBA_CORREO_BASE = env("CUENTAS_PRUEBA_CORREO_BASE", default="")
 
 # Búsqueda por foto: puntaje mínimo (0 a 1) para proponer un producto (catalogo/domain/coincidencia)
 UMBRAL_COINCIDENCIA_FOTO = env.float("UMBRAL_COINCIDENCIA_FOTO", default=0.45)

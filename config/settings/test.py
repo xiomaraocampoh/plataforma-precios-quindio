@@ -29,3 +29,4 @@ NOTIFICACIONES = {"ENVIAR_AL_CONFIRMAR": False}
 # siembra la activan con override_settings.
 SEMBRAR_DATOS_PRUEBA = False
 SEMBRAR_CUENTAS_PRUEBA = False
+CUENTAS_PRUEBA_CORREO_BASE = ""  # las pruebas y el CI siempre con @example.com

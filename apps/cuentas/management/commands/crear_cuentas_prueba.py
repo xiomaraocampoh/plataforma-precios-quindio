@@ -1,9 +1,12 @@
 """Crea o actualiza las cuentas de prueba de cada rol.
 
 Uso: CUENTAS_PRUEBA_PASSWORD=... python manage.py crear_cuentas_prueba
+     python manage.py crear_cuentas_prueba --solo-correos
 
 La contraseña sale SOLO de la variable de entorno. Sin ella el comando se detiene: no genera ni
-imprime contraseñas. Documentación: docs/nucleo/cuentas-de-prueba.md
+imprime contraseñas. El correo sale de CUENTAS_PRUEBA_CORREO_BASE (vacía: @example.com).
+`--solo-correos` cambia solo el correo de las cuentas que ya existen: no pide la contraseña ni
+toca contraseñas, roles o grupos. Documentación: docs/nucleo/cuentas-de-prueba.md
 """
 
 import os
@@ -14,8 +17,10 @@ from django.core.management.base import BaseCommand, CommandError
 
 from apps.cuentas import services
 from apps.cuentas.domain.cuentas_prueba import (
+    CUENTAS_PRUEBA,
     VARIABLE_CONTRASENA,
     ContrasenaDePruebaAusenteError,
+    CorreoBaseInvalidoError,
     exigir_contrasena_de_prueba,
 )
 
@@ -23,7 +28,34 @@ from apps.cuentas.domain.cuentas_prueba import (
 class Command(BaseCommand):
     help = "Crea o actualiza las cuentas de prueba (una por rol) con CUENTAS_PRUEBA_PASSWORD."
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--solo-correos",
+            action="store_true",
+            help="Solo actualiza el correo de las cuentas existentes (CUENTAS_PRUEBA_CORREO_BASE).",
+        )
+
     def handle(self, *args, **opciones):
+        try:
+            if opciones["solo_correos"]:
+                self._solo_correos()
+                return
+            self._crear()
+        except CorreoBaseInvalidoError as exc:
+            raise CommandError(str(exc)) from exc
+
+    def _solo_correos(self) -> None:
+        actualizadas = services.cuentas_prueba.actualizar_correos_prueba()
+        for cuenta, correo in actualizadas:
+            self.stdout.write(f"{cuenta.usuario}  {correo}")
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Correos actualizados: {len(actualizadas)} de {len(CUENTAS_PRUEBA)} cuentas de "
+                "prueba (las que no existen no se crean)."
+            )
+        )
+
+    def _crear(self) -> None:
         try:
             contrasena = exigir_contrasena_de_prueba(os.environ.get(VARIABLE_CONTRASENA))
         except ContrasenaDePruebaAusenteError as exc:

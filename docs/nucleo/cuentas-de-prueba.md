@@ -61,8 +61,9 @@ python manage.py crear_cuentas_prueba
   comando se detiene. **No genera ni imprime contraseñas.**
 - La contraseña debe cumplir los validadores de Django: longitud mínima, que no sea común y que
   no sea solo numérica.
-- Los correos usan `example.com` (RFC 2606), así que nunca llegan a una persona real. Quedan ya
-  verificados y con el consentimiento de datos (Ley 1581) aceptado.
+- Por defecto los correos usan `example.com` (RFC 2606), así que nunca llegan a una persona real.
+  Con `CUENTAS_PRUEBA_CORREO_BASE` usan un buzón del equipo (ver abajo). Quedan ya verificados y
+  con el consentimiento de datos (Ley 1581) aceptado.
 - El grupo y los permisos salen del rol (`apps/cuentas/domain/roles.py`).
 - Correr el comando otra vez actualiza las cuentas: rol, estado, grupo y contraseña. No las duplica.
 
@@ -79,6 +80,46 @@ python manage.py crear_cuentas_prueba
 
 Los datos de prueba (ver `data/demo/README.md`) usan estas mismas cuentas como autores. Por eso, al
 ingresar, cada reportante ya tiene aportes.
+
+## Correos de las cuentas: `CUENTAS_PRUEBA_CORREO_BASE`
+
+En producción (`DEBUG=False`) el 2FA no se puede omitir: el administrador, el moderador y el staff
+reciben el código por correo. Con los correos `@example.com` ese código no le llega a nadie y no
+se puede ingresar. Para eso, define en el entorno un buzón real del equipo:
+
+```
+CUENTAS_PRUEBA_CORREO_BASE=equipo@gmail.com
+```
+
+Cada cuenta usa `parte_local+sufijo@dominio`. Gmail y la mayoría de proveedores entregan
+`equipo+admin@gmail.com` en el buzón `equipo@gmail.com`, así que un solo buzón recibe los códigos
+de todas las cuentas.
+
+| Usuario | Sufijo | Correo con `equipo@gmail.com` |
+|---|---|---|
+| `admin_prueba` | `admin` | `equipo+admin@gmail.com` |
+| `moderador_prueba` | `moderador` | `equipo+moderador@gmail.com` |
+| `editor_prueba` | `editor` | `equipo+editor@gmail.com` |
+| `reportante_prueba` | `reportante` | `equipo+reportante@gmail.com` |
+| `reportante_ana` | `ana` | `equipo+ana@gmail.com` |
+| `reportante_luis` | `luis` | `equipo+luis@gmail.com` |
+| `comercio_prueba` | `comercio` | `equipo+comercio@gmail.com` |
+| `suspendido_prueba` | `suspendido` | `equipo+suspendido@gmail.com` |
+
+- Vacía (el valor por defecto): se conservan los `@example.com`. Las pruebas y el CI siempre la
+  usan vacía (`config/settings/test.py`).
+- La base debe tener la forma `parte_local@dominio`, sin espacios ni `+`. Si no la tiene, el
+  comando y la siembra se detienen con un error que nombra la variable, sin escribir nada.
+- La regla vive en `apps/cuentas/domain/cuentas_prueba.py::correo_de_prueba`. La usan
+  `crear_cuentas_prueba` y la siembra de `migrate` (`apps/cuentas/semilla.py`, ADR-0023).
+- La migración ya aplicada no vuelve a correr. En una base que ya tiene las cuentas, actualiza
+  solo el correo, sin tocar contraseñas, roles ni grupos y sin pedir `CUENTAS_PRUEBA_PASSWORD`:
+
+```bash
+python manage.py crear_cuentas_prueba --solo-correos
+```
+
+  Solo cambia las cuentas marcadas `es_cuenta_prueba=True`; no crea las que faltan.
 
 ## Verificación en dos pasos en local: `PERMITIR_PRUEBA_SIN_2FA`
 

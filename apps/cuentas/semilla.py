@@ -5,14 +5,17 @@ Recibe el registro de modelos (`apps`). Los modelos históricos no tienen `set_p
 se fija con `make_password`, que también produce la contraseña inutilizable cuando no hay clave.
 
 La contraseña llega como argumento (sale de CUENTAS_PRUEBA_PASSWORD) y nunca se imprime.
+El correo sale de `domain.cuentas_prueba.correo_de_prueba` con CUENTAS_PRUEBA_CORREO_BASE (ajuste);
+si la base no es válida, CorreoBaseInvalidoError detiene la siembra antes de escribir.
 """
 
+from django.conf import settings
 from django.contrib.auth.hashers import is_password_usable, make_password
 from django.db import transaction
 from django.db.models import ProtectedError, Q
 from django.utils import timezone
 
-from .domain.cuentas_prueba import CUENTAS_PRUEBA, CuentaPrueba
+from .domain.cuentas_prueba import CUENTAS_PRUEBA, CuentaPrueba, correos_de_prueba
 from .domain.roles import GRUPOS, PERMISOS, grupo_de
 
 
@@ -38,9 +41,14 @@ def asegurar_grupos(apps) -> dict[str, object]:
     return grupos
 
 
-def _aplicar(usuario, cuenta: CuentaPrueba, ahora) -> None:
+def correos() -> dict[str, str]:
+    """El correo de cada cuenta de prueba según CUENTAS_PRUEBA_CORREO_BASE, por usuario."""
+    return correos_de_prueba(getattr(settings, "CUENTAS_PRUEBA_CORREO_BASE", ""))
+
+
+def _aplicar(usuario, cuenta: CuentaPrueba, correo: str, ahora) -> None:
     usuario.rol = cuenta.rol
-    usuario.email = cuenta.correo
+    usuario.email = correo
     usuario.email_verificado_en = usuario.email_verificado_en or ahora
     usuario.acepto_tratamiento_datos = True
     usuario.fecha_aceptacion_datos = usuario.fecha_aceptacion_datos or ahora
@@ -74,6 +82,7 @@ def sembrar(
     La validación de la contraseña (AUTH_PASSWORD_VALIDATORS) la hace quien llama.
     """
     Usuario = apps.get_model("cuentas", "Usuario")
+    por_usuario = correos()  # primero: una base inválida no deja nada a medias
     grupos = asegurar_grupos(apps)
     ahora = timezone.now()
     resultado = []
@@ -82,7 +91,7 @@ def sembrar(
         creada = usuario is None
         if creada:
             usuario = Usuario(username=cuenta.usuario)
-        _aplicar(usuario, cuenta, ahora)
+        _aplicar(usuario, cuenta, por_usuario[cuenta.usuario], ahora)
         if contrasena and (fijar_en_existentes or not _tiene_clave_utilizable(usuario)):
             usuario.password = make_password(contrasena)
         elif not _tiene_clave_utilizable(usuario):
@@ -91,6 +100,21 @@ def sembrar(
         _sincronizar_grupo(usuario, grupos)
         resultado.append((cuenta, creada))
     return resultado
+
+
+def actualizar_correos(apps) -> list[tuple[CuentaPrueba, str]]:
+    """Solo el correo de las cuentas de prueba que ya existen (`es_cuenta_prueba=True`); no crea
+    cuentas ni toca contraseña, rol, grupo o estado. Devuelve (cuenta, correo) de las actualizadas.
+    """
+    Usuario = apps.get_model("cuentas", "Usuario")
+    por_usuario = correos()
+    actualizadas = []
+    for cuenta in CUENTAS_PRUEBA:
+        correo = por_usuario[cuenta.usuario]
+        filtro = Usuario.objects.filter(username=cuenta.usuario, es_cuenta_prueba=True)
+        if filtro.update(email=correo):
+            actualizadas.append((cuenta, correo))
+    return actualizadas
 
 
 def autores(apps) -> dict:
