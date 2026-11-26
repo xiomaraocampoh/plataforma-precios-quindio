@@ -59,3 +59,14 @@ def test_en_celular_y_tablet_sigue_la_hamburguesa_sin_desbordar(page, live_serve
     expect(page.locator(".menu-boton")).to_be_visible()
     assert not page.evaluate("document.documentElement.scrollWidth > innerWidth")
     assert page.locator(".cabecera-in").bounding_box()["height"] <= 80
+
+
+@pytest.mark.parametrize("ancho", [1280, 1440, 1600])
+def test_la_pastilla_esta_centrada_y_el_logo_pegado_a_la_izquierda(page, live_server, ancho):
+    _ir(page, live_server, "/productos/", ancho)
+    nav = page.locator(".nav").bounding_box()
+    centro = nav["x"] + nav["width"] / 2
+    assert abs(centro - ancho / 2) <= 3  # centrada en la pantalla
+    logo = page.locator(".marca").bounding_box()
+    assert logo["x"] <= 40  # cerca del borde izquierdo
+    assert not page.evaluate("document.documentElement.scrollWidth > innerWidth")
