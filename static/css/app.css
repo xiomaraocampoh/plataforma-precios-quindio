@@ -1286,3 +1286,12 @@ body.asistente-abierto .asistente-lanzador { display: none; }
 @media (min-width: 1024px) and (max-width: 1199px) { .btn-registrar .reg-largo { display: none; } }
 @media (max-width: 1023px) { .marca-logo { height: 40px; } .cabecera-in { min-height: 62px; } }
 @media (prefers-reduced-motion: reduce) { .cabecera, .marca-logo, .nav a { transition: none; } .marca:hover .marca-logo { transform: none; } }
+
+/* Escritorio ancho: logo a la izquierda, pastilla centrada en la pantalla y botones a la derecha */
+@media (min-width: 1280px) {
+  .cabecera-in { max-width: 1440px; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); padding-inline: 1.25rem; }
+  .cabecera-in { max-width: none; }
+  .cabecera-in .marca { justify-self: start; }
+  .cabecera-in .acciones { margin-left: 0; justify-self: end; flex-wrap: nowrap; }
+}
+@media (min-width: 1280px) and (max-width: 1439px) { .btn-registrar .reg-largo { display: none; } }
