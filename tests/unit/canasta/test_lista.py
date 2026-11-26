@@ -84,7 +84,9 @@ def test_ignora_lineas_vacias_y_sin_letras():
 
 def test_cantidad_absurda_o_cero_no_se_inventa():
     ln = parsear_lista("0 kg arroz")[0]
-    assert ln.cantidad is None  # 0 no es una cantidad: el sistema pregunta o usa el valor por defecto
+    assert (
+        ln.cantidad is None
+    )  # 0 no es una cantidad: el sistema pregunta o usa el valor por defecto
 
 
 def test_limita_la_cantidad_de_lineas():
