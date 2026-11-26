@@ -243,3 +243,12 @@ def test_si_el_empaque_alcanza_exacto_no_habla_de_varios(client, reportante, arr
     _precio(reportante, p1kg, tiendas[0], 8000)
     html = _decir(client, "1 kg arroz").content.decode()
     assert "pediste 1 kg" in html and "empaque de 1 kg" in html and "llevas 2" not in html
+
+
+def test_las_cantidades_pequenas_se_muestran_en_gramos_o_mililitros(
+    client, reportante, arroz, tiendas
+):
+    _, p500, _ = arroz
+    _precio(reportante, p500, tiendas[0], 2650)
+    html = _decir(client, "250 g arroz").content.decode()
+    assert "pediste 250 g" in html and "pediste 0,25 kg" not in html

@@ -103,10 +103,18 @@ class Resultado:
     sin_precios: bool
 
 
+def _cantidad_natural(cantidad: Decimal, unidad_base: str) -> str:
+    """0,25 kg se lee mejor como 250 g, y 0,15 L como 150 ml."""
+    if cantidad < 1 and unidad_base in ("kg", "L"):
+        menor = "g" if unidad_base == "kg" else "ml"
+        return f"{formatear_cantidad((cantidad * 1000).normalize())} {menor}"
+    return f"{formatear_cantidad(cantidad)} {unidad_base}"
+
+
 def _linea_vista(ln) -> dict:
     """Lo que dice cada renglón: qué pediste y cuántos empaques de qué tamaño llevarías."""
     empaque = f"{formatear_cantidad(ln.tamano)} {ln.unidad_presentacion}"
-    pediste = f"{formatear_cantidad(ln.cantidad_base)} {ln.unidad_base}"
+    pediste = _cantidad_natural(ln.cantidad_base, ln.unidad_base)
     llevas = (
         f"llevas {ln.empaques} empaques de {empaque}"
         if ln.empaques > 1
