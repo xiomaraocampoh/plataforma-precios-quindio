@@ -90,7 +90,7 @@ SECCIONES = {
             modelo="categoria",
             formulario=forms.CategoriaForm,
             listar=selectors.listar_categorias,
-            columnas=("Categoría", "Perecedera", "Productos", "Estado"),
+            columnas=("Categoría", "Departamento", "Perecedera", "Productos", "Estado"),
             descripcion="Agrupan productos y fijan cuánto dura un precio (perecederos: 3 días).",
             filtros=(
                 Filtro(

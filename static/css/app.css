@@ -982,7 +982,7 @@ select:disabled { cursor: not-allowed; opacity: .6; }
 .tp-resumen .acciones-fila { padding-top: .35rem; margin-top: auto; }
 
 /* Accesos rápidos por categoría bajo el buscador de la portada */
-.cat-rapidas { gap: .6rem; max-width: 720px; }
+.cat-rapidas { gap: .6rem; max-width: 900px; }  /* cinco departamentos caben en una línea */
 .chip-cat { display: inline-flex; align-items: center; gap: .55rem; min-height: 44px; padding: .35rem 1.1rem .35rem .85rem; border-radius: 999px; background: rgb(255 255 255 / .85); backdrop-filter: blur(6px); color: var(--texto); font-weight: 600; font-size: .95rem; box-shadow: 0 6px 20px -12px rgb(30 60 120 / .45); transition: background-color .2s ease, transform .2s ease; }
 .chip-cat .ico { width: 22px; height: 22px; color: var(--marca-enlace); flex: none; }
 .chip-cat:hover { text-decoration: none; background: var(--marca-suave); transform: translateY(-1px); }

@@ -205,3 +205,20 @@ def test_una_fila_invalida_no_deja_nada_a_medias(db, tmp_path):
     with pytest.raises(CommandError, match="precios.csv línea 6"):
         _cargar("--directorio", str(destino))
     assert not Producto.objects.exists() and not ReportePrecio.objects.exists()
+
+
+@pytest.mark.django_db
+def test_los_datos_de_prueba_quedan_en_sus_departamentos():
+    from django.core.management import call_command
+
+    from apps.catalogo.models import Categoria
+
+    call_command("cargar_datos_prueba", "--solo-catalogo")
+    esperado = {
+        "Arroz": "mercado",
+        "Leche": "lacteos_huevos",
+        "Detergente": "aseo_hogar",
+        "Crema dental": "salud_belleza",
+    }
+    for nombre, grupo in esperado.items():
+        assert Categoria.objects.get(nombre=nombre).grupo == grupo

@@ -276,3 +276,40 @@ def test_editar_sin_tocar_la_fila_libre_guarda_y_las_cantidades_se_leen_bien(ent
         categoria=datos["granos"].pk,
     )
     assert client.post(url, datos_form).status_code == 302
+
+
+# ---------- Departamento de la categoría ----------
+
+
+def test_una_categoria_sin_departamento_se_ubica_por_su_nombre(entrar, db):
+    client, _ = entrar("editor_catalogo")
+    client.post(reverse("panel:nuevo", args=["categorias"]), {"nombre": "Frutas y verduras"})
+    assert Categoria.objects.get(nombre="Frutas y verduras").grupo == "frutas_verduras"
+
+
+def test_el_departamento_elegido_gana_sobre_el_automatico(entrar, db):
+    client, _ = entrar("editor_catalogo")
+    client.post(
+        reverse("panel:nuevo", args=["categorias"]),
+        {"nombre": "Cremas ponds", "grupo": "salud_belleza"},
+    )
+    assert Categoria.objects.get(nombre="Cremas ponds").grupo == "salud_belleza"
+
+
+def test_un_departamento_inventado_se_rechaza(entrar, db):
+    client, _ = entrar("editor_catalogo")
+    r = client.post(
+        reverse("panel:nuevo", args=["categorias"]), {"nombre": "Algo", "grupo": "inventado"}
+    )
+    assert not Categoria.objects.filter(nombre="Algo").exists()
+    assert "departamento" in r.content.decode().lower()
+
+
+def test_el_formulario_ofrece_los_departamentos_y_la_lista_los_muestra(entrar, db):
+    client, _ = entrar("editor_catalogo")
+    nuevo = client.get(reverse("panel:nuevo", args=["categorias"])).content.decode()
+    for etiqueta in ("Mercado", "Frutas y verduras", "Salud y belleza", "Aseo del hogar"):
+        assert etiqueta in nuevo
+    Categoria.objects.create(nombre="Crema dental", grupo="salud_belleza")
+    lista = client.get(reverse("panel:lista", args=["categorias"])).content.decode()
+    assert "Departamento" in lista and "Salud y belleza" in lista

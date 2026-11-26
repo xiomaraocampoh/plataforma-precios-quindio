@@ -23,6 +23,13 @@
     </select>
   </div>
   <div class="campo">
+    <label for="f-grupo">Departamento</label>
+    <select id="f-grupo" name="grupo">
+      <option value="">Todos</option>
+      {% for g in grupos %}<option value="{{ g.valor }}"{% if g.valor == grupo %} selected{% endif %}>{{ g.etiqueta }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="campo">
     <label for="f-categoria">Categoría</label>
     <select id="f-categoria" name="categoria">
       <option value="">Todas</option>

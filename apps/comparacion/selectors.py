@@ -16,6 +16,7 @@ from django.db.models import Count, Q
 from django.utils import timezone
 
 from apps.catalogo import selectors as catalogo
+from apps.catalogo.domain.grupos import GRUPOS
 from apps.catalogo.domain.normalizacion import a_unidad_base, formatear_cantidad, precio_por_unidad
 from apps.catalogo.models import Categoria, Presentacion, Producto
 from apps.establecimientos.domain.mapas import enlace_mapa
@@ -455,25 +456,21 @@ def resumen_plataforma() -> dict[str, int]:
     return cache.get_or_set(clave_resumen(), _calcular_resumen_plataforma, ttl_comparacion())
 
 
-def categorias_frecuentes(limite: int = 4):
-    """Categorías con más precios publicados, para los accesos rápidos de la portada.
+def grupos_para_portada(limite: int = 5) -> list:
+    """Los departamentos con al menos un precio publicado, para los accesos rápidos de la portada.
 
-    Solo mide la actividad de la comunidad (sin criterio comercial); empata por nombre.
+    El orden es el fijo de los departamentos (Mercado primero): no mide ninguna actividad comercial.
     """
-    return list(
-        Categoria.objects.filter(activa=True)
-        .annotate(
-            n_reportes=Count(
-                "productos__presentaciones__reportes",
-                filter=Q(
-                    productos__activo=True,
-                    productos__presentaciones__reportes__estado=ReportePrecio.Estado.PUBLICADO,
-                ),
-            )
+    con_precios = set(
+        Categoria.objects.filter(
+            activa=True,
+            productos__activo=True,
+            productos__presentaciones__reportes__estado=ReportePrecio.Estado.PUBLICADO,
         )
-        .filter(n_reportes__gt=0)
-        .order_by("-n_reportes", "nombre")[:limite]
+        .values_list("grupo", flat=True)
+        .distinct()
     )
+    return [g for g in GRUPOS if g.valor in con_precios][:limite]
 
 
 def productos_destacados(limite: int = 8):
