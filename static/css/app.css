@@ -1255,3 +1255,34 @@ body.asistente-abierto .asistente-lanzador { display: none; }
 @keyframes toque { 0% { opacity: .85; transform: scale(.92); } 70%, 100% { opacity: 0; transform: scale(1.18); } }
 @keyframes parpadeo { 50% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .toque { animation: none; opacity: .6; } .cursor { animation: none; } }
+
+/* Bloque final de la portada: ilustración ancha (íconos en las esquinas, centro libre para el texto);
+   en celular, una versión con los dos lados de la ilustración juntos (el bloque es angosto). */
+.tile-oscuro.cta-final { background: #0c0e16 url("../img/fondo-cta.webp") center / cover no-repeat; }
+@media (max-width: 700px) { .tile-oscuro.cta-final { background-image: radial-gradient(ellipse 80% 55% at 50% 50%, rgb(12 14 22 / .82), rgb(12 14 22 / 0) 100%), url("../img/fondo-cta-movil.webp"); min-height: 22rem; justify-content: center; } }
+
+/* Cinco departamentos caben en una línea en escritorio */
+.cat-rapidas { max-width: 900px; }
+
+/* Barra superior: logo grande, pastilla segmentada para los enlaces y sombra al bajar ----------------- */
+.cabecera { transition: box-shadow .25s ease, border-color .25s ease, background-color .25s ease; }
+.cabecera.sombra { background: color-mix(in srgb, var(--fondo) 93%, transparent); box-shadow: 0 12px 28px -20px rgb(10 30 80 / .55); border-bottom-color: transparent; }
+.cabecera-in { min-height: 68px; padding-block: .5rem; gap: .5rem 1rem; }
+.marca { padding: .15rem 0; }
+.marca-logo { height: 46px; transition: transform .25s ease; }
+.marca:hover .marca-logo { transform: scale(1.035); }
+.marca-logo-icono { height: 42px; width: 42px; }
+.acciones { gap: .5rem; }
+.acciones .btn { min-height: 42px; padding-inline: 1.1rem; }
+.btn-crear-cuenta { box-shadow: 0 10px 20px -12px rgb(0 100 220 / .75); }
+.js .tema-alternar { border: 1px solid var(--borde); background: var(--superficie); }
+.js .tema-alternar:hover { border-color: var(--borde-fuerte); }
+@media (min-width: 1024px) {
+  .nav { gap: .15rem; padding: .25rem; border-radius: 999px; background: color-mix(in srgb, var(--texto) 6%, transparent); flex-wrap: nowrap; }
+  .nav a { min-height: 38px; padding: 0 .8rem; font-size: .9rem; transition: background-color .2s ease, color .2s ease, box-shadow .2s ease; }
+  .nav a:hover { background: color-mix(in srgb, var(--texto) 8%, transparent); }
+  .nav a[aria-current="page"] { background: var(--superficie); color: var(--marca-enlace); font-weight: 600; box-shadow: 0 1px 2px rgb(0 0 0 / .12), 0 6px 14px -8px rgb(0 0 0 / .35); }
+}
+@media (min-width: 1024px) and (max-width: 1199px) { .btn-registrar .reg-largo { display: none; } }
+@media (max-width: 1023px) { .marca-logo { height: 40px; } .cabecera-in { min-height: 62px; } }
+@media (prefers-reduced-motion: reduce) { .cabecera, .marca-logo, .nav a { transition: none; } .marca:hover .marca-logo { transform: none; } }
