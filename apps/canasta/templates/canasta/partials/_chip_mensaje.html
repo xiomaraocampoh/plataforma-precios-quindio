@@ -1,0 +1,4 @@
+<form method="post" action="{% url 'canasta:enviar' %}" hx-post="{% url 'canasta:enviar' %}" hx-target="#chat-hilo" hx-swap="innerHTML">
+  {% csrf_token %}<input type="hidden" name="mensaje" value="{{ texto }}">{% if tema %}<input type="hidden" name="tema" value="{{ tema }}">{% endif %}
+  <button class="chip-resp" type="submit">{{ etiqueta|default:texto }}</button>
+</form>

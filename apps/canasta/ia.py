@@ -10,6 +10,8 @@ import json
 from dataclasses import dataclass
 from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 
+from django.urls import reverse
+
 from apps.integraciones import services as integraciones
 from apps.integraciones.domain.asistente import (
     HERRAMIENTAS,
@@ -25,6 +27,7 @@ from apps.integraciones.domain.asistente import (
 
 from . import selectors
 from .domain.canasta import MAX_ITEMS, CanastaInvalidaError, ItemCanasta, validar_items
+from .domain.guia import TEMAS, buscar_temas
 
 _ROL = {"usuario": "user", "asistente": "assistant"}
 
@@ -108,7 +111,34 @@ def _calcular(args: dict, estado: dict) -> dict:
     }
 
 
-_EJECUTORES = {"buscar_productos": _buscar, "armar_canasta": _armar, "calcular_canasta": _calcular}
+def _guia(args: dict, estado: dict) -> dict:
+    temas = buscar_temas(str(args.get("consulta", ""))[:200], limite=2)
+    if not temas:
+        return {
+            "ok": False,
+            "error": "La guía no cubre eso.",
+            "temas_disponibles": [t.titulo for t in TEMAS],
+        }
+    # Los botones de acceso directo los pone el sistema (no la IA): solo rutas que existen
+    estado["_extras"] = {
+        "acciones": [{"texto": texto, "url": reverse(ruta)} for texto, ruta in temas[0].acciones]
+    }
+    return {
+        "ok": True,
+        "temas": [
+            {"titulo": t.titulo, "pasos": list(t.pasos), "botones": [a[0] for a in t.acciones]}
+            for t in temas
+        ],
+    }
+
+
+_DE_CANASTA = {"armar_canasta", "calcular_canasta"}
+_EJECUTORES = {
+    "buscar_productos": _buscar,
+    "armar_canasta": _armar,
+    "calcular_canasta": _calcular,
+    "consultar_guia": _guia,
+}
 
 
 def _ejecutar(llamada: dict, estado: dict) -> str:
@@ -154,10 +184,16 @@ def conversar(
     if imagen is not None:
         contenido.insert(0, integraciones.bloque_imagen(*imagen))
     mensajes = [*_historial(historial), {"role": "user", "content": contenido}]
-    sistema = INSTRUCCIONES + _contexto_de_la_lista(estado)
+    temas = "; ".join(t.titulo for t in TEMAS)
+    sistema = (
+        INSTRUCCIONES
+        + f"\n\nTEMAS DE LA GUÍA DE USO (datos): {temas}"
+        + _contexto_de_la_lista(estado)
+    )
 
     devueltos: list[str] = []
     vueltas = llamadas = 0
+    uso_canasta = False
     respuesta = None
     while True:
         respuesta = modelo.responder(sistema=sistema, mensajes=mensajes, herramientas=HERRAMIENTAS)
@@ -171,6 +207,7 @@ def conversar(
             break
         resultados = []
         for llamada in pedidas:
+            uso_canasta = uso_canasta or llamada.get("name") in _DE_CANASTA
             salida = _ejecutar(llamada, estado)
             devueltos.append(salida)
             resultados.append(
@@ -181,7 +218,9 @@ def conversar(
             {"role": "user", "content": resultados},
         ]
 
-    hay_lista = bool(estado["pedido"]) and bool(devueltos)
+    hay_lista = (
+        bool(estado["pedido"]) and uso_canasta
+    )  # una pregunta de ayuda no muestra la tarjeta
     texto = respuesta.texto if respuesta is not None and respuesta.parada == "end_turn" else ""
     permitidas = cifras_permitidas(entrada or "", *devueltos, json.dumps(estado["pedido"]))
     confiable = bool(texto) and len(texto) <= MAX_TEXTO_MODELO

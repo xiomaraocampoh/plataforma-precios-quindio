@@ -5,10 +5,11 @@
   <div class="cuerpo">
     <p>¡Hola! Soy K-nasta, tu asistente de compras. Pásame tu lista del mercado, escrita o pegada, y te digo en qué tienda te sale más barato comprarlo todo.</p>
     <p class="suave">Por ejemplo: <em>2 kg arroz, 1 L leche, 12 huevos</em>{% if asistente_ia %}, o algo como <em>mercado para 4 personas</em>{% endif %}. También puedes adjuntar {% if asistente_ia %}una foto o {% endif %}un archivo de texto con tu lista.</p>
-    <form method="post" action="{% url 'canasta:enviar' %}" hx-post="{% url 'canasta:enviar' %}" hx-target="#chat-hilo" hx-swap="innerHTML">
-      {% csrf_token %}<input type="hidden" name="mensaje" value="{{ ejemplo }}">
-      <button class="chip-resp" type="submit">Probar con una lista de ejemplo</button>
-    </form>
+    <p class="cn-nota"><strong>¿Primera vez aquí?</strong> Pregúntame cómo usar la app:</p>
+    <div class="respuestas-rapidas">
+      {% for atajo in atajos %}{% include "canasta/partials/_chip_mensaje.html" with texto=atajo.texto tema=atajo.tema %}{% endfor %}
+      {% include "canasta/partials/_chip_mensaje.html" with texto=ejemplo etiqueta="Probar con una lista de ejemplo" %}
+    </div>
   </div>
 </div>
 {% endif %}
@@ -18,6 +19,12 @@
   <div class="cuerpo">
     <p><span class="sr-only">{% if m.rol == "asistente" %}Asistente: {% else %}Tú: {% endif %}</span>{{ m.texto|texto_chat }}</p>
     {% if forloop.counter0 == indice_tarjeta and resultado %}{% include "canasta/partials/_tarjeta.html" %}{% endif %}
+    {% if m.acciones or m.sugerencias and forloop.last %}
+    <div class="respuestas-rapidas">
+      {% for a in m.acciones %}<a class="chip-resp" href="{{ a.url }}">{{ a.texto }}</a>{% endfor %}
+      {% if forloop.last %}{% for s in m.sugerencias %}{% include "canasta/partials/_chip_mensaje.html" with texto=s.texto tema=s.tema %}{% endfor %}{% endif %}
+    </div>
+    {% endif %}
   </div>
 </div>
 {% endfor %}

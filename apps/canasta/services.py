@@ -9,12 +9,15 @@ import unicodedata
 from dataclasses import dataclass
 from decimal import Decimal
 
+from django.urls import reverse
+
 from apps.catalogo.domain.normalizacion import son_comparables
 from apps.integraciones import services as integraciones
 from apps.integraciones.domain.reconocimiento import ImagenInvalidaError, tipo_de_imagen
 
 from . import ia, selectors
 from .domain.canasta import CRITERIO_COBERTURA, CRITERIO_TOTAL, MAX_ITEMS
+from .domain.guia import Tema, buscar_temas, tema_por_id
 from .domain.intencion import Intencion, Tipo, detectar_intencion
 from .domain.lista import parsear_lista
 
@@ -173,7 +176,46 @@ def _ordenar(estado: dict, criterio: str) -> tuple[str, bool]:
     return _texto_resultado(res, [], []), True
 
 
+PRINCIPALES = ("registrar", "comparar", "cuenta", "canasta")  # lo que se sugiere al empezar
+
+
+def _acciones_de(tema: Tema) -> list[dict]:
+    return [{"texto": texto, "url": reverse(ruta)} for texto, ruta in tema.acciones]
+
+
+def _texto_de_tema(tema: Tema) -> str:
+    pasos = "\n".join(f"{n}. {paso}" for n, paso in enumerate(tema.pasos, 1))
+    return f"**{tema.titulo}**\n{pasos}"
+
+
+def _sugerir(estado: dict, temas, **extras) -> None:
+    estado["_extras"] = {
+        **extras,
+        "sugerencias": [{"texto": t.titulo, "tema": t.id} for t in temas],
+    }
+
+
+def _responder_tema(estado: dict, tema: Tema, relacionados=()) -> tuple[str, bool]:
+    _sugerir(estado, relacionados, acciones=_acciones_de(tema))
+    return _texto_de_tema(tema), False
+
+
+def _ayuda(estado: dict, entrada: str) -> tuple[str, bool]:
+    """Una pregunta sobre cómo usar la app: se responde con la guía (nunca se inventa)."""
+    temas = buscar_temas(entrada, limite=2)
+    if temas:
+        return _responder_tema(estado, temas[0], temas[1:])
+    _sugerir(estado, [tema_por_id(i) for i in PRINCIPALES])
+    return (
+        "Con gusto te ayudo a usar AhorraPues. Elige un tema o cuéntame qué quieres hacer, "
+        "o pásame tu lista del mercado.",
+        False,
+    )
+
+
 def _con_reglas(estado: dict, intencion) -> tuple[str, bool]:
+    if intencion.tipo is Tipo.AYUDA:
+        return _ayuda(estado, intencion.resto)
     if intencion.tipo is Tipo.REINICIAR:
         estado["pedido"] = []
         return f"Listo, empecemos de nuevo. {SALUDO_AYUDA}", False
@@ -227,6 +269,14 @@ def _respuesta(estado, historial, entrada, adjunto, usuario, ip) -> tuple[str, b
     return aviso + texto, tarjeta
 
 
+def _registrar(sesion, estado, visto: str, respuesta: str, tarjeta: bool) -> None:
+    extras = estado.pop("_extras", {})
+    mensaje = {"rol": "asistente", "texto": respuesta, "tarjeta": tarjeta}
+    mensaje.update({k: v for k, v in extras.items() if v})
+    estado["mensajes"].append(mensaje)
+    _guardar(sesion, estado)
+
+
 def responder(sesion, texto: str, adjunto: Adjunto | None = None, *, usuario=None, ip="") -> None:
     """Procesa un mensaje de la persona y deja en la sesión su respuesta."""
     estado = leer(sesion)
@@ -243,8 +293,22 @@ def responder(sesion, texto: str, adjunto: Adjunto | None = None, *, usuario=Non
     else:
         entrada = (texto + "\n" + adjunto.texto[:MAX_ADJUNTO]).strip() if adjunto else texto
     respuesta, tarjeta = _respuesta(estado, historial, entrada, adjunto, usuario, ip)
-    estado["mensajes"].append({"rol": "asistente", "texto": respuesta, "tarjeta": tarjeta})
-    _guardar(sesion, estado)
+    _registrar(sesion, estado, visto, respuesta, tarjeta)
+
+
+def responder_tema(sesion, texto: str, tema_id: str) -> bool:
+    """Un botón de la guía: responde ese tema, sin IA y sin costo. False si no existe."""
+    tema = tema_por_id(tema_id)
+    if tema is None:
+        return False
+    estado = leer(sesion)
+    estado["mensajes"].append(
+        {"rol": "usuario", "texto": (texto or tema.titulo)[:200], "tarjeta": False}
+    )
+    relacionados = [t for t in buscar_temas(tema.titulo, limite=3) if t.id != tema.id][:1]
+    respuesta, tarjeta = _responder_tema(estado, tema, relacionados)
+    _registrar(sesion, estado, "", respuesta, tarjeta)
+    return True
 
 
 def reiniciar(sesion) -> None:

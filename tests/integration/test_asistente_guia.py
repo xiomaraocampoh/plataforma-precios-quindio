@@ -1,0 +1,169 @@
+"""K-nasta enseña a usar la app a quien llega por primera vez (con y sin IA).
+
+Todo lo que dice sale de la guía (apps/canasta/domain/guia.py): nada se inventa.
+"""
+
+import json
+
+import pytest
+from django.core.cache import cache
+from django.urls import reverse
+
+from apps.canasta.domain.guia import TEMAS, buscar_temas
+from apps.integraciones import services as integraciones
+from apps.integraciones.clients.asistente import RespuestaModelo
+
+pytestmark = pytest.mark.django_db
+
+
+@pytest.fixture(autouse=True)
+def _cache_limpia():
+    cache.clear()
+
+
+def _decir(client, texto, **extra):
+    return client.post(reverse("canasta:enviar"), {"mensaje": texto, **extra}).content.decode()
+
+
+# --- sin IA: K-nasta responde con la guía -------------------------------------------------------
+def test_la_guia_responde_una_pregunta_con_pasos_y_botones_que_funcionan(client):
+    html = _decir(client, "¿Cómo registro un precio?")
+    assert "<strong>¿Cómo registro un precio?</strong>" in html
+    assert "Guardar precio" in html and "Registrar precio aquí" in html
+    assert 'href="/precios/registrar/"' in html  # botón de acceso directo
+    assert 'href="/cuentas/registro/"' in html
+
+
+def test_cada_destino_de_la_guia_es_una_ruta_que_existe(client):
+    for tema in TEMAS:
+        for texto, ruta in tema.acciones:
+            assert reverse(ruta).startswith("/"), (tema.id, texto)
+
+
+def test_cada_titulo_de_la_guia_lleva_a_su_propio_tema():
+    for tema in TEMAS:
+        assert buscar_temas(tema.titulo)[0].id == tema.id, tema.titulo
+
+
+def test_una_pregunta_sin_tema_ofrece_los_temas_principales(client):
+    html = _decir(client, "¿Cómo hago para teletransportarme?")
+    assert "Con gusto te ayudo a usar AhorraPues" in html
+    assert 'name="tema" value="registrar"' in html
+
+
+def test_un_tema_relacionado_se_ofrece_como_boton(client):
+    texto = "cómo registro un precio y creo una cuenta"
+    principal, relacionado = buscar_temas(texto, limite=2)
+    html = _decir(client, texto)
+    assert f"<strong>{principal.titulo}</strong>" in html  # responde el más afín
+    assert f'name="tema" value="{relacionado.id}"' in html  # el otro, a un toque
+
+
+def test_el_boton_de_un_tema_responde_sin_ia_y_muestra_la_pregunta(client):
+    html = _decir(client, "¿Cómo creo una cuenta?", tema="cuenta")
+    assert html.count("¿Cómo creo una cuenta?") >= 2  # lo que tocó + el título de la respuesta
+    assert "Crear cuenta" in html and "8 caracteres o más" in html
+
+
+def test_un_tema_inexistente_no_rompe_el_chat(client):
+    html = _decir(client, "hola", tema="no-existe")
+    assert "burbuja" in html
+
+
+def test_el_saludo_invita_a_las_primeras_acciones(client):
+    html = client.get(reverse("canasta:inicio")).content.decode()
+    assert "¿Primera vez aquí?" in html
+    for tema in ("registrar", "comparar", "cuenta", "canasta"):
+        assert f'name="tema" value="{tema}"' in html
+    assert "Probar con una lista de ejemplo" in html
+
+
+def test_una_lista_de_compras_no_se_confunde_con_una_pregunta_de_ayuda(client):
+    html = _decir(client, "2 kg arroz, 1 L leche")
+    assert "<strong>¿Cómo" not in html
+
+
+def test_los_textos_de_la_guia_no_se_publican_con_html_peligroso(client):
+    html = _decir(client, "<script>alert(1)</script> cómo registro un precio")
+    assert "<script>alert(1)</script>" not in html
+
+
+# --- con IA: consulta la guía como herramienta --------------------------------------------------
+class ModeloFalso:
+    def __init__(self, *respuestas):
+        self.respuestas = list(respuestas)
+        self.recibido = []
+
+    def responder(self, *, sistema, mensajes, herramientas):
+        self.recibido.append(
+            {
+                "sistema": sistema,
+                "mensajes": json.loads(json.dumps(mensajes)),
+                "tools": herramientas,
+            }
+        )
+        return self.respuestas.pop(0)
+
+
+@pytest.fixture
+def ia_activa(settings, monkeypatch):
+    settings.INTEGRACIONES = {
+        **settings.INTEGRACIONES,
+        "ASISTENTE_IA_ACTIVO": True,
+        "ANTHROPIC_API_KEY": "clave-de-prueba",
+    }
+
+    def instalar(*respuestas):
+        falso = ModeloFalso(*respuestas)
+        monkeypatch.setattr(integraciones, "crear_asistente", lambda: falso)
+        return falso
+
+    return instalar
+
+
+def _usa_guia(consulta):
+    bloque = {
+        "type": "tool_use",
+        "id": "g1",
+        "name": "consultar_guia",
+        "input": {"consulta": consulta},
+    }
+    return RespuestaModelo(parada="tool_use", bloques=[bloque])
+
+
+def _texto(texto):
+    return RespuestaModelo(parada="end_turn", bloques=[{"type": "text", "text": texto}])
+
+
+def test_la_ia_consulta_la_guia_y_el_sistema_pone_los_botones(client, ia_activa):
+    falso = ia_activa(
+        _usa_guia("cómo registro un precio"),
+        _texto("Toca «Registrar precio», busca el producto y escribe el precio. ¡Es rápido!"),
+    )
+    html = _decir(client, "no sé cómo subir un precio de la leche")
+    assert "Toca «Registrar precio»" in html
+    assert 'href="/precios/registrar/"' in html  # el botón lo pone el sistema
+    assert "cc-res" not in html  # una pregunta de ayuda no abre la tarjeta de tiendas
+    resultado = json.dumps(falso.recibido[1]["mensajes"], ensure_ascii=False)
+    assert "Guardar precio" in resultado  # la IA recibió los pasos reales
+    assert "consultar_guia" in {t["name"] for t in falso.recibido[0]["tools"]}
+    assert "TEMAS DE LA GUÍA" in falso.recibido[0]["sistema"]
+
+
+def test_si_la_guia_no_cubre_el_tema_la_ia_lo_sabe(client, ia_activa):
+    falso = ia_activa(_usa_guia("cómo viajo a la luna"), _texto("Eso no está en mi guía."))
+    html = _decir(client, "cómo viajo a la luna")
+    assert "Eso no está en mi guía." in html
+    assert "La guía no cubre eso" in json.dumps(falso.recibido[1]["mensajes"], ensure_ascii=False)
+
+
+def test_una_cifra_inventada_en_una_respuesta_de_ayuda_se_descarta(client, ia_activa):
+    ia_activa(_usa_guia("cómo registro un precio"), _texto("Es gratis y cuesta $5.000 al mes."))
+    html = _decir(client, "cómo subo un precio")
+    assert "5.000" not in html  # EC-14
+
+
+def test_las_preguntas_de_ayuda_con_ia_van_a_la_ia_pero_el_boton_de_tema_no(client, ia_activa):
+    falso = ia_activa()  # no debe llamarse: el botón de un tema es gratis
+    _decir(client, "¿Cómo creo una cuenta?", tema="cuenta")
+    assert falso.recibido == []

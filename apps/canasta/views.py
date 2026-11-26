@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.views.decorators.http import require_GET, require_POST
 
 from . import selectors, services
+from .domain.guia import tema_por_id
 
 EXTENSIONES_TEXTO = (".txt", ".csv", ".md")
 MAX_IMAGEN = 5_000_001  # un byte más del tope: así se detecta una imagen demasiado grande
@@ -22,6 +23,10 @@ def _contexto(request) -> dict:
         "indice_tarjeta": ultima,
         "resultado": resultado,
         "ejemplo": EJEMPLO,
+        "atajos": [
+            {"texto": t.titulo, "tema": t.id}
+            for t in (tema_por_id(i) for i in services.PRINCIPALES)
+        ],
     }
 
 
@@ -52,6 +57,10 @@ def enviar(request):
     texto = request.POST.get("mensaje", "")
     if request.POST.get("reiniciar"):
         services.reiniciar(request.session)
+    elif request.POST.get("tema") and services.responder_tema(
+        request.session, texto, request.POST["tema"]
+    ):
+        pass  # un botón de la guía: ya respondió, sin IA
     else:
         services.responder(
             request.session,
