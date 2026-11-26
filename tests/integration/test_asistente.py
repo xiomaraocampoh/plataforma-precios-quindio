@@ -57,7 +57,7 @@ def mercado(reportante, arroz, leche, tiendas):
 
 def test_la_pagina_saluda_e_invita_a_pasar_la_lista(client):
     html = client.get(reverse("canasta:inicio")).content.decode()
-    assert "Soy K-nasta" in html and "lista de ejemplo" in html
+    assert "Soy K-nasta" in html and "Enviar mi mercado" in html and "lista de ejemplo" not in html
     assert 'type="file"' in html and "<textarea" in html
 
 

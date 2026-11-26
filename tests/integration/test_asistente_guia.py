@@ -73,9 +73,9 @@ def test_un_tema_inexistente_no_rompe_el_chat(client):
 def test_el_saludo_invita_a_las_primeras_acciones(client):
     html = client.get(reverse("canasta:inicio")).content.decode()
     assert "¿Primera vez aquí?" in html
-    for tema in ("registrar", "comparar", "cuenta", "canasta"):
+    for tema in ("registrar", "comparar", "cuenta", "escanear"):
         assert f'name="tema" value="{tema}"' in html
-    assert "Probar con una lista de ejemplo" in html
+    assert "lista de ejemplo" not in html
 
 
 def test_una_lista_de_compras_no_se_confunde_con_una_pregunta_de_ayuda(client):
@@ -184,7 +184,7 @@ def test_el_saludo_muestra_atajos_parejos_con_etiqueta_corta(client):
         "Registrar un precio",
         "Comparar precios",
         "Crear una cuenta",
-        "Armar mi mercado",
+        "Usar la cámara",
     ):
         assert etiqueta in html
 
@@ -192,3 +192,9 @@ def test_el_saludo_muestra_atajos_parejos_con_etiqueta_corta(client):
 def test_al_tocar_un_atajo_la_conversacion_muestra_la_pregunta_completa(client):
     html = _decir(client, "¿Cómo registro un precio?", tema="registrar")
     assert "<strong>¿Cómo registro un precio?</strong>" in html
+
+
+def test_el_saludo_ofrece_enviar_el_mercado_con_un_enlace_que_lleva_a_la_caja(client):
+    html = client.get(reverse("canasta:inicio")).content.decode()
+    assert 'href="#chat-mensaje"' in html and "data-enviar-mercado" in html  # funciona sin JS
+    assert "Enviar mi mercado" in html

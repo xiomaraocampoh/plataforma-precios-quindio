@@ -89,7 +89,14 @@ def test_si_falla_el_envio_el_texto_vuelve_a_la_caja_y_se_avisa(chat):
 
 def test_los_botones_de_respuesta_tambien_muestran_el_mensaje_al_instante(chat):
     page, retenidas = chat
-    page.click("text=Probar con una lista de ejemplo")
+    page.click(".atajo >> nth=0")  # «Registrar un precio»
     _esperar_envio(page, retenidas)
-    expect(page.locator("#chat-hilo .burbuja.usuario")).to_contain_text("2 kg arroz")
+    expect(page.locator("#chat-hilo .burbuja.usuario")).to_contain_text("¿Cómo registro un precio?")
     expect(page.locator("#chat-hilo .puntos")).to_be_visible()
+
+
+def test_enviar_mi_mercado_lleva_el_cursor_a_la_caja(chat):
+    page, _ = chat
+    page.click("[data-enviar-mercado]")
+    assert page.evaluate("document.activeElement.id") == "chat-mensaje"
+    assert page.url.endswith("/")  # no cambia de página ni agrega #chat-mensaje a la dirección
