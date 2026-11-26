@@ -42,7 +42,8 @@ def test_la_lista_de_registrar_muestra_el_icono_de_cada_producto(client, reporta
     client.force_login(reportante)
     html = client.get(REGISTRAR).content.decode()
     assert _usa(html, "i-cat-grano")  # «Granos»
-    assert "<img" not in html[html.index('id="resultados-producto"') :]
+    principal = html[html.index('id="resultados-producto"') : html.index("</main>")]
+    assert "<img" not in principal  # el botón flotante del asistente va fuera del contenido
 
 
 def test_la_busqueda_en_vivo_tambien_trae_los_iconos(client, reportante, arroz):

@@ -101,7 +101,6 @@
         </button>
       </div>
       <input type="file" accept="image/*" capture="environment" class="sr-only" data-captura tabindex="-1" aria-label="Tomar una foto con la cámara del sistema">
-      <p class="esc-nota" data-nota>{% if vivo_activo %}Con la cámara abierta enviamos a Anthropic (IA) algunos cuadros quietos para reconocer el producto o la etiqueta de precio; no se guardan. El código de barras se lee en tu equipo. {% elif foto_activa %}También puedes pegar (Cmd/Ctrl+V) o arrastrar una imagen. {% endif %}{% if foto_activa %}Las fotos de producto se envían a Anthropic (IA) solo para identificarlo y no se guardan; el código de barras se lee en tu equipo.{% else %}La imagen se lee en tu equipo y no sale de él: solo se usan los números.{% endif %}</p>
     </div>
 
     <div class="esc-hoja" data-hoja hidden>

@@ -474,7 +474,6 @@ textarea { width: 100%; min-height: 90px; padding: .6rem .95rem; font: inherit; 
 .esc-disparador span { display: block; width: 100%; height: 100%; border-radius: 50%; background: #fff; transition: transform .1s; }
 .esc-disparador:active span { transform: scale(.88); }
 .escaner[data-modo="codigo"][data-camara] .esc-disparador { visibility: hidden; }
-.esc-nota { margin: 0; text-align: center; font-size: .78rem; color: #aeaeb2; }
 .esc-manual { padding: .75rem 1rem; background: #1c1c1e; display: grid; gap: .5rem; }
 .esc-manual[hidden] { display: none; }
 .esc-manual label { font-size: .9rem; color: #d2d2d7; }
@@ -1051,3 +1050,208 @@ select:disabled { cursor: not-allowed; opacity: .6; }
    (si ambos tuvieran margen automático se repartirían el sobrante y el botón quedaría a alturas distintas). */
 .tarjeta-precio .acciones-fila { margin-top: auto; }
 .tarjeta-precio .acciones-fila + .ir { margin-top: .5rem; }
+
+/* Canasta de compra ---------------------------------------------------------------------------- */
+.canasta { display: grid; gap: var(--gap); }
+.cn-buscador { display: grid; gap: .5rem; }
+.cn-buscador label { font-weight: 600; }
+.cn-buscador input[type="search"] { width: 100%; }
+.cn-sugerencias, .cn-lista, .cn-detalle, .cn-opciones { list-style: none; margin: 0; padding: 0; }
+.cn-sugerencias { display: grid; gap: .35rem; margin-top: .25rem; }
+.cn-sugerencias li, .cn-lista li { display: flex; align-items: center; gap: .75rem; padding: .35rem .25rem; }
+.cn-sugerencias .foto-chip, .cn-lista .foto-chip { width: 40px; height: 40px; }
+.cn-nombre { flex: 1; min-width: 0; font-weight: 500; }
+.cn-nota { margin: 0; font-size: .875rem; }
+.cn-cabecera { display: flex; align-items: center; justify-content: space-between; gap: .75rem; flex-wrap: wrap; }
+.cn-cabecera h2 { margin: 0; }
+.cn-lista { display: grid; gap: .15rem; margin-top: .5rem; }
+.cn-lista li { border-top: 1px solid var(--borde); }
+.cn-cantidad { display: inline-flex; gap: .35rem; align-items: center; }
+.cn-cantidad input, .cn-cantidad select, .cn-orden select { min-height: 40px; }
+.cn-cantidad input { width: 4.5rem; text-align: center; }
+.cn-quitar { display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; border: 0; background: transparent; color: var(--texto-suave); cursor: pointer; }
+.cn-quitar:hover { background: var(--superficie-2); color: var(--texto); }
+.cn-quitar:focus-visible { outline: 3px solid var(--marca); outline-offset: 2px; }
+.cn-orden { display: inline-flex; align-items: center; gap: .5rem; }
+.cn-opciones { display: grid; gap: var(--gap); margin-top: .75rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+.cn-opcion { display: flex; flex-direction: column; gap: .35rem; }
+.cn-opcion h3 { margin: 0; font-size: 1.15rem; }
+.cn-opcion .precio { margin: .25rem 0; }
+.cn-opcion.es-mejor { box-shadow: inset 0 0 0 2px var(--marca); }
+.cn-faltan { margin: 0; font-size: .875rem; color: var(--error); }
+.cn-detalle { display: grid; gap: .35rem; }
+.cn-detalle li { display: flex; justify-content: space-between; gap: .75rem; font-size: .9rem; }
+@media (max-width: 520px) { .cn-lista li { flex-wrap: wrap; } .cn-nombre { flex-basis: calc(100% - 60px); } }
+.cn-opciones > .tile { grid-column: auto; }
+.cn-orden label { white-space: nowrap; }
+
+/* Asistente de compras (chat) --------------------------------------------------------------------- */
+.chat { display: grid; gap: var(--gap); max-width: 760px; margin: 0 auto; }
+.chat-cab { display: flex; align-items: flex-start; justify-content: space-between; gap: .75rem; flex-wrap: wrap; }
+.chat-cab h1 { margin: 0 0 .25rem; font-size: clamp(1.6rem, 4vw, 2.2rem); }
+.chat-cab p { margin: 0; }
+.chat-hilo { display: grid; gap: .9rem; padding: 1rem 1rem 4.5rem; border-radius: var(--radio); background: var(--superficie); min-height: 320px; align-content: start; }
+.burbuja { display: flex; gap: .6rem; align-items: flex-start; max-width: 100%; }
+.burbuja.usuario { justify-content: flex-end; }
+.burbuja .avatar { flex: none; width: 32px; height: 32px; border-radius: 50%; overflow: hidden; background: var(--marca-suave); }
+.burbuja .avatar img { width: 100%; height: 100%; display: block; }
+.burbuja .cuerpo { min-width: 0; max-width: min(100%, 36rem); padding: .7rem 1rem; border-radius: 20px; background: var(--superficie-2); display: grid; gap: .6rem; }
+.burbuja .cuerpo p { margin: 0; }
+.burbuja.usuario .cuerpo { background: var(--marca); color: var(--sobre-marca); border-bottom-right-radius: 6px; }
+.burbuja.asistente .cuerpo { border-top-left-radius: 6px; }
+.cc-res { display: grid; gap: .3rem; padding: .9rem 1rem; border-radius: 16px; background: var(--superficie); box-shadow: inset 0 0 0 2px var(--marca); }
+.cc-res h3 { margin: 0; font-size: 1.15rem; }
+.cc-res .precio { margin: .15rem 0; }
+.cc-lista { list-style: none; margin: .4rem 0 0; padding: 0; display: grid; gap: .3rem; }
+.cc-lista li { display: flex; justify-content: space-between; gap: .75rem; font-size: .9rem; }
+.respuestas-rapidas { display: flex; flex-wrap: wrap; gap: .4rem; }
+.chip-resp { min-height: 36px; padding: .2rem .9rem; border-radius: 999px; border: 1px solid var(--marca-enlace); background: var(--superficie); color: var(--marca-enlace); font: inherit; font-size: .875rem; font-weight: 500; cursor: pointer; }
+.chip-resp:hover { background: var(--marca-suave); }
+.chip-resp:focus-visible, .chat-enviar:focus-visible, .chat-adjuntar:focus-within { outline: 3px solid var(--marca); outline-offset: 2px; }
+.chat-entrada { position: sticky; bottom: .5rem; display: grid; grid-template-columns: auto 1fr auto; gap: .5rem; align-items: end; padding: .5rem; border-radius: 28px; background: var(--superficie); border: 1px solid var(--borde-fuerte); box-shadow: 0 10px 30px -18px rgb(0 0 0 / .5); }
+.chat-entrada textarea { resize: none; border: 0; outline: 0; background: transparent; color: var(--texto); font: inherit; padding: .55rem .25rem; min-height: 44px; max-height: 160px; }
+.chat-adjuntar, .chat-enviar { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; border: 0; cursor: pointer; flex: none; }
+.chat-adjuntar { background: transparent; color: var(--texto-suave); }
+.chat-adjuntar:hover { background: var(--superficie-2); color: var(--texto); }
+.chat-enviar { background: var(--marca); color: var(--sobre-marca); }
+.chat-enviar:disabled { opacity: .5; cursor: default; }
+.chat-archivo { grid-column: 1 / -1; margin: 0; padding: 0 .75rem; font-size: .8rem; color: var(--texto-suave); }
+.chat-pie { margin: 0; font-size: .8rem; text-align: center; }
+@media (max-width: 520px) { .chat-hilo { padding: .6rem; } .burbuja .cuerpo { padding: .6rem .8rem; } }
+
+/* Asistente flotante: disponible en cualquier página --------------------------------------------- */
+.asistente-widget { position: fixed; right: max(1rem, env(safe-area-inset-right)); bottom: max(1rem, env(safe-area-inset-bottom)); z-index: 70; display: grid; justify-items: end; gap: .6rem; }
+.asistente-lanzador { display: inline-flex; align-items: center; gap: .5rem; min-height: 52px; padding: 0 1.2rem 0 .35rem; border-radius: 999px; background: var(--marca); color: var(--sobre-marca); font-weight: 650; box-shadow: 0 12px 30px -10px rgb(0 60 160 / .6); }
+.asistente-lanzador:hover { text-decoration: none; background: var(--marca-hover); }
+.asistente-lanzador:focus-visible, .asistente-cerrar:focus-visible { outline: 3px solid var(--marca-enlace); outline-offset: 3px; }
+.asistente-lanzador .knasta-avatar { width: 42px; height: 42px; }
+.asistente-panel { display: flex; flex-direction: column; width: min(400px, calc(100vw - 2rem)); height: min(640px, calc(100vh - 7rem)); border-radius: 26px; background: var(--superficie); color: var(--texto); border: 1px solid var(--borde-fuerte); box-shadow: 0 24px 60px -20px rgb(0 0 0 / .5); overflow: hidden; }
+.asistente-panel[hidden] { display: none; }
+.asistente-cab { display: flex; align-items: flex-start; justify-content: space-between; gap: .5rem; padding: .85rem 1rem .6rem; border-bottom: 1px solid var(--borde); }
+.asistente-cab h2 { margin: 0; font-size: 1.05rem; }
+.asistente-cab p { margin: .1rem 0 0; font-size: .8rem; }
+.asistente-acciones { display: flex; align-items: center; gap: .25rem; flex: none; }
+.asistente-acciones .btn { min-height: 34px; padding: 0 .7rem; font-size: .8rem; }
+.asistente-cerrar { display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; border: 0; background: transparent; color: var(--texto-suave); cursor: pointer; }
+.asistente-cerrar:hover { background: var(--superficie-2); color: var(--texto); }
+.asistente-cuerpo { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.asistente-cargando { margin: 1rem; }
+.asistente-cuerpo .chat-hilo { flex: 1; min-height: 0; overflow-y: auto; border-radius: 0; background: transparent; padding: .8rem .8rem 1rem; }
+.asistente-cuerpo .chat-entrada { position: static; margin: .5rem; box-shadow: none; }
+.asistente-cuerpo .burbuja .cuerpo { max-width: 100%; }
+.chat-pagina { display: grid; gap: var(--gap); }
+@media (max-width: 520px) {
+  .asistente-widget { right: .5rem; left: .5rem; bottom: .5rem; }
+  .asistente-panel { width: 100%; height: min(82vh, 640px); border-radius: 22px; }
+}
+@media print { .asistente-widget { display: none !important; } }
+.knasta-avatar { display: block; flex: none; width: 40px; height: 40px; border-radius: 50%; background: #dbeafe; object-fit: cover; }
+.knasta-avatar.grande { width: 64px; height: 64px; }
+.asistente-titulos { flex: 1; min-width: 0; }
+.chat-cab { align-items: center; }
+.asistente-cab { align-items: center; gap: .6rem; }
+.chat-cab .asistente-titulos h1 { display: flex; align-items: center; gap: .5rem; }
+.etiqueta-ia { display: inline-flex; align-items: center; padding: .05rem .5rem; border-radius: 999px; background: #fff; color: #0057b8; font-size: .7rem; font-weight: 800; letter-spacing: .06em; line-height: 1.5; vertical-align: middle; }
+.asistente-cab .etiqueta-ia, .chat-cab .etiqueta-ia { background: var(--marca-suave); color: var(--marca-enlace); box-shadow: inset 0 0 0 1px var(--marca-enlace); }
+.burbuja .avatar { background: transparent; }
+
+/* K-nasta: apariencia del chat --------------------------------------------------------------------- */
+.asistente-nombre { display: flex; align-items: center; gap: .5rem; flex: 1; min-width: 0; margin: 0; font-size: 1.15rem; letter-spacing: -.01em; }
+.chat-cab { align-items: center; justify-content: flex-start; gap: .75rem; }
+.chat-cab .asistente-nombre { font-size: clamp(1.5rem, 4vw, 2rem); }
+.asistente-reiniciar { display: contents; }
+.asistente-icono { display: inline-grid; place-items: center; width: 38px; height: 38px; flex: none; border-radius: 50%; border: 0; background: var(--superficie-2); color: var(--texto-suave); cursor: pointer; transition: background-color .2s ease, color .2s ease, transform .3s ease; }
+.asistente-icono:hover { background: var(--marca-suave); color: var(--marca-enlace); }
+.asistente-icono:focus-visible { outline: 3px solid var(--marca); outline-offset: 2px; }
+.asistente-reiniciar .asistente-icono:hover .ico { transform: rotate(-360deg); }
+.asistente-icono .ico { width: 20px; height: 20px; transition: transform .45s ease; }
+.asistente-cab { padding: .8rem .9rem; background: linear-gradient(135deg, var(--marca-suave), var(--superficie)); }
+.asistente-cab .asistente-acciones { gap: .4rem; }
+.asistente-cuerpo .chat-hilo { background: var(--superficie); gap: 1rem; padding: 1rem .9rem 1.25rem; scroll-behavior: smooth; }
+.burbuja .cuerpo { box-shadow: 0 1px 2px rgb(0 0 0 / .06); }
+.burbuja.usuario .cuerpo { background: linear-gradient(135deg, var(--marca), var(--marca-hover)); box-shadow: 0 6px 16px -8px rgb(0 80 200 / .55); }
+.burbuja.asistente .cuerpo { background: var(--superficie-2); }
+.burbuja .avatar { width: 34px; height: 34px; }
+.cc-res { box-shadow: inset 0 0 0 2px var(--marca), 0 8px 20px -14px rgb(0 80 200 / .5); }
+.puntos { display: inline-flex; align-items: center; gap: .3rem; padding: .35rem 0; }
+.puntos i { width: 7px; height: 7px; border-radius: 50%; background: var(--texto-suave); animation: salto 1s infinite ease-in-out; }
+.puntos i:nth-child(2) { animation-delay: .15s; } .puntos i:nth-child(3) { animation-delay: .3s; }
+@keyframes salto { 0%, 60%, 100% { transform: translateY(0); opacity: .5; } 30% { transform: translateY(-5px); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .puntos i { animation: none; opacity: .8; } .asistente-icono .ico { transition: none; } }
+.burbuja.usuario .cuerpo p { white-space: pre-wrap; overflow-wrap: anywhere; }
+.burbuja.error .cuerpo { background: var(--error-fondo); color: var(--error); }
+.chat-hilo > .burbuja:last-child { animation: aparece .22s ease both; }
+@media (prefers-reduced-motion: reduce) { .chat-hilo > .burbuja:last-child { animation: none; } }
+.asistente-cuerpo .chat-entrada { margin: 0 .6rem .7rem; border-radius: 24px; background: var(--superficie-2); border-color: transparent; }
+.asistente-cuerpo .chat-entrada:focus-within { border-color: var(--marca); background: var(--superficie); }
+.asistente-lanzador { animation: aparece .4s ease both; }
+@keyframes aparece { from { transform: translateY(8px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .asistente-lanzador { animation: none; } }
+/* Con el chat abierto el botón se esconde (en cualquier tamaño): se cierra con la X o con Esc */
+body.asistente-abierto .asistente-lanzador { display: none; }
+
+/* Botones de K-nasta: atajos parejos en dos columnas y respuestas rápidas en píldoras alineadas ----- */
+.atajos-titulo { margin: .25rem 0 0; font-size: .9rem; }
+.atajos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
+.atajo-form { display: contents; }
+.atajo { display: flex; align-items: center; gap: .6rem; width: 100%; min-height: 56px; padding: .5rem .75rem; text-align: left; font: inherit; font-size: .875rem; font-weight: 600; line-height: 1.2; color: var(--texto); background: var(--superficie); border: 1px solid var(--borde); border-radius: 16px; cursor: pointer; transition: border-color .2s ease, background-color .2s ease, transform .2s ease, box-shadow .2s ease; }
+.atajo .ico { flex: none; box-sizing: content-box; width: 18px; height: 18px; padding: 7px; border-radius: 50%; background: var(--marca-suave); color: var(--marca-enlace); }
+.atajo:hover { border-color: var(--marca); background: var(--marca-suave); transform: translateY(-1px); box-shadow: 0 8px 18px -12px rgb(0 80 200 / .6); }
+.atajo:active { transform: none; }
+.atajo:focus-visible { outline: 3px solid var(--marca); outline-offset: 2px; }
+.chip-form { display: contents; }
+.chip-resp { display: inline-flex; align-items: center; gap: .4rem; text-align: left; line-height: 1.2; }
+.chip-resp .ico { flex: none; width: 16px; height: 16px; }
+.respuestas-rapidas { align-items: stretch; }
+@media (max-width: 380px) { .atajos { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .atajo { transition: none; } .atajo:hover { transform: none; } }
+
+/* «Enviar mi mercado»: la acción principal del saludo (relleno de marca) y un destello en la caja al tocarla */
+.atajo.mercado { grid-column: 1 / -1; justify-content: center; color: var(--sobre-marca); background: var(--marca); border-color: var(--marca); text-decoration: none; }
+.atajo.mercado .ico { background: rgb(255 255 255 / .22); color: var(--sobre-marca); }
+.atajo.mercado:hover { background: var(--marca-hover); border-color: var(--marca-hover); }
+.atajos { margin-bottom: 0; }
+.chat-entrada.llamar { animation: destello .9s ease 1; }
+@keyframes destello { 0%, 100% { box-shadow: 0 0 0 0 rgb(0 113 227 / 0); } 35% { box-shadow: 0 0 0 5px rgb(0 113 227 / .35); } }
+@media (prefers-reduced-motion: reduce) { .chat-entrada.llamar { animation: none; outline: 3px solid var(--marca); } }
+
+/* Minitutoriales visuales de K-nasta: pasos numerados con una mini-pantalla en cada uno ----------- */
+.tuto { list-style: none; margin: .25rem 0 0; padding: 0; display: grid; gap: .9rem; counter-reset: paso; }
+.tuto-paso { position: relative; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: .7rem; }
+.tuto-paso:not(:last-child)::before { content: ""; position: absolute; left: 13px; top: 30px; bottom: -.8rem; width: 2px; border-radius: 2px; background: var(--borde); }
+.tuto-num { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--marca); color: var(--sobre-marca); font-size: .8rem; font-weight: 700; }
+.tuto-cuerpo { min-width: 0; display: grid; gap: .5rem; }
+.tuto-cuerpo > p { margin: .1rem 0 0; font-size: .9rem; line-height: 1.35; }
+.tuto-visual { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; padding: .65rem; border-radius: 14px; background: var(--superficie); border: 1px solid var(--borde); }
+.tuto-nota { margin: .1rem 0 0; font-size: .75rem; }
+.mini-etiqueta { display: block; font-size: .68rem; font-weight: 600; color: var(--texto-suave); margin-bottom: .2rem; }
+.mini-boton { position: relative; display: inline-flex; align-items: center; justify-content: center; min-height: 30px; padding: 0 .9rem; border-radius: 999px; background: var(--marca); color: var(--sobre-marca); font-size: .78rem; font-weight: 600; white-space: nowrap; }
+.mini-boton.sec { background: transparent; color: var(--marca-enlace); box-shadow: inset 0 0 0 1.5px var(--marca-enlace); }
+.mini-campo, .mini-opciones, .mini-filas { display: block; width: 100%; }
+.mini-valor { display: flex; align-items: center; min-height: 32px; padding: 0 .7rem; border-radius: 10px; border: 1.5px solid var(--borde-fuerte); background: var(--fondo); font-size: .8rem; }
+.cursor { width: 1.5px; height: 14px; margin-left: 2px; background: var(--texto); animation: parpadeo 1s steps(1) infinite; }
+.mini-buscador { position: relative; display: flex; align-items: center; gap: .5rem; width: 100%; min-height: 34px; padding: 0 .75rem; border-radius: 999px; border: 1.5px solid var(--borde-fuerte); background: var(--fondo); font-size: .8rem; color: var(--texto-suave); }
+.mini-buscador .ico { width: 15px; height: 15px; flex: none; color: var(--texto-suave); }
+.mini-buscador .ico.camara { margin-left: auto; color: var(--marca-enlace); }
+.mini-buscador span { color: var(--texto); }
+.mini-opts { display: flex; flex-wrap: wrap; gap: .35rem; }
+.mini-op { display: inline-flex; align-items: center; min-height: 28px; padding: 0 .75rem; border-radius: 999px; border: 1.5px solid var(--borde-fuerte); font-size: .76rem; font-weight: 500; }
+.mini-op.activa { background: var(--marca); border-color: var(--marca); color: var(--sobre-marca); }
+.mini-filas { display: grid; gap: .3rem; }
+.mini-fila { display: flex; justify-content: space-between; gap: .5rem; padding: .4rem .65rem; border-radius: 10px; background: var(--superficie-2); font-size: .76rem; }
+.mini-fila.primera { background: var(--positivo-fondo); box-shadow: inset 0 0 0 1.5px var(--positivo); }
+.mini-chip { display: inline-flex; align-items: center; min-height: 26px; padding: 0 .65rem; border-radius: 999px; background: var(--superficie-2); font-size: .74rem; font-weight: 500; }
+.mini-chip.positivo { background: var(--positivo-fondo); color: var(--positivo); }
+.mini-chip.alerta { background: var(--error-fondo); color: var(--error); }
+.mini-chip.promo { background: var(--ambar-fondo); color: var(--ambar-texto); }
+.mini-icono { display: inline-flex; align-items: center; gap: .5rem; font-size: .78rem; font-weight: 500; }
+.mini-icono .ico { box-sizing: content-box; width: 20px; height: 20px; padding: 8px; border-radius: 50%; background: var(--marca-suave); color: var(--marca-enlace); }
+.mini-icono.simbolo b { display: inline-grid; place-items: center; min-width: 36px; height: 36px; padding: 0 .5rem; border-radius: 999px; background: var(--marca-suave); color: var(--marca-enlace); font-size: 1.05rem; }
+.mini-casilla { display: inline-flex; align-items: center; gap: .5rem; font-size: .76rem; }
+.mini-casilla i { width: 16px; height: 16px; flex: none; border-radius: 5px; border: 1.5px solid var(--borde-fuerte); background: var(--marca) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5 9-10'/%3E%3C/svg%3E") center / 80% no-repeat; border-color: var(--marca); }
+/* El «toque»: un aro que late sobre el botón para mostrar dónde se toca */
+.toque { position: absolute; inset: -4px; border-radius: inherit; border: 2px solid var(--marca); opacity: 0; pointer-events: none; animation: toque 2.2s ease-out infinite; }
+.mini-buscador .toque { inset: auto 2px 2px auto; width: 26px; height: 26px; border-radius: 50%; right: 5px; top: 3px; bottom: auto; }
+@keyframes toque { 0% { opacity: .85; transform: scale(.92); } 70%, 100% { opacity: 0; transform: scale(1.18); } }
+@keyframes parpadeo { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .toque { animation: none; opacity: .6; } .cursor { animation: none; } }

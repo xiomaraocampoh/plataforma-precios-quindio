@@ -1,0 +1,13 @@
+{% comment %}Paso a paso con una imagen en cada paso. Recibe `tema`. El texto de cada paso se lee; lo dibujado es decorativo.{% endcomment %}
+<ol class="tuto" aria-label="Paso a paso: {{ tema.titulo }}">
+  {% for paso in tema.pasos %}
+  <li class="tuto-paso">
+    <span class="tuto-num" aria-hidden="true">{{ forloop.counter }}</span>
+    <div class="tuto-cuerpo">
+      <p>{{ paso.texto }}</p>
+      {% if paso.visuales %}<div class="tuto-visual" aria-hidden="true">{% for v in paso.visuales %}{% include "canasta/partials/_visual.html" %}{% endfor %}</div>{% endif %}
+    </div>
+  </li>
+  {% endfor %}
+</ol>
+<p class="suave tuto-nota">Ejemplo ilustrativo: las pantallas pueden verse un poco distintas.</p>

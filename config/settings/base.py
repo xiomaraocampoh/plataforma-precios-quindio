@@ -41,6 +41,7 @@ LOCAL_APPS = [
     "apps.integraciones",
     "apps.notificaciones",  # correo transaccional (ADR-021)
     "apps.administracion",  # panel propio en /panel/ (roles, catálogo, auditoría)
+    "apps.canasta",  # Canasta de compra (ADR-0027 a 0029); el asistente irá encima (ADR-0030)
     "apps.comercios",  # Comercios (Corte III, ADR-012): se integra por el puerto de comparacion
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -106,6 +107,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "apps.administracion.context_processors.panel",
+                "apps.canasta.context_processors.asistente",
             ],
         },
     },
@@ -239,6 +241,14 @@ INTEGRACIONES = {
     # Escáner en vivo (ADR-0026): apagado por defecto; además exige ANTHROPIC_API_KEY. Cada
     # fotograma enviado consume el mismo cupo por hora y por día que una foto.
     "ESCANEO_VIVO_ACTIVO": env.bool("ESCANEO_VIVO_ACTIVO", default=False),
+    # K-nasta (ADR-0030): la IA interpreta y explica; el dominio calcula las cifras. Cada mensaje
+    # cuesta dinero: topes por hora (visitante y con cuenta) y por día en total.
+    "ASISTENTE_IA_ACTIVO": env.bool("ASISTENTE_IA_ACTIVO", default=False),
+    "ASISTENTE_MODELO": env.str("ASISTENTE_MODELO", default="claude-opus-5-5"),
+    "ASISTENTE_TIMEOUT_S": env.int("ASISTENTE_TIMEOUT_S", default=45),
+    "ASISTENTE_MENSAJES_POR_HORA": env.int("ASISTENTE_MENSAJES_POR_HORA", default=40),
+    "ASISTENTE_ANONIMO_POR_HORA": env.int("ASISTENTE_ANONIMO_POR_HORA", default=15),
+    "ASISTENTE_POR_DIA_TOTAL": env.int("ASISTENTE_POR_DIA_TOTAL", default=400),
     "RECONOCIMIENTO_MODELO_VIVO": env.str("RECONOCIMIENTO_MODELO_VIVO", default="claude-haiku-5-5"),
     "RECONOCIMIENTO_TIMEOUT_VIVO_S": env.int("RECONOCIMIENTO_TIMEOUT_VIVO_S", default=6),
     "ESCANEO_MAX_FOTOGRAMAS_SESION": env.int("ESCANEO_MAX_FOTOGRAMAS_SESION", default=20),

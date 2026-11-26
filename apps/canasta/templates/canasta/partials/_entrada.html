@@ -1,0 +1,14 @@
+<form class="chat-entrada" method="post" action="{% url 'canasta:enviar' %}" enctype="multipart/form-data"
+      hx-post="{% url 'canasta:enviar' %}" hx-target="#chat-hilo" hx-swap="innerHTML" hx-encoding="multipart/form-data"
+      hx-disabled-elt="find button[type=submit]">
+  {% csrf_token %}
+  <label class="chat-adjuntar" title="Adjuntar tu lista (.txt)">
+    <svg class="ico" aria-hidden="true"><use href="#i-clip"/></svg>
+    <span class="sr-only">Adjuntar un archivo con tu lista (.txt)</span>
+    <input type="file" name="archivo" accept=".txt,.csv,.md,text/plain,image/*" class="sr-only" data-archivo>
+  </label>
+  <label class="sr-only" for="chat-mensaje">Tu mensaje</label>
+  <textarea id="chat-mensaje" name="mensaje" rows="1" maxlength="4000" placeholder="Escribe o pega tu lista…" autocomplete="off"></textarea>
+  <button class="chat-enviar" type="submit"><svg class="ico" aria-hidden="true"><use href="#i-enviar"/></svg><span class="sr-only">Enviar</span></button>
+  <p class="chat-archivo" data-nombre-archivo hidden></p>
+</form>

@@ -115,3 +115,24 @@ def test_el_pie_de_toda_pagina_enlaza_la_politica(client):
 def test_por_defecto_la_politica_muestra_el_correo_del_proyecto(client):
     html = _politica(client)
     assert 'href="mailto:ahorrapuescolombia@gmail.com"' in html
+
+
+# --- el aviso sobre la IA vive en la política de datos, no en las pantallas ---------------------
+def test_la_politica_cubre_la_foto_el_escaner_y_k_nasta(client):
+    html = client.get(reverse("cuentas:politica_datos")).content.decode()
+    for tema in ("Búsqueda por foto", "Escaneo en vivo con IA", "K-nasta, el asistente"):
+        assert tema in html
+    assert html.count("Anthropic") >= 3
+
+
+def test_las_pantallas_no_repiten_el_aviso_de_la_ia(client, settings):
+    settings.INTEGRACIONES = {
+        **settings.INTEGRACIONES,
+        "ASISTENTE_IA_ACTIVO": True,
+        "ESCANEO_VIVO_ACTIVO": True,
+        "ANTHROPIC_API_KEY": "clave-de-prueba",
+    }
+    inicio = client.get(reverse("comparacion:inicio")).content.decode()
+    assert "enviamos a Anthropic" not in inicio and "se envían a Anthropic" not in inicio
+    chat = client.get(reverse("canasta:cuerpo")).content.decode()
+    assert "Anthropic" not in chat and "No escribas datos personales" not in chat

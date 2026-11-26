@@ -1,0 +1,31 @@
+{% load static kn %}
+{% if not mensajes %}
+<div class="burbuja asistente">
+  <span class="avatar" aria-hidden="true"><img src="{% static 'img/knasta-96.png' %}" alt="" width="32" height="32"></span>
+  <div class="cuerpo">
+    <p>¡Hola! Soy K-nasta, tu asistente de compras. Pásame tu lista del mercado, escrita o pegada, y te digo en qué tienda te sale más barato comprarlo todo.</p>
+    <p class="suave">Por ejemplo: <em>2 kg arroz, 1 L leche, 12 huevos</em>{% if asistente_ia %}, o algo como <em>mercado para 4 personas</em>{% endif %}. También puedes adjuntar {% if asistente_ia %}una foto o {% endif %}un archivo de texto con tu lista.</p>
+    <p class="atajos-titulo"><strong>¿Primera vez aquí?</strong> Toca un tema y te explico:</p>
+    <div class="atajos">
+      {% for atajo in atajos %}{% include "canasta/partials/_chip_mensaje.html" with texto=atajo.texto tema=atajo.tema etiqueta=atajo.etiqueta icono=atajo.icono clase="atajo-form" boton="atajo" %}{% endfor %}
+    </div>
+    <a class="atajo mercado" href="#chat-mensaje" data-enviar-mercado><svg class="ico" aria-hidden="true"><use href="#i-enviar"/></svg><span>Enviar mi mercado</span></a>
+  </div>
+</div>
+{% endif %}
+{% for m in mensajes %}
+<div class="burbuja {{ m.rol }}">
+  {% if m.rol == "asistente" %}<span class="avatar" aria-hidden="true"><img src="{% static 'img/knasta-96.png' %}" alt="" width="32" height="32"></span>{% endif %}
+  <div class="cuerpo">
+    <p><span class="sr-only">{% if m.rol == "asistente" %}Asistente: {% else %}Tú: {% endif %}</span>{{ m.texto|texto_chat }}</p>
+    {% if m.tema %}{% with tema=m.tema|tema_guia %}{% if tema %}{% include "canasta/partials/_tutorial.html" %}{% endif %}{% endwith %}{% endif %}
+    {% if forloop.counter0 == indice_tarjeta and resultado %}{% include "canasta/partials/_tarjeta.html" %}{% endif %}
+    {% if m.acciones or m.sugerencias and forloop.last %}
+    <div class="respuestas-rapidas">
+      {% for a in m.acciones %}<a class="chip-resp" href="{{ a.url }}">{{ a.texto }}</a>{% endfor %}
+      {% if forloop.last %}{% for s in m.sugerencias %}{% include "canasta/partials/_chip_mensaje.html" with texto=s.texto tema=s.tema etiqueta=s.etiqueta icono=s.icono %}{% endfor %}{% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endfor %}

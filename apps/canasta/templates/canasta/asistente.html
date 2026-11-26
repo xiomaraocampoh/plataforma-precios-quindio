@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load static %}
+{% block titulo %}K-nasta, asistente de compras · AhorraPues{% endblock %}
+{% block contenido %}
+<section class="chat" aria-labelledby="t-chat">
+  <header class="chat-cab">
+    <img class="knasta-avatar" src="{% static 'img/knasta-96.png' %}" alt="" width="40" height="40">
+    <h1 id="t-chat" class="asistente-nombre">K-nasta{% if asistente_ia %} <span class="etiqueta-ia">IA</span>{% endif %}</h1>
+    {% include "canasta/partials/_reiniciar.html" %}
+  </header>
+  <div class="chat-pagina">{% include "canasta/partials/_panel.html" %}</div>
+  <p class="suave chat-pie">Los precios son los que reporta la comunidad; los totales son estimados. Enter envía y Mayús+Enter baja de línea.</p>
+</section>
+{% endblock %}

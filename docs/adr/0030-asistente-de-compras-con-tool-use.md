@@ -115,3 +115,23 @@ son del dominio** de la canasta (ADR-0027 a 0029).
    existe («Solicitar producto»).
 7. **Sin clave:** con `ANTHROPIC_API_KEY` vacía, `/asistente/` no aparece en la navegación y responde
    404.
+
+
+## Actualización (implementación, 2026-11-26)
+Lo que cambió al construirlo y probarlo con la API real:
+- **Tope de vueltas, no de llamadas.** La IA pide varias herramientas a la vez (por ejemplo 8
+  búsquedas en un solo paso). El tope pasa a **6 vueltas** con la IA por mensaje y **24 llamadas** en
+  total; con 6 llamadas «mercado para 4 personas» se cortaba siempre.
+- **`buscar_productos` recibe una lista** de nombres (hasta 15) y busca todos en una llamada.
+- **`armar_canasta` devuelve el cálculo** de las tiendas, así que `calcular_canasta` solo se usa para
+  cambiar el orden; se ahorra una vuelta.
+- **Validador de cifras (EC-14)** en `integraciones/domain/asistente.py`: todo monto (con «$», o de tres
+  o más dígitos) del texto de la IA debe aparecer en lo que devolvieron las herramientas; si no, se
+  descarta y redacta el sistema.
+- **Fallback:** si la IA falla, se agota el cupo (`ASISTENTE_*_POR_HORA`, `ASISTENTE_POR_DIA_TOTAL`)
+  o responde algo no confiable, K-nasta sigue en modo básico (reglas) y lo avisa.
+- **Medición con la API real** (misma petición, «mercado para 4 personas»): Opus 5.5 ≈ 8–10 s,
+  Sonnet 5.5 ≈ 8 s, Haiku 5.5 ≈ 9 s; Haiku no produjo un texto con cifras válidas. Se mantiene Opus
+  5.5 por defecto (`ASISTENTE_MODELO`). La latencia es de varias idas y vueltas, no del modelo.
+- **Foto de la lista:** con la IA activa, la imagen viaja como bloque de imagen y no se guarda.
+- La etiqueta «IA» solo se muestra con `ASISTENTE_IA_ACTIVO` y clave.

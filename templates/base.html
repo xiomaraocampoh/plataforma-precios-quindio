@@ -17,6 +17,7 @@
   <script src="{% static 'vendor/htmx.min.js' %}" defer></script>
   <script src="{% static 'js/accesibilidad.js' %}?v=2" defer></script>
   <script src="{% static 'js/menu.js' %}?v=2" defer></script>
+  <script src="{% static 'js/asistente.js' %}?v=7" defer></script>
   <script src="{% static 'js/tema.js' %}?v=1" defer></script>
   {% if user.is_authenticated %}
   {# RF-12 / ADR-009: cola de registros sin conexión. Solo con sesión: el reenvío se atribuye (M-14) #}
@@ -119,5 +120,6 @@
   </footer>
   {# Región viva para anunciar resultados HTMX a lectores de pantalla (WCAG 4.1.3) #}
   <div id="avisos" role="status" aria-live="polite" class="sr-only"></div>
+  {% if request.resolver_match.app_name != "canasta" %}{% include "canasta/partials/_widget.html" %}{% endif %}
 </body>
 </html>

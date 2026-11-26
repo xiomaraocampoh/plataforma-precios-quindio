@@ -28,6 +28,7 @@ source_modules =
     apps.administracion.domain
     apps.notificaciones.domain
     apps.comercios.domain
+    apps.canasta.domain
 forbidden_modules =
     django
     rest_framework
@@ -45,6 +46,7 @@ source_modules =
     apps.administracion.domain
     apps.notificaciones.domain
     apps.comercios.domain
+    apps.canasta.domain
 forbidden_modules =
     core
     config
@@ -185,4 +187,12 @@ forbidden_modules =
     apps.comparacion
     apps.moderacion
     apps.administracion
+    apps.comercios
+
+[importlinter:contract:canasta-sin-comercios]
+name = La canasta no importa el módulo comercial (las promociones entran por un puerto, ADR-0029)
+type = forbidden
+source_modules =
+    apps.canasta
+forbidden_modules =
     apps.comercios
