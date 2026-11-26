@@ -1159,8 +1159,8 @@ select:disabled { cursor: not-allowed; opacity: .6; }
 .asistente-icono { display: inline-grid; place-items: center; width: 38px; height: 38px; flex: none; border-radius: 50%; border: 0; background: var(--superficie-2); color: var(--texto-suave); cursor: pointer; transition: background-color .2s ease, color .2s ease, transform .3s ease; }
 .asistente-icono:hover { background: var(--marca-suave); color: var(--marca-enlace); }
 .asistente-icono:focus-visible { outline: 3px solid var(--marca); outline-offset: 2px; }
-.asistente-reiniciar .asistente-icono:hover .ico { transform: rotate(-200deg); }
-.asistente-icono .ico { width: 18px; height: 18px; transition: transform .4s ease; }
+.asistente-reiniciar .asistente-icono:hover .ico { transform: rotate(-360deg); }
+.asistente-icono .ico { width: 20px; height: 20px; transition: transform .45s ease; }
 .asistente-cab { padding: .8rem .9rem; background: linear-gradient(135deg, var(--marca-suave), var(--superficie)); }
 .asistente-cab .asistente-acciones { gap: .4rem; }
 .asistente-cuerpo .chat-hilo { background: var(--superficie); gap: 1rem; padding: 1rem .9rem 1.25rem; scroll-behavior: smooth; }
