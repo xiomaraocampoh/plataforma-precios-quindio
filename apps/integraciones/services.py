@@ -13,6 +13,13 @@ from django.utils import timezone
 from apps.catalogo import selectors as catalogo
 from apps.catalogo import services as catalogo_servicios
 
+from .clients.asistente import (  # noqa: F401  (se reexporta para K-nasta)
+    AsistenteClaude,
+    AsistenteNoDisponibleError,
+    ModeloConversacional,
+    RespuestaModelo,
+    bloque_imagen,
+)
 from .clients.sipsa import PrecioExterno
 from .clients.vision import (  # noqa: F401  (se reexporta para las vistas)
     ReconocedorClaude,
@@ -138,6 +145,32 @@ def reconocer_producto(*, usuario, imagen: bytes, ip: str = "") -> PistaProducto
     tipo = tipo_de_imagen(imagen)  # una imagen inválida no consume cupo ni llega a la IA
     _exigir_cupo_de_reconocimiento(usuario, ip)
     return _crear_reconocedor().reconocer(imagen, tipo)
+
+
+class LimiteDelAsistenteExcedidoError(Exception):
+    """Cada mensaje a K-nasta con IA cuesta dinero: topes por hora y por día."""
+
+
+def crear_asistente() -> ModeloConversacional:
+    return AsistenteClaude()
+
+
+def exigir_cupo_del_asistente(usuario, ip: str) -> None:
+    """Un cupo por mensaje de la persona (no por cada vuelta de herramientas)."""
+    cfg = settings.INTEGRACIONES
+    ahora = timezone.now()
+    quien, _ = _identidad(usuario, ip)
+    limite = (
+        cfg["ASISTENTE_MENSAJES_POR_HORA"]
+        if quien.startswith("u")
+        else cfg["ASISTENTE_ANONIMO_POR_HORA"]
+    )
+    if _contar(f"asistente:v1:dia:{ahora:%Y%m%d}", 86400) > cfg["ASISTENTE_POR_DIA_TOTAL"]:
+        raise LimiteDelAsistenteExcedidoError("K-nasta alcanzó su límite de IA de hoy.")
+    if _contar(f"asistente:v1:{quien}:{ahora:%Y%m%d%H}", 3600) > limite:
+        raise LimiteDelAsistenteExcedidoError(
+            f"Alcanzaste el límite de {limite} mensajes por hora."
+        )
 
 
 def asistente_ia_activo() -> bool:

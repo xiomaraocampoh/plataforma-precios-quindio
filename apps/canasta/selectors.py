@@ -54,6 +54,34 @@ def elegir_producto(texto: str):
     return orden[0], orden[1:4]
 
 
+def candidatos(texto: str, limite: int = 8) -> list[dict]:
+    """Productos que encajan con un nombre, con las unidades en que se piden y en cuántas tiendas
+    tienen precio vigente (el que más datos tiene, primero). Lo que lee la IA: solo hechos."""
+    encontrados = list(catalogo.buscar_productos(texto, limite=limite))
+    if not encontrados and len(texto) > 3 and texto.endswith("s"):
+        encontrados = list(catalogo.buscar_productos(texto[:-1], limite=limite))
+    filas = filas_vigentes_de([p.pk for p in encontrados])
+    datos = [
+        {
+            "producto_id": p.pk,
+            "nombre": str(p),
+            "unidades": list(unidades_de(p)),
+            "tiendas_con_precio": len(filas.get(p.pk, [])),
+        }
+        for p in encontrados
+    ]
+    return sorted(datos, key=lambda d: (-d["tiendas_con_precio"], d["nombre"].casefold()))
+
+
+def productos_por_ids(producto_ids: list[int]) -> dict:
+    return {
+        p.pk: p
+        for p in catalogo.productos_publicos()
+        .filter(pk__in=producto_ids)
+        .prefetch_related("presentaciones")
+    }
+
+
 def nombres_de(producto_ids: list[int]) -> dict[int, str]:
     return {p.pk: str(p) for p in catalogo.productos_publicos().filter(pk__in=producto_ids)}
 

@@ -6,6 +6,7 @@ from django.views.decorators.http import require_GET, require_POST
 from . import selectors, services
 
 EXTENSIONES_TEXTO = (".txt", ".csv", ".md")
+MAX_IMAGEN = 5_000_001  # un byte más del tope: así se detecta una imagen demasiado grande
 EJEMPLO = "2 kg arroz\n1 L leche\n12 huevos\n1 kg azúcar\n500 g café"
 
 
@@ -28,7 +29,7 @@ def _adjunto(archivo):
     if archivo is None:
         return None
     if (archivo.content_type or "").startswith("image/"):
-        return services.Adjunto(archivo.name, es_imagen=True)
+        return services.Adjunto(archivo.name, es_imagen=True, imagen=archivo.read(MAX_IMAGEN))
     if not archivo.name.lower().endswith(EXTENSIONES_TEXTO) or archivo.size > 200_000:
         return services.Adjunto(archivo.name, es_imagen=False, texto="")
     texto = archivo.read(services.MAX_ADJUNTO * 4).decode("utf-8", errors="replace")
@@ -52,6 +53,12 @@ def enviar(request):
     if request.POST.get("reiniciar"):
         services.reiniciar(request.session)
     else:
-        services.responder(request.session, texto[:4000], _adjunto(request.FILES.get("archivo")))
+        services.responder(
+            request.session,
+            texto[:4000],
+            _adjunto(request.FILES.get("archivo")),
+            usuario=request.user,
+            ip=request.META.get("REMOTE_ADDR", ""),
+        )
     plantilla = "canasta/partials/_hilo.html" if request.htmx else "canasta/asistente.html"
     return render(request, plantilla, _contexto(request))

@@ -5,6 +5,7 @@ esto, el middleware cerraría la sesión de cada moderador o administrador de la
 pruebas del middleware arman a propósito sesiones sin esa marca (ver tests/integration/cuentas).
 """
 
+import pytest
 from django.test.client import ClientMixin
 
 from apps.cuentas.views.ingreso import FLAG
@@ -20,3 +21,10 @@ def _login_con_segundo_factor(self, user, backend=None):
 
 
 ClientMixin._login = _login_con_segundo_factor
+
+
+@pytest.fixture(autouse=True)
+def _kn_asistente_sin_ia_por_defecto(settings):
+    """Las pruebas nunca deben llamar a la IA de verdad ni depender del .env de quien las corre:
+    K-nasta con IA queda apagada y cada prueba que la necesite la enciende con un modelo falso."""
+    settings.INTEGRACIONES = {**settings.INTEGRACIONES, "ASISTENTE_IA_ACTIVO": False}

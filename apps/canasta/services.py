@@ -10,16 +10,23 @@ from dataclasses import dataclass
 from decimal import Decimal
 
 from apps.catalogo.domain.normalizacion import son_comparables
+from apps.integraciones import services as integraciones
+from apps.integraciones.domain.reconocimiento import ImagenInvalidaError, tipo_de_imagen
 
-from . import selectors
+from . import ia, selectors
 from .domain.canasta import CRITERIO_COBERTURA, CRITERIO_TOTAL, MAX_ITEMS
-from .domain.intencion import Tipo, detectar_intencion
+from .domain.intencion import Intencion, Tipo, detectar_intencion
 from .domain.lista import parsear_lista
 
 CLAVE_SESION = "asistente_v1"
 MAX_MENSAJES = 30
 MAX_ADJUNTO = 20_000  # caracteres de texto de un archivo adjunto
 SALUDO_AYUDA = "Escribe o pega tu lista, por ejemplo: 2 kg arroz, 1 L leche, 12 huevos."
+SIN_FOTOS = (
+    "Todavía no sé leer fotos de listas: eso lo hace la IA cuando está activada. "
+    "Por ahora, escribe o pega tu lista, por ejemplo: 2 kg arroz, 1 L leche, 12 huevos."
+)
+COMANDOS_LOCALES = {Tipo.REINICIAR, Tipo.ORDENAR_TOTAL, Tipo.ORDENAR_COBERTURA}
 
 
 @dataclass(frozen=True)
@@ -27,6 +34,7 @@ class Adjunto:
     nombre: str
     texto: str = ""
     es_imagen: bool = False
+    imagen: bytes = b""  # solo se usa con la IA; nunca se guarda
 
 
 def leer(sesion) -> dict:
@@ -165,7 +173,61 @@ def _ordenar(estado: dict, criterio: str) -> tuple[str, bool]:
     return _texto_resultado(res, [], []), True
 
 
-def responder(sesion, texto: str, adjunto: Adjunto | None = None) -> None:
+def _con_reglas(estado: dict, intencion) -> tuple[str, bool]:
+    if intencion.tipo is Tipo.REINICIAR:
+        estado["pedido"] = []
+        return f"Listo, empecemos de nuevo. {SALUDO_AYUDA}", False
+    if intencion.tipo is Tipo.ORDENAR_TOTAL:
+        return _ordenar(estado, CRITERIO_TOTAL)
+    if intencion.tipo is Tipo.ORDENAR_COBERTURA:
+        return _ordenar(estado, CRITERIO_COBERTURA)
+    if intencion.tipo is Tipo.AGREGAR:
+        return _agregar(estado, intencion.resto)
+    if intencion.tipo is Tipo.QUITAR:
+        return _quitar(estado, intencion.resto)
+    return _nueva_lista(estado, intencion.resto)
+
+
+def _con_ia(estado, historial, entrada, adjunto, usuario, ip) -> tuple[str, bool]:
+    """K-nasta con IA (ADR-0030). Si el texto de la IA no es confiable, redacta el sistema."""
+    imagen = None
+    if adjunto is not None and adjunto.es_imagen:
+        try:
+            imagen = (adjunto.imagen, tipo_de_imagen(adjunto.imagen))
+        except ImagenInvalidaError as exc:
+            return str(exc), False
+    turno = ia.conversar(estado, historial, entrada, imagen, usuario=usuario, ip=ip)
+    if turno.texto is not None:
+        return turno.texto, turno.tarjeta
+    if turno.tarjeta:
+        res = selectors.resultado(estado["pedido"], estado["criterio"])
+        return _texto_resultado(res, [], []), True
+    return "No logré darte una respuesta confiable. ¿Me cuentas de nuevo qué vas a comprar?", False
+
+
+def _respuesta(estado, historial, entrada, adjunto, usuario, ip) -> tuple[str, bool]:
+    es_imagen = adjunto is not None and adjunto.es_imagen
+    usa_ia = integraciones.asistente_ia_activo()
+    if es_imagen and not usa_ia:
+        return SIN_FOTOS, False
+    intencion = Intencion(Tipo.LISTA, entrada) if es_imagen else detectar_intencion(entrada)
+    if intencion.tipo in COMANDOS_LOCALES or not usa_ia:  # órdenes cortas: gratis, sin IA
+        return _con_reglas(estado, intencion)
+    try:
+        return _con_ia(estado, historial, entrada, adjunto, usuario, ip)
+    except integraciones.LimiteDelAsistenteExcedidoError:
+        aviso = (
+            "Llegué a mi límite de consultas con IA por ahora, así que respondo en modo básico. "
+        )
+    except integraciones.AsistenteNoDisponibleError:
+        aviso = "No pude usar la IA en este momento, así que respondo en modo básico. "
+    if es_imagen:
+        return aviso + SIN_FOTOS, False
+    texto, tarjeta = _con_reglas(estado, intencion)
+    return aviso + texto, tarjeta
+
+
+def responder(sesion, texto: str, adjunto: Adjunto | None = None, *, usuario=None, ip="") -> None:
     """Procesa un mensaje de la persona y deja en la sesión su respuesta."""
     estado = leer(sesion)
     texto = (texto or "").strip()
@@ -174,32 +236,13 @@ def responder(sesion, texto: str, adjunto: Adjunto | None = None) -> None:
         visto = (texto + "\n" if texto else "") + f"📎 {adjunto.nombre}"
     if not visto:
         return
+    historial = list(estado["mensajes"])
     estado["mensajes"].append({"rol": "usuario", "texto": visto, "tarjeta": False})
-
     if adjunto and adjunto.es_imagen:
-        respuesta, tarjeta = (
-            (
-                "Todavía no sé leer fotos de listas: eso lo hará la IA cuando esté activada. "
-                f"Por ahora, {SALUDO_AYUDA[0].lower() + SALUDO_AYUDA[1:]}"
-            ),
-            False,
-        )
+        entrada = texto
     else:
         entrada = (texto + "\n" + adjunto.texto[:MAX_ADJUNTO]).strip() if adjunto else texto
-        intencion = detectar_intencion(entrada)
-        if intencion.tipo is Tipo.REINICIAR:
-            estado["pedido"] = []
-            respuesta, tarjeta = f"Listo, empecemos de nuevo. {SALUDO_AYUDA}", False
-        elif intencion.tipo is Tipo.ORDENAR_TOTAL:
-            respuesta, tarjeta = _ordenar(estado, CRITERIO_TOTAL)
-        elif intencion.tipo is Tipo.ORDENAR_COBERTURA:
-            respuesta, tarjeta = _ordenar(estado, CRITERIO_COBERTURA)
-        elif intencion.tipo is Tipo.AGREGAR:
-            respuesta, tarjeta = _agregar(estado, intencion.resto)
-        elif intencion.tipo is Tipo.QUITAR:
-            respuesta, tarjeta = _quitar(estado, intencion.resto)
-        else:
-            respuesta, tarjeta = _nueva_lista(estado, intencion.resto)
+    respuesta, tarjeta = _respuesta(estado, historial, entrada, adjunto, usuario, ip)
     estado["mensajes"].append({"rol": "asistente", "texto": respuesta, "tarjeta": tarjeta})
     _guardar(sesion, estado)
 
