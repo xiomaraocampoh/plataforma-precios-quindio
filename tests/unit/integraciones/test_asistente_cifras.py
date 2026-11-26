@@ -49,3 +49,9 @@ def test_las_cantidades_que_la_persona_pidio_y_salieron_del_calculo_son_validas(
 
 def test_varias_fuentes_se_suman():
     assert _ok("Total $30.841 y alternativa $35.000.", RESULTADO, '{"total": 35000}')
+
+
+def test_las_instrucciones_piden_no_asumir_el_genero_de_la_persona():
+    from apps.integraciones.domain.asistente import INSTRUCCIONES
+
+    assert "No asumas el género" in INSTRUCCIONES and "bienvenida" in INSTRUCCIONES
