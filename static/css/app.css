@@ -357,6 +357,10 @@ a.chip:hover { text-decoration: none; background: var(--borde); }
 .cta-final { text-align: center; align-items: center; padding: clamp(2.5rem, 7vw, 4.5rem) 1.5rem; gap: 1.1rem; border-radius: var(--radio); }
 .cta-final h2 { font-size: clamp(2rem, 5.5vw, 3.4rem); font-weight: 700; letter-spacing: -.04em; max-width: 16ch; }
 .cta-final p { max-width: 38ch; font-size: 1.15rem; }
+/* Bloque final de la portada: ilustración ancha (íconos en las esquinas, centro libre para el texto);
+   en celular, una versión con los dos lados de la ilustración juntos (el bloque es angosto). */
+.tile-oscuro.cta-final { background: #0c0e16 url("../img/fondo-cta.webp") center / cover no-repeat; }
+@media (max-width: 700px) { .tile-oscuro.cta-final { background-image: radial-gradient(ellipse 80% 55% at 50% 50%, rgb(12 14 22 / .82), rgb(12 14 22 / 0) 100%), url("../img/fondo-cta-movil.webp"); min-height: 22rem; justify-content: center; } }
 
 /* ---------- Resultados ---------- */
 .actualizacion { display: flex; flex-wrap: wrap; align-items: center; gap: 0 .5rem; margin: -.5rem 0 1rem; font-size: .9rem; }
@@ -1047,8 +1051,3 @@ select:disabled { cursor: not-allowed; opacity: .6; }
    (si ambos tuvieran margen automático se repartirían el sobrante y el botón quedaría a alturas distintas). */
 .tarjeta-precio .acciones-fila { margin-top: auto; }
 .tarjeta-precio .acciones-fila + .ir { margin-top: .5rem; }
-
-/* Bloque final de la portada: ilustración ancha (íconos en las esquinas, centro libre para el texto);
-   en celular, una versión con los dos lados de la ilustración juntos (el bloque es angosto). */
-.tile-oscuro.cta-final { background: #0c0e16 url("../img/fondo-cta.webp") center / cover no-repeat; }
-@media (max-width: 700px) { .tile-oscuro.cta-final { background-image: radial-gradient(ellipse 80% 55% at 50% 50%, rgb(12 14 22 / .82), rgb(12 14 22 / 0) 100%), url("../img/fondo-cta-movil.webp"); min-height: 22rem; justify-content: center; } }
