@@ -20,7 +20,7 @@ pytestmark = pytest.mark.unit
 
 CABECERA = "participante,tarea,tiempo_s,completo,error,pidio_ayuda,observaciones\n"
 CABECERA_SUS = "participante,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10\n"
-PLANTILLAS = Path("docs/calidad/usabilidad")
+REGISTRO = Path("docs/calidad/usabilidad")
 
 
 def registro(*filas: str):
@@ -104,11 +104,24 @@ def test_leer_sus_devuelve_un_puntaje_por_participante_y_omite_vacios():
     assert leer_sus(lineas) == {"P1": Decimal("80.0")}
 
 
-def test_las_plantillas_del_kit_no_traen_resultados():
-    # El kit se entrega vacío: ningún resultado inventado
-    with (PLANTILLAS / "registro.csv").open(encoding="utf-8") as f:
+def _plantillas_vacias(carpeta: Path) -> tuple[Path, Path]:
+    """El kit se entrega vacío (una fila por participante y tarea, sin datos)."""
+    registro_csv = carpeta / "registro.csv"
+    registro_csv.write_text(
+        CABECERA + "".join(f"P{n},{t},,,,,\n" for n in (1, 2) for t in ("T1", "T3", "T2", "T4")),
+        encoding="utf-8",
+    )
+    sus_csv = carpeta / "sus.csv"
+    sus_csv.write_text(CABECERA_SUS + "P1,,,,,,,,,,\nP2,,,,,,,,,,\n", encoding="utf-8")
+    return registro_csv, sus_csv
+
+
+def test_las_plantillas_vacias_no_traen_resultados(tmp_path):
+    # Las filas sin datos se ignoran: ningún resultado inventado
+    registro_csv, sus_csv = _plantillas_vacias(tmp_path)
+    with registro_csv.open(encoding="utf-8") as f:
         assert leer_registro(f) == []
-    with (PLANTILLAS / "sus.csv").open(encoding="utf-8") as f:
+    with sus_csv.open(encoding="utf-8") as f:
         assert leer_sus(f) == {}
 
 
@@ -122,9 +135,18 @@ def test_calcular_resume_metricas_y_umbrales():
     assert resultado["SUS"].valor == Decimal("80.0")
 
 
-def test_main_con_las_plantillas_vacias_informa_sin_datos(capsys):
-    codigo = main([str(PLANTILLAS / "registro.csv"), str(PLANTILLAS / "sus.csv")])
+def test_main_con_las_plantillas_vacias_informa_sin_datos(capsys, tmp_path):
+    registro_csv, sus_csv = _plantillas_vacias(tmp_path)
+    codigo = main([str(registro_csv), str(sus_csv)])
     salida = capsys.readouterr().out
     assert codigo == 0
     assert "sin datos" in salida
     assert "Participantes evaluados: 0" in salida
+
+
+def test_los_resultados_del_repositorio_se_calculan_sin_error(capsys):
+    # PUX-01: registro.csv y sus.csv del repositorio deben seguir siendo calculables
+    codigo = main([str(REGISTRO / "registro.csv"), str(REGISTRO / "sus.csv")])
+    salida = capsys.readouterr().out
+    assert codigo == 0
+    assert "Participantes evaluados:" in salida

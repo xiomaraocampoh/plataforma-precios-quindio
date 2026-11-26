@@ -1,5 +1,7 @@
 """Vistas HTMX del catálogo: solicitud de productos con aviso de duplicados (RF-06, D-05)."""
 
+from decimal import Decimal, InvalidOperation
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse, HttpResponseNotModified
@@ -8,7 +10,20 @@ from django.views.decorators.http import require_GET, require_http_methods
 
 from . import selectors, services
 from .domain.codigo_barras import normalizar_codigo
+from .domain.normalizacion import Unidad
 from .forms import SolicitudForm
+
+
+def _presentacion_pedida(parametros) -> dict:
+    """Cantidad y unidad que trae el escáner (ADR-0026), solo si son válidas; si no, nada."""
+    unidad, cantidad = parametros.get("unidad", ""), parametros.get("cantidad", "")
+    try:
+        numero = Decimal(cantidad)
+    except InvalidOperation:
+        return {}
+    if unidad not in {u.value for u in Unidad} or not (numero.is_finite() and numero > 0):
+        return {}
+    return {"cantidad": numero, "unidad": unidad}
 
 
 @login_required
@@ -18,6 +33,7 @@ def solicitar(request):
         "codigo_barras": normalizar_codigo(request.GET.get("codigo_barras", ""))[:14],
         "nombre": request.GET.get("nombre", "")[:120],
         "marca": request.GET.get("marca", "")[:80],
+        **_presentacion_pedida(request.GET),
     }
     form = SolicitudForm(request.POST or None, initial=inicial)
     if request.method == "POST" and form.is_valid():

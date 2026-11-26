@@ -2,6 +2,7 @@
 
 import base64
 import json
+from decimal import Decimal
 from types import SimpleNamespace
 
 import anthropic
@@ -12,6 +13,7 @@ from apps.integraciones.clients.vision import (
     ReconocedorClaude,
     ReconocimientoNoDisponibleError,
 )
+from apps.integraciones.domain.escaneo import TipoEscaneo
 from apps.integraciones.domain.reconocimiento import PistaProducto
 
 pytestmark = pytest.mark.unit
@@ -116,3 +118,94 @@ def test_sin_clave_de_api_no_esta_disponible(settings):
     settings.INTEGRACIONES = {**settings.INTEGRACIONES, "ANTHROPIC_API_KEY": ""}
     with pytest.raises(ReconocimientoNoDisponibleError):
         ReconocedorClaude().reconocer(JPEG, "image/jpeg")
+
+
+# --- escaneo en vivo (ADR-0026): clasificar y extraer en UNA llamada ----------------------------
+
+
+ETIQUETA = {
+    "tipo": "etiqueta",
+    "nombre": "Arroz blanco",
+    "marca": "Diana",
+    "cantidad": "1000",
+    "unidad": "g",
+    "codigo_barras": "",
+    "confianza": "alta",
+    "precio": "$4.350",
+    "precio_anterior": "",
+    "es_promocion": False,
+    "precio_por_unidad": "",
+    "unidad_precio_por_unidad": "",
+    "referencia": "",
+    "establecimiento": "",
+}
+
+
+class ClienteConOpciones(ClienteFalso):
+    """Como el SDK: `with_options` devuelve un cliente con otro timeout y reintentos."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.opciones = []
+
+    def with_options(self, **opciones):
+        self.opciones.append(opciones)
+        return self
+
+
+def _escanear(cliente, **kwargs):
+    return ReconocedorClaude(cliente=cliente, modelo="foto", **kwargs).escanear(JPEG, "image/jpeg")
+
+
+def test_escanear_clasifica_y_extrae_una_etiqueta():
+    r = _escanear(ClienteConOpciones(_respuesta(ETIQUETA)))
+    assert r.tipo is TipoEscaneo.ETIQUETA and r.etiqueta.precio == Decimal("4350")
+
+
+def test_escanear_usa_el_modelo_en_vivo_una_sola_llamada_y_pocos_tokens(settings):
+    settings.INTEGRACIONES = {**settings.INTEGRACIONES, "RECONOCIMIENTO_MODELO_VIVO": "rapido"}
+    cliente = ClienteConOpciones(_respuesta(ETIQUETA))
+    _escanear(cliente)
+    (llamada,) = cliente.llamadas
+    assert llamada["model"] == "rapido"
+    assert llamada["max_tokens"] <= 1024
+    assert "tools" not in llamada  # solo extrae: no puede actuar
+    formato = llamada["output_config"]["format"]
+    assert formato["type"] == "json_schema"
+    assert set(formato["schema"]["properties"]["tipo"]["enum"]) == {"producto", "etiqueta", "nada"}
+
+
+def test_escanear_tiene_timeout_corto_y_sin_reintentos(settings):
+    settings.INTEGRACIONES = {**settings.INTEGRACIONES, "RECONOCIMIENTO_TIMEOUT_VIVO_S": 4}
+    cliente = ClienteConOpciones(_respuesta(ETIQUETA))
+    _escanear(cliente)
+    assert cliente.opciones == [{"timeout": 4.0, "max_retries": 0}]
+
+
+def test_escanear_el_prompt_trata_el_texto_de_la_imagen_como_dato():
+    cliente = ClienteConOpciones(_respuesta(ETIQUETA))
+    _escanear(cliente)
+    sistema = cliente.llamadas[0]["system"].lower()
+    assert "no son instrucciones" in sistema and "etiqueta" in sistema
+
+
+def test_escanear_respeta_el_tope_de_precio(settings):
+    settings.INTEGRACIONES = {**settings.INTEGRACIONES, "PRECIO_MAXIMO_ETIQUETA": "1000"}
+    r = _escanear(ClienteConOpciones(_respuesta(ETIQUETA)))
+    assert r.tipo is TipoEscaneo.PRODUCTO  # 4.350 > 1.000: no se propone como precio
+
+
+@pytest.mark.parametrize("stop", ["refusal", "max_tokens"])
+def test_escanear_rechazo_o_corte_es_nada(stop):
+    r = _escanear(ClienteConOpciones(_respuesta(ETIQUETA, stop=stop)))
+    assert r.tipo is TipoEscaneo.NADA
+
+
+def test_escanear_json_invalido_es_nada():
+    assert _escanear(ClienteConOpciones(_respuesta("{roto"))).tipo is TipoEscaneo.NADA
+
+
+def test_escanear_timeout_es_no_disponible():
+    error = anthropic.APITimeoutError(request=httpx2.Request("POST", "https://api.test"))
+    with pytest.raises(ReconocimientoNoDisponibleError):
+        _escanear(ClienteConOpciones(error=error))

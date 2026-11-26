@@ -28,7 +28,10 @@ def directorio(request):
 @login_required
 @require_http_methods(["GET", "POST"])
 def sugerir(request):
-    form = SugerenciaForm(request.POST or None)
+    # El escáner (ADR-0026) trae el nombre impreso en la etiqueta: la persona completa el resto
+    form = SugerenciaForm(
+        request.POST or None, initial={"nombre": request.GET.get("nombre", "")[:150]}
+    )
     if request.method == "POST" and form.is_valid():
         services.sugerir_establecimiento(autor=request.user, **form.cleaned_data)
         messages.success(

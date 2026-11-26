@@ -244,7 +244,7 @@ def test_api_reportes_en_revision_solo_moderacion_y_sin_autor(api, moderador, ve
     assert r.status_code == 200
     item = r.json()["results"][0]
     assert item["id"] == reporte.pk
-    assert "autor" not in item  # EC-07: ni siquiera para moderación por API
+    assert "autor" not in item  # EC-15: ni siquiera para moderación por API
     detalle = reverse("api-en-revision-detalle", args=[reporte.pk])
     r = api.patch(detalle, {"decision": "rechazar", "motivo": "Duplicado"}, format="json")
     assert r.status_code == 200 and r.json()["estado"] == "rechazado"

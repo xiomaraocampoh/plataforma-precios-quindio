@@ -18,7 +18,7 @@
 | ADR-004 CQRS ligero: servicios/selectores, cache-aside con TTL de 60 s e invalidación en `on_commit` | `precios/services.py`, `comparacion/selectors.py`, `core/cache.py` | Implementado y probado (D-01) |
 | ADR-005 vigencia de 7, 3 y 30 días parametrizada (RN-03) | `precios/domain/vigencia.py`, `settings.PRECIOS` | Implementado con TDD |
 | ADR-006 anomalía con más del 50 % de diferencia sobre la mediana y mínimo 3 muestras (RN-05) | `precios/domain/confianza.py` | Implementado con TDD |
-| ADR-008 serialización pública con lista blanca y sin autor (EC-07, M-15) | `comparacion/api/serializers.py` | Implementado y probado |
+| ADR-008 serialización pública con lista blanca y sin autor (EC-15, M-15) | `comparacion/api/serializers.py` | Implementado y probado |
 | ADR-009 idempotencia por `id_cliente` (RN-07, M-22) | `ReportePrecio.id_cliente` único, servicio | Implementado y probado |
 | ADR-010 puerto `FuentePreciosExterna` y adaptador SIPSA con tiempo de espera | `integraciones/clients/sipsa.py` | Solo la interfaz; el adaptador está pendiente (I4) |
 | ADR-011 catálogo canónico y precio por unidad base con `Decimal` (RN-01, RN-02) | `catalogo/domain/normalizacion.py` | Implementado con TDD |

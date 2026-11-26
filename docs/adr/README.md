@@ -19,6 +19,16 @@ Cada ADR sigue la plantilla [`0000-plantilla.md`](0000-plantilla.md) (formato de
 | [0022](0022-reconocimiento-de-productos-por-foto-con-ia.md) | Reconocimiento de productos por foto con IA (opcional) | Propuesto (requiere aprobación) |
 | [0023](0023-semilla-de-prueba-en-migraciones.md) | Datos y cuentas de prueba sembrados desde las migraciones | Propuesto |
 | [0024](0024-fotos-de-producto-guardadas-en-la-base-de-datos.md) | Fotos de producto en la base de datos, subidas desde el panel | Propuesto |
+| 0025 | Reservado: REST frente a GraphQL | — |
+| [0026](0026-escaneo-en-vivo-e-interpretacion-de-etiquetas.md) | Escaneo en vivo e interpretación de etiquetas de precio (amplía el 0022) | Propuesto (apagado por defecto; requiere aprobación) |
+| [0027](0027-calculo-de-la-canasta-en-cada-consulta.md) | Canasta: calcular en cada consulta sobre la caché de la comparación | Propuesto |
+| [0028](0028-productos-sin-precio-y-criterios-de-orden-de-la-canasta.md) | Canasta: productos sin precio vigente y criterios de orden declarados | Propuesto |
+| [0029](0029-cantidades-y-promociones-en-la-canasta.md) | Canasta: cantidades, presentaciones y promociones «pague X lleve Y» | Propuesto (promociones dependen del módulo comercial) |
+| [0030](0030-asistente-de-compras-con-tool-use.md) | Asistente de compras con IA: la IA interpreta, el dominio calcula | Propuesto (requiere aprobación) |
+| [0031](0031-despliegue-alternativo-en-vercel-serverless.md) | Despliegue alternativo en Vercel (serverless), sin cambiar Render | Propuesto (sin despliegue real todavía) |
+
+Los ADR de la ampliación del Anexo 1 (desde el 0027) usan la **plantilla 8.1 del Anexo**, que agrega
+a la de Nygard los campos *Escenarios relacionados* y *Verificación*.
 
 ## Sobre la numeración (decisión D-1 pendiente)
 

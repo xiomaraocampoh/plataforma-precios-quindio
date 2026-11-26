@@ -20,7 +20,7 @@ EC-06). Nunca hay datos del autor (M-15).
 <p class="suave" role="status">{{ tarjetas|length }} producto{{ tarjetas|length|pluralize }} con precio vigente. Orden alfabético; para ver si conviene, abre «Ver todos los precios» y compáralo con otros comercios. El precio por unidad sirve para comparar empaques de distinto tamaño.</p>
 <ul class="tarjetas tarjetas-precio" aria-label="Productos con precio en {{ local.nombre }}">
   {% for p, fila in tarjetas %}
-  <li class="tarjeta tarjeta-precio" aria-labelledby="tp-{{ fila.reporte_id }}">
+  <li class="tarjeta tarjeta-precio" aria-labelledby="{{ fila.ancla }}">
     {% include "partials/_foto_producto.html" with producto=p clase="foto-grande" %}
     {% include "comparacion/partials/_tarjeta_precio.html" with destacada=False sin_comercio=True etiqueta=p.categoria.nombre icono=p.categoria|icono_categoria %}
     <a class="ir" href="{% url 'comparacion:comparar' p.pk %}">Ver todos los precios<span class="sr-only"> de {{ p }}</span></a>

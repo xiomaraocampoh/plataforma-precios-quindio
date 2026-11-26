@@ -6,6 +6,9 @@ ADR-017 (despliegue en un PaaS de contenedores) y al entregable AS-II 3.
 > **Estado.** La imagen y el compose de producción están **verificados en local** (sección 9).
 > **No hay despliegue en la nube todavía**: falta elegir el proveedor (decisión D-11 del equipo).
 > La sección 7 explica qué cambia al llevarlo a uno.
+>
+> **Alternativa serverless:** [`despliegue-vercel.md`](despliegue-vercel.md) explica cómo publicar en
+> Vercel sin cambiar nada de lo que describe esta guía (ADR-0031).
 
 ## 1. Qué se levanta
 

@@ -112,7 +112,7 @@ def test_ninguna_tarjeta_expone_al_autor(client, con_precios, reportante, vecina
 
 def test_api_publica_devuelve_la_direccion_del_comercio_y_nada_del_autor(
     api, con_precios, reportante
-):  # EC-07, M-15
+):  # EC-15, M-15
     datos = api.get(reverse("api-comparacion", args=[con_precios.pk])).json()
     primero = datos["resultados"][0]
     assert set(primero) == {
@@ -130,7 +130,10 @@ def test_api_publica_devuelve_la_direccion_del_comercio_y_nada_del_autor(
         "confianza",
         "fecha_observacion",
         "es_promocion",
+        "usuarios_reportan",  # aditivo en /v1 (ADR-018): nulo si no hay precio oficial
     }
+    assert primero["usuarios_reportan"] is None
+    assert datos["promociones"] == []  # aditivo en /v1 (D-3, ADR-014)
     assert primero["direccion"] == "Cra 14 # 10-20" and primero["municipio"] == "Armenia"
     assert primero["establecimiento_tipo"] == "Supermercado"
     assert reportante.username not in str(datos)

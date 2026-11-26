@@ -3,7 +3,7 @@
 {% if tarjetas %}
 <ul class="tarjetas tarjetas-precio" aria-label="Productos">
   {% for p, fila in tarjetas %}
-  <li class="tarjeta tarjeta-precio" aria-labelledby="{% if fila %}tp-{{ fila.reporte_id }}{% else %}tp-sin-{{ p.pk }}{% endif %}">
+  <li class="tarjeta tarjeta-precio" aria-labelledby="{% if fila %}{{ fila.ancla }}{% else %}tp-sin-{{ p.pk }}{% endif %}">
     {% include "partials/_foto_producto.html" with producto=p clase="foto-grande" %}
     {% if fila %}
       {% include "comparacion/partials/_tarjeta_precio.html" with destacada=False etiqueta=p.categoria.nombre icono=p.categoria|icono_categoria %}

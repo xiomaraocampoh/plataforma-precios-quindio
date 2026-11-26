@@ -62,8 +62,14 @@ def registrar_reporte(
     precio: Decimal,
     fecha_observacion: datetime | None = None,
     id_cliente: uuid.UUID | None = None,
+    origen: str = ReportePrecio.Origen.MANUAL,
 ) -> ReportePrecio:
-    """Registra un precio observado. Idempotente por `id_cliente` (sincronización offline)."""
+    """Registra un precio observado. Idempotente por `id_cliente` (sincronización offline).
+
+    `origen` dice si se escribió a mano o se leyó de una etiqueta (ADR-0026); un valor desconocido
+    cuenta como manual. No cambia ninguna regla: mismo cupo, anomalías e invalidación."""
+    if origen not in ReportePrecio.Origen.values:
+        origen = ReportePrecio.Origen.MANUAL
     if id_cliente is not None:
         existente = ReportePrecio.objects.filter(id_cliente=id_cliente).first()
         if existente is not None:
@@ -114,6 +120,7 @@ def registrar_reporte(
         fecha_observacion=fecha,
         estado=estado,
         id_cliente=id_cliente,
+        origen=origen,
     )
     producto_id = presentacion.producto_id
     transaction.on_commit(lambda: invalidar_comparacion(producto_id))

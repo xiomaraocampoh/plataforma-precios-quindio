@@ -5,6 +5,10 @@
  *    dígitos (GET /escanear/?codigo=…).
  *  - Foto del producto (ADR-022): se reduce a 1024 px y se recodifica aquí (se pierde el EXIF,
  *    incluida la ubicación) antes de enviarla; el servidor no la guarda.
+ *  - Escáner en vivo (ADR-0026): con la cámara abierta, cada cuadro pasa primero por el lector de
+ *    código de barras (local y gratis). Si no hay código, y solo si la imagen está quieta y nítida,
+ *    no hay otro envío en curso y pasó el intervalo mínimo, se envía un cuadro reducido a 768 px y
+ *    recodificado en JPEG. La regla es la de integraciones/domain/escaneo.py (decidir_envio).
  * La cámara en vivo exige contexto seguro (HTTPS o localhost). Sin ella queda la foto/galería. */
 (function () {
   "use strict";
@@ -21,8 +25,20 @@
   var galeria = $("[data-galeria]"), captura = $("[data-captura]");
   var urlIA = dlg.getAttribute("data-foto-url") || "";
   var hayIA = urlIA !== "";
+  var urlVivo = dlg.getAttribute("data-vivo-url") || "";
+  var hayVivo = urlVivo !== "";
   var formatos = ["ean_13", "ean_8", "upc_a"];
-  var modo = hayIA ? "producto" : "codigo";
+  var modo = hayVivo ? "vivo" : (hayIA ? "producto" : "codigo");
+  var pausar = $("[data-pausar]"), seguir = $("[data-seguir]");
+  /* Estado del escáner en vivo; los umbrales vienen del servidor (ControlDeEnvio) */
+  var vivo = {
+    intervalo: Number(dlg.getAttribute("data-intervalo")) || 1500,
+    max: Number(dlg.getAttribute("data-max")) || 20,
+    umbralMovimiento: Number(dlg.getAttribute("data-umbral-movimiento")) || 0.05,
+    umbralNitidez: Number(dlg.getAttribute("data-umbral-nitidez")) || 40,
+    enviados: 0, enCurso: false, ultimo: null, pausado: false, porResultado: false,
+    caido: false, previo: null, tic: null
+  };
   var flujo = null, lector = null, detector = null, activo = false, zxing = null, enVivo = false;
 
   /* ---------- utilidades ---------- */
@@ -40,6 +56,7 @@
   function decir(t) { guia.textContent = t; }
   function textoGuia() {
     if (dlg.hasAttribute("data-sincamara")) { decir(""); return; }
+    if (modo === "vivo") { decir("Apunta a un empaque o a la etiqueta de precio y quédate quieto"); return; }
     decir(modo === "producto" ? "Encuadra el producto completo y toca el botón"
                               : "Alinea el código de barras dentro del marco");
   }
@@ -47,7 +64,10 @@
     if (esHtml) salida.innerHTML = html; else salida.textContent = html; // html: fragmento propio
     hoja.hidden = false;
   }
-  function cerrarHoja() { hoja.hidden = true; salida.textContent = ""; }
+  function cerrarHoja() {
+    hoja.hidden = true; salida.textContent = "";
+    vivo.porResultado = false; vivo.previo = null; // al cerrar la hoja, el escaneo continúa
+  }
 
   /* ---------- modos ---------- */
   function ponerModo(m) {
@@ -58,7 +78,7 @@
     });
     cerrarHoja();
     textoGuia();
-    if (m === "codigo" && activo) arrancarLectura();
+    if (activo) arrancarLectura();
   }
   dlg.querySelectorAll("button[data-modo]").forEach(function (b) {
     b.addEventListener("click", function () { ponerModo(b.getAttribute("data-modo")); });
@@ -94,15 +114,19 @@
     pistas.set(Z.DecodeHintType.TRY_HARDER, true);
     return new Z.BrowserMultiFormatReader(pistas, 300);
   }
+  function leeCodigo() { return modo === "codigo" || modo === "vivo"; }
+  function enEspera() { return vivo.pausado || vivo.porResultado; } // pausa o hoja abierta
   function bucleDetector() {
-    if (!activo || modo !== "codigo") return;
+    if (!activo || !leeCodigo()) return;
+    if (enEspera()) { setTimeout(bucleDetector, 400); return; }
     detector.detect(video).then(function (r) {
       for (var i = 0; i < r.length; i++) if (aceptar(r[i].rawValue)) return;
+      if (modo === "vivo") evaluarFotograma(); // sin código en este cuadro: ¿vale la pena la IA?
       setTimeout(bucleDetector, 250);
     }).catch(function () { setTimeout(bucleDetector, 400); });
   }
   function arrancarLectura() {
-    if (!flujo || modo !== "codigo") return;
+    if (!flujo || !leeCodigo()) return;
     if ("BarcodeDetector" in window) {
       detector = detector || new window.BarcodeDetector({ formats: formatos });
       bucleDetector();
@@ -111,8 +135,9 @@
         if (!activo) return;
         lector = nuevoLectorZxing(Z);
         lector.decodeFromStream(flujo, video, function (r) {
-          if (r && modo === "codigo") aceptar(r.getText());
+          if (r && leeCodigo() && !enEspera()) aceptar(r.getText());
         });
+        if (modo === "vivo") bucleVivoSinDetector();
       }).catch(function () { decir("No pudimos cargar el lector. Toma una foto o escribe el código."); });
     }
   }
@@ -160,10 +185,116 @@
     return reducir(video, video.videoWidth, video.videoHeight);
   }
 
+  /* ---------- escáner en vivo (ADR-0026) ---------- */
+  var lienzo = document.createElement("canvas");
+  lienzo.width = 160; lienzo.height = 120;
+  var ctx = lienzo.getContext("2d", { willReadFrequently: true });
+  var movil = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)");
+  /* Diferencia media con el cuadro anterior (0 a 1) y varianza del laplaciano (nitidez) en gris */
+  function medir() {
+    ctx.drawImage(video, 0, 0, lienzo.width, lienzo.height);
+    var px = ctx.getImageData(0, 0, lienzo.width, lienzo.height).data;
+    var n = lienzo.width * lienzo.height, gris = new Float32Array(n), dif = 0;
+    for (var i = 0; i < n; i++) {
+      gris[i] = 0.299 * px[i * 4] + 0.587 * px[i * 4 + 1] + 0.114 * px[i * 4 + 2];
+      if (vivo.previo) dif += Math.abs(gris[i] - vivo.previo[i]);
+    }
+    var diferencia = vivo.previo ? dif / n / 255 : 1; // el primer cuadro no tiene con qué compararse
+    vivo.previo = gris;
+    var w = lienzo.width, suma = 0, suma2 = 0, k = 0;
+    for (var y = 1; y < lienzo.height - 1; y++) {
+      for (var x = 1; x < w - 1; x++) {
+        var j = y * w + x;
+        var lap = gris[j - w] + gris[j + w] + gris[j - 1] + gris[j + 1] - 4 * gris[j];
+        suma += lap; suma2 += lap * lap; k++;
+      }
+    }
+    var media = suma / k;
+    return { diferencia: diferencia, nitidez: suma2 / k - media * media };
+  }
+  /* Igual que decidir_envio: pausa > tope > en curso > muy pronto > movida > borrosa */
+  function decidir(m) {
+    if (vivo.pausado || vivo.porResultado || vivo.caido) return "pausado";
+    if (vivo.enviados >= vivo.max) return "tope";
+    if (vivo.enCurso) return "en_curso";
+    if (vivo.ultimo !== null && Date.now() - vivo.ultimo < vivo.intervalo) return "muy_pronto";
+    if (!(m.diferencia < vivo.umbralMovimiento)) return "movida";
+    if (!(m.nitidez >= vivo.umbralNitidez)) return "borrosa";
+    return "listo";
+  }
+  var GUIAS = {
+    movida: "Mantén quieto el celular un momento",
+    borrosa: "Acércate un poco o mejora la luz"
+  };
+  function evaluarFotograma() {
+    if (!activo || modo !== "vivo" || !video.videoWidth || !hoja.hidden) return;
+    var espera = decidir(medir());
+    if (espera === "listo") { enviarFotograma(); return; }
+    if (espera === "tope") { alcanzarTope(); return; }
+    if (GUIAS[espera]) decir(GUIAS[espera]);
+  }
+  function bucleVivoSinDetector() { // sin BarcodeDetector, zxing lee aparte; aquí solo la IA
+    clearInterval(vivo.tic);
+    vivo.tic = setInterval(function () {
+      if (!activo || modo !== "vivo") { clearInterval(vivo.tic); return; }
+      evaluarFotograma();
+    }, 300);
+  }
+  function alcanzarTope() {
+    if (!seguir.hidden) return;
+    seguir.hidden = false;
+    decir("Pausamos el escaneo para cuidar el cupo. Toca «Seguir escaneando» para continuar.");
+  }
+  function avisarReconocido() {
+    var reducido = movil && movil.matches;
+    if (!reducido && navigator.vibrate) { try { navigator.vibrate(60); } catch (e) { /* sin vibración */ } }
+    var foco = salida.querySelector("[data-foco]");
+    if (foco) foco.focus();
+  }
+  function enviarFotograma() {
+    vivo.enCurso = true; vivo.enviados += 1; vivo.ultimo = Date.now();
+    decir("Reconociendo…");
+    var k = Math.min(1, 768 / Math.max(video.videoWidth, video.videoHeight));
+    var c = document.createElement("canvas");
+    c.width = Math.round(video.videoWidth * k); c.height = Math.round(video.videoHeight * k);
+    c.getContext("2d").drawImage(video, 0, 0, c.width, c.height);
+    new Promise(function (ok) { c.toBlob(ok, "image/jpeg", 0.8); }).then(function (blob) {
+      var datos = new FormData();
+      datos.append("fotograma", blob, "fotograma.jpg");
+      return fetch(urlVivo, { method: "POST", body: datos, headers: { "X-CSRFToken": csrf() }, credentials: "same-origin" });
+    }).then(function (r) {
+      if (r.status === 204) { textoGuia(); return null; }
+      return r.text().then(function (html) { return { estado: r.status, html: html }; });
+    }).then(function (res) {
+      if (!res || !activo || modo !== "vivo") return;
+      if (res.estado === 200) {
+        vivo.porResultado = true; // pausado hasta que la persona cierre la hoja o elija una acción
+        mostrarHoja(res.html, true);
+        avisarReconocido();
+      } else if (res.estado === 429) {
+        vivo.caido = true; mostrarHoja(res.html, true); // tope de uso: queda el código de barras
+      } else if (res.estado === 503) {
+        vivo.caido = true; decir("El reconocimiento no responde. Sigue con el código de barras.");
+      } else { textoGuia(); }
+    }).catch(function () { textoGuia(); })
+      .then(function () { vivo.enCurso = false; });
+  }
+  if (pausar) {
+    pausar.addEventListener("click", function () {
+      vivo.pausado = pausar.getAttribute("aria-pressed") !== "true";
+      pausar.setAttribute("aria-pressed", String(vivo.pausado));
+      if (vivo.pausado) decir("Escaneo en pausa.");
+      else { vivo.previo = null; textoGuia(); }
+    });
+    seguir.addEventListener("click", function () {
+      vivo.enviados = 0; vivo.caido = false; seguir.hidden = true; vivo.previo = null; textoGuia();
+    });
+  }
+
   /* ---------- una imagen que llega por galería, cámara del sistema, pegado o arrastre ---------- */
   function procesarArchivo(archivo) {
     if (!dlg.open) dlg.showModal();
-    if (hayIA && modo === "producto") {
+    if (hayIA && (modo === "producto" || modo === "vivo")) {
       enviarIA(createImageBitmap(archivo).then(function (b) { return reducir(b, b.width, b.height); }));
     } else {
       leerCodigoDeArchivo(archivo);
@@ -181,7 +312,7 @@
 
   disparador.addEventListener("click", function () {
     var foto = fotogramaActual();
-    if (foto && hayIA && modo === "producto") enviarIA(foto);
+    if (foto && hayIA && (modo === "producto" || modo === "vivo")) { vivo.porResultado = true; enviarIA(foto); }
     else if (!enVivo) captura.click(); // sin cámara en vivo: abre la cámara del sistema
   });
 
@@ -286,6 +417,7 @@
   /* ---------- cámara en vivo ---------- */
   function detener() {
     activo = false; enVivo = false;
+    clearInterval(vivo.tic); vivo.previo = null; vivo.porResultado = false; vivo.enCurso = false;
     if (lector) { try { lector.reset(); } catch (e) { /* ya detenido */ } lector = null; }
     if (flujo) { flujo.getTracks().forEach(function (t) { t.stop(); }); flujo = null; }
     video.srcObject = null;

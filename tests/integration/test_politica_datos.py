@@ -53,6 +53,14 @@ def test_la_politica_informa_el_envio_de_la_foto_a_anthropic(client):
     assert "1024" in html
 
 
+def test_la_politica_informa_el_escaneo_en_vivo_con_ia(client):
+    # ADR-0026: los cuadros del escáner viajan a Anthropic solo para extraer el texto; es opcional
+    html = _politica(client)
+    assert "Escaneo en vivo con IA (opcional)" in html
+    assert "solo para extraer el texto" in html
+    assert "ni la imagen ni los cuadros se guardan" in html
+
+
 def test_la_politica_no_promete_lo_que_la_plataforma_no_hace(client):
     html = _politica(client)
     assert "No vendemos tus datos" in html

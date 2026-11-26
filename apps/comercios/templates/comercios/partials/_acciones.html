@@ -1,0 +1,11 @@
+{% comment %}Decisión de moderación sobre un perfil o una corrección. Parámetros: url, prefijo, objeto, si, no, etiqueta, requerido.{% endcomment %}
+<form method="post" action="{{ url }}" class="acciones-fila"
+      hx-post="{{ url }}" hx-target="closest li" hx-swap="innerHTML" hx-disabled-elt="find button">
+  {% csrf_token %}
+  <div class="campo" style="flex:1 1 220px;margin:0">
+    <label for="motivo-{{ prefijo }}-{{ objeto }}">{{ etiqueta|default:"Motivo" }} <span class="suave">({{ requerido|default:"obligatorio para no verificar" }})</span></label>
+    <input type="text" id="motivo-{{ prefijo }}-{{ objeto }}" name="motivo" maxlength="300" autocomplete="off">
+  </div>
+  <button class="btn btn-pequeno" type="submit" name="decision" value="aprobar">{{ si }}</button>
+  <button class="btn btn-sec btn-pequeno" type="submit" name="decision" value="rechazar">{{ no }}</button>
+</form>

@@ -1,5 +1,6 @@
 """Lecturas del directorio de establecimientos (RF-08, RF-09)."""
 
+from .domain.coincidencia import elegir_establecimiento
 from .domain.mapas import enlace_openstreetmap
 from .models import Establecimiento
 
@@ -51,3 +52,13 @@ def pendientes():
         .select_related("sugerido_por")
         .order_by("creado_en")
     )
+
+
+def establecimiento_de_etiqueta(texto: str) -> Establecimiento | None:
+    """La tienda del directorio que nombra una etiqueta de precio, solo si es una sin dudas
+    (ADR-0026). Un query: el directorio de Armenia cabe en memoria."""
+    if not texto:
+        return None
+    candidatos = _aprobados().values_list("pk", "nombre")
+    pk = elegir_establecimiento(texto, candidatos)
+    return _aprobados().filter(pk=pk).first() if pk else None

@@ -7,8 +7,8 @@ Las claves llevan versión para poder invalidar en bloque al cambiar el formato.
 from django.conf import settings
 from django.core.cache import cache
 
-# v2: FilaComparacion trae los datos de la tarjeta completa (RF-16); v1 ya no se lee
-VERSION_CLAVES = "v2"
+# v3: FilaComparacion trae los datos del módulo comercial (ADR-012); v2 ya no se lee
+VERSION_CLAVES = "v3"
 
 
 def clave_comparacion(producto_id: int) -> str:

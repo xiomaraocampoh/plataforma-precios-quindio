@@ -170,10 +170,10 @@ La Tabla 4 asigna una prioridad a cada característica de ISO/IEC 25010:2023 y l
 | ----- | ----- | ----- | ----- |
 | Adecuación funcional | Alta | Si la comparación por unidad, la vigencia o las promociones se calculan mal, el producto pierde su razón de ser. Incluye la neutralidad del orden. | EC-06 |
 | Capacidad de interacción | Alta | El modelo colaborativo solo funciona si registrar es rapidísimo y con mala señal. | EC-01 |
-| Seguridad | Alta | Riesgo de reportes falsos o coordinados y obligación legal de proteger identidad y ubicación de los reportantes. | EC-03, EC-07 |
+| Seguridad | Alta | Riesgo de reportes falsos o coordinados y obligación legal de proteger identidad y ubicación de los reportantes. | EC-03, EC-15 |
 | Eficiencia de desempeño | Alta | Las consultas dominan la carga y hay picos de quincena. | EC-04 |
 | Mantenibilidad | Alta | El módulo comercial se agrega sobre un núcleo construido; TDD exige código fácil de probar. | EC-05 |
-| Fiabilidad | Media | No perder registros hechos con conectividad intermitente; una caída corta no causa daños graves. | EC-08, EC-04 |
+| Fiabilidad | Media | No perder registros hechos con conectividad intermitente; una caída corta no causa daños graves. | EC-16, EC-04 |
 | Flexibilidad | Media | Escalar ante picos y funcionar en distintos navegadores móviles. | EC-04 |
 | Compatibilidad | Baja | Solo interopera con fuentes externas opcionales (SIPSA). |  |
 | Protección (safety) | No aplica | No controla equipos ni puede causar daño físico o económico directo. Se documenta como descartada. |  |

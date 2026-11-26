@@ -39,5 +39,6 @@ o error sin presentación), la lista completa de siempre. Mismos nombres de camp
     {% endif %}
   {% endfor %}
   {% for oculto in form.hidden_fields %}{{ oculto }}{% endfor %}
+  {% if form.initial.origen == "etiqueta" %}<p class="ayuda" role="note">Leímos estos datos de la etiqueta de precio. Revísalos antes de guardar.</p>{% endif %}
   <button class="btn btn-bloque" type="submit">Guardar precio</button>
 </form>

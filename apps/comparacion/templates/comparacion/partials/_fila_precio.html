@@ -3,12 +3,12 @@
 Una fila de la comparación de UN producto: el producto, su foto y su descripción ya están arriba,
 así que aquí solo va lo que cambia entre establecimientos: dónde, qué presentación, cuánto
 cuesta y qué tan confiable es. Solo presentación (EC-06): el orden viene de ordenar_neutral.
-Nunca hay datos del autor (M-15). Parámetros: fila, destacada, numero, propios, denunciados.
+Nunca hay datos del autor (M-15, EC-15). «Oficial» = precio de un comercio verificado (ADR-018). Parámetros: fila, destacada, numero, propios, denunciados.
 {% endcomment %}
 {% with r=fila.resultado %}
 <div class="fp-lugar">
   <span class="{% if destacada %}etiqueta{% else %}puesto{% endif %}">{% if destacada %}Más barato por unidad{% else %}N.º {{ numero }}{% endif %}</span>
-  <h2 class="nombre-tienda" id="tp-{{ fila.reporte_id }}">{{ r.establecimiento }}</h2>
+  <h2 class="nombre-tienda" id="{{ fila.ancla }}">{{ r.establecimiento }}</h2>
   <p class="tp-tipo">{{ fila.tipo }}</p>
   <address class="tp-direccion">{{ fila.direccion }}{% if fila.barrio %}, {{ fila.barrio }}{% endif %}{% if fila.municipio %}, {{ fila.municipio }}{% endif %}</address>
   {% if fila.enlace_mapa %}<a class="tp-mapa" href="{{ fila.enlace_mapa }}" target="_blank" rel="noopener noreferrer">Ver en el mapa<span class="sr-only"> «{{ r.establecimiento }}» en OpenStreetMap (se abre en otra pestaña)</span></a>{% endif %}
@@ -20,19 +20,32 @@ Nunca hay datos del autor (M-15). Parámetros: fila, destacada, numero, propios,
 </div>
 <div class="fp-detalle">
   <ul class="pie-tile tp-datos" aria-label="Origen y confianza del precio">
-    <li class="chip">{{ fila.fuente_texto }}</li>
+    <li class="chip{% if fila.es_oficial %} chip-positivo{% endif %}">{% if fila.es_oficial %}<svg class="ico" aria-hidden="true"><use href="#i-shield"/></svg>Oficial · {% endif %}{{ fila.fuente_texto }}</li>
     <li class="chip"><time datetime="{{ r.fecha_observacion|date:'c' }}">{{ fila.antiguedad }}</time></li>
     <li class="chip tp-confianza-{{ r.confianza }}{% if r.confianza == 'baja' %} chip-alerta{% elif r.confianza == 'alta' %} chip-positivo{% endif %}">
       <svg class="ico" aria-hidden="true"><use href="#{% if r.confianza == 'alta' %}i-check{% elif r.confianza == 'baja' %}i-info{% else %}i-shield{% endif %}"/></svg>{{ fila.confianza.0 }}
     </li>
     {% if r.es_promocion %}<li class="chip chip-promo">Promoción</li>{% endif %}
+    {% if fila.usuarios_reportan_texto %}<li class="chip chip-alerta"><svg class="ico" aria-hidden="true"><use href="#i-info"/></svg>{{ fila.usuarios_reportan_texto }}</li>{% endif %}
     {% if fila.ultima_confirmacion %}<li class="chip chip-positivo"><time datetime="{{ fila.ultima_confirmacion|date:'c' }}">confirmado hace {{ fila.ultima_confirmacion|hace }}</time></li>{% endif %}
   </ul>
-  <p class="tp-explicacion">{{ fila.confianza.1 }}</p>
+  <p class="tp-explicacion">{{ fila.confianza.1 }}{% if fila.usuarios_reportan_texto %} Varias personas vieron otro precio esta semana: verifica antes de ir.{% endif %}</p>
+  {% if fila.promociones %}
+  <ul class="tp-promos" aria-label="Promociones de {{ r.establecimiento }}">
+    {% for promo in fila.promociones %}
+    <li class="tp-promo">
+      <p class="tp-promo-titulo"><span class="chip chip-promo">Promoción</span> {{ promo.descripcion }}: <strong>{{ promo.precio_texto }}</strong> <span class="tp-ayuda">({{ promo.por_unidad_texto }})</span></p>
+      <p class="tp-promo-condiciones">Vigente hasta el <time datetime="{{ promo.fin|date:'c' }}">{{ promo.fin|date:"j \d\e F" }}</time> · {{ promo.motivo }}{% if promo.fecha_vencimiento_producto %} · el producto vence el {{ promo.fecha_vencimiento_producto|date:"j \d\e F" }}{% endif %}. {{ promo.condiciones }}</p>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
   <div class="acciones-fila">
     {# Un toque: producto, presentación y tienda ya van elegidos; solo falta escribir el precio #}
     <a class="btn btn-pequeno" href="{% url 'precios:registrar' %}?presentacion={{ fila.presentacion_id }}&amp;establecimiento={{ r.establecimiento_id }}">Registrar precio aquí<span class="sr-only"> en {{ r.establecimiento }}</span></a>
-    {% if not user.is_authenticated %}
+    {% if fila.es_oficial %}
+      <p class="suave">Precio publicado por el comercio. Si ves otro en la tienda, regístralo.</p>
+    {% elif not user.is_authenticated %}
       <a class="btn btn-sec btn-pequeno" href="{% url 'cuentas:ingresar' %}?next={{ request.get_full_path|urlencode }}">Ingresa para confirmar o denunciar<span class="sr-only"> el precio de {{ r.establecimiento }}</span></a>
     {% elif fila.reporte_id in propios %}
       <p class="suave">Este precio lo reportaste tú.</p>

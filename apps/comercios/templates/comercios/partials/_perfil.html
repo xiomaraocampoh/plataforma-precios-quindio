@@ -1,0 +1,22 @@
+<section class="seccion tile" id="sec-perfil" aria-labelledby="t-perfil" style="margin-top:1rem">
+  {% include "comercios/partials/_mensaje.html" %}
+  {% if perfil %}
+    <h2 id="t-perfil">Tu perfil está en revisión</h2>
+    <p>Moderación confirmará que representas a <strong>{{ perfil.establecimiento.nombre }}</strong>. Mientras tanto no puedes publicar precios.</p>
+    <p>Tu código de verificación es <strong class="num" id="codigo-verificacion">{{ perfil.codigo_verificacion }}</strong>. Si enviaste una foto de la fachada, el código debe verse en ella.</p>
+  {% else %}
+    <h2 id="t-perfil">Crea el perfil de tu comercio</h2>
+    <p class="suave">Es voluntario y gratuito. Una persona de moderación verifica que eres el dueño o encargado antes de que puedas publicar.</p>
+    {% if rechazo %}<p class="chip chip-alerta">No pudimos verificar el perfil anterior de {{ rechazo.establecimiento.nombre }}{% if rechazo.motivo_decision %}: {{ rechazo.motivo_decision }}{% endif %}.</p>{% endif %}
+    <form method="post" action="{% url 'comercios:crear_perfil' %}" novalidate
+          hx-post="{% url 'comercios:crear_perfil' %}" hx-target="#sec-perfil" hx-swap="outerHTML" hx-disabled-elt="find button">
+      {% csrf_token %}
+      {% include "partials/_campo.html" with campo=form_perfil.establecimiento %}
+      {% include "partials/_campo.html" with campo=form_perfil.nombre_contacto %}
+      {% include "partials/_campo.html" with campo=form_perfil.telefono %}
+      {% include "partials/_campo.html" with campo=form_perfil.evidencia %}
+      <button class="btn btn-bloque" type="submit">Enviar a verificación</button>
+    </form>
+    <p class="suave">Guardamos tu usuario y tu teléfono solo para la verificación (Ley 1581 de 2012). En la comparación solo aparece el nombre del establecimiento.</p>
+  {% endif %}
+</section>

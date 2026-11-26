@@ -1,0 +1,2 @@
+{# Región que anuncia el resultado de la última acción (aria-live, WCAG 4.1.3) #}
+<p class="mensaje-seccion{% if mensaje %} chip {% if ok %}chip-positivo{% else %}chip-alerta{% endif %}{% endif %}" role="status" aria-live="polite">{{ mensaje }}</p>

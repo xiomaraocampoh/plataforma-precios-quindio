@@ -7,6 +7,7 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_GET, require_POST
+from rest_framework.throttling import ScopedRateThrottle
 
 from apps.catalogo import selectors as catalogo
 from apps.catalogo.domain.codigo_barras import es_gtin_valido, normalizar_codigo
@@ -30,6 +31,7 @@ from .selectors import (
     estado_del_usuario,
     filas_de_establecimiento,
     productos_destacados,
+    propuesta_de_escaneo,
     resumen_plataforma,
     tarjetas_de_productos,
     ubicaciones_de,
@@ -45,6 +47,8 @@ def inicio(request):
         "ejemplo_producto": destacados[0] if destacados else None,
         "ejemplo": ejemplo_comparacion(destacados[0].pk) if destacados else [],
         "foto_activa": integraciones.reconocimiento_activo(),
+        "vivo_activo": integraciones.escaneo_vivo_activo(),
+        "control_envio": integraciones.control_de_envio(),
     }
     return render(request, "comparacion/buscar.html", contexto)
 
@@ -104,6 +108,43 @@ def buscar_por_foto(request):
     return _fragmento_foto(
         request, 200, pista=pista, candidatos=candidatos, buscamos=consulta_de_busqueda(pista)
     )
+
+
+class _RitmoDeEscaneo:
+    throttle_scope = "escaneo"  # M-13: mismo mecanismo que la API, aunque responda HTML
+
+
+def _fragmento_escaneo(request, estado: int, **contexto):
+    return render(request, "comparacion/partials/_escaneo_resultado.html", contexto, status=estado)
+
+
+@require_POST
+def escanear_fotograma(request):
+    """Escáner en vivo (ADR-0026): qué hay en un fotograma. 204 si no hay nada que mostrar, así el
+    navegador sigue escaneando sin abrir la hoja. La imagen no se guarda en ningún lado."""
+    if not integraciones.escaneo_vivo_activo():
+        raise Http404
+    if not ScopedRateThrottle().allow_request(request, _RitmoDeEscaneo):
+        return _fragmento_escaneo(request, 429, error="Vas muy rápido. Espera un momento.")
+    archivo = request.FILES.get("fotograma")
+    if archivo is None:
+        return _fragmento_escaneo(request, 400, error="No llegó la imagen de la cámara.")
+    try:
+        resultado = integraciones.escanear_fotograma(
+            usuario=request.user, imagen=archivo.read(), ip=request.META.get("REMOTE_ADDR", "")
+        )
+    except ImagenInvalidaError as exc:
+        return _fragmento_escaneo(request, 400, error=str(exc))
+    except integraciones.LimiteDeReconocimientosExcedidoError as exc:
+        return _fragmento_escaneo(request, 429, error=str(exc))
+    except integraciones.ReconocimientoNoDisponibleError:
+        return _fragmento_escaneo(
+            request, 503, error="El reconocimiento no respondió. Sigue con el código de barras."
+        )
+    propuesta = propuesta_de_escaneo(resultado, request.user)
+    if propuesta is None:
+        return HttpResponse(status=204)
+    return _fragmento_escaneo(request, 200, p=propuesta)
 
 
 @require_GET

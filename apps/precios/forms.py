@@ -5,6 +5,8 @@ from apps.catalogo.domain.normalizacion import formatear_cantidad
 from apps.catalogo.models import Presentacion
 from apps.establecimientos.models import Establecimiento
 
+from .models import ReportePrecio
+
 
 class _ConDatosDeUnidad:
     """Cada opción lleva su cantidad y unidad para calcular en vivo el precio por unidad (RF-16).
@@ -70,6 +72,8 @@ class RegistroPrecioForm(forms.Form):
     # en que se vio el precio; el servicio aplica RN-08 a esa fecha.
     id_cliente = forms.UUIDField(required=False, widget=forms.HiddenInput)
     fecha_observacion = forms.DateTimeField(required=False, widget=forms.HiddenInput)
+    # Escaneo de la etiqueta (ADR-0026): solo para medir; un valor raro cuenta como manual
+    origen = forms.CharField(required=False, widget=forms.HiddenInput)
 
     field_order = ["presentacion", "establecimiento", "precio"]
 
@@ -88,6 +92,10 @@ class RegistroPrecioForm(forms.Form):
         campo.queryset = presentaciones
         if not self.is_bound:
             self._enfocar_primer_dato_pendiente()
+
+    def clean_origen(self) -> str:
+        origen = self.cleaned_data.get("origen")
+        return origen if origen in ReportePrecio.Origen.values else ReportePrecio.Origen.MANUAL
 
     def _enfocar_primer_dato_pendiente(self) -> None:
         """Con todo precargado, el cursor cae en el precio: lo único que falta escribir."""

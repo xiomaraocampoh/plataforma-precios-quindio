@@ -1,7 +1,8 @@
 # Núcleo completo: requisitos, rutas y cómo probarlos
 
-Rama `feat/nucleo-completo`. Incluye todos los requisitos del núcleo **sin el módulo comercial**
-(`apps/comercios` no se toca; contrato `comercios-no-adelantado` de import-linter) y sin despliegue.
+Requisitos del núcleo y, desde el Corte 3, del **módulo comercial** (`apps/comercios`, sección
+«Módulo comercial»). El núcleo sigue sin importar el módulo comercial: se integra por un puerto
+(ADR-012, DP-1 opción B) y el contrato `comercios-no-adelantado` de import-linter sigue en *kept*.
 
 ## Preparar los datos
 
@@ -32,11 +33,13 @@ Si la variable no existe al crear los usuarios, se genera una contraseña aleato
 | RF-04 Búsqueda | Por nombre sin tildes ni mayúsculas (`nombre_normalizado`, conserva la ñ) y por código de barras exacto de 8 a 14 dígitos | buscador de inicio, `/productos/?q=` | `test_busqueda.py` |
 | RF-04 Escanear código de barras | Botón en el buscador: lee el código con la cámara o una foto **en el navegador** (la imagen no se envía) y abre `/escanear/?codigo=`. Valida longitud y dígito de control GTIN; si el producto existe va a su comparación, si no ofrece solicitarlo con el código ya escrito | `/escanear/`, `/catalogo/solicitar/?codigo_barras=` | `test_codigo_barras.py`, `test_escanear.py` |
 | RF-04 Buscar por foto (IA, opcional) | En el mismo diálogo, «Fotografiar el producto»: la IA extrae nombre y marca, el sistema busca en el catálogo y la persona confirma. Sin cuenta, con topes de uso; ADR-022 | `/buscar-por-foto/` (POST) | `test_reconocimiento.py`, `test_reconocedor_claude.py`, `test_buscar_por_foto.py` |
+| RF-04 Escáner en vivo (IA, opcional) | Con la cámara abierta lee primero el código de barras (local); si no hay, envía a la IA solo cuadros quietos y nítidos (cada 1,5 s como mínimo, un envío a la vez, 20 por sesión) y reconoce el **empaque** (abre la comparación) o la **etiqueta de precio** (precio, promoción, precio por unidad calculado, tienda). Hoja inferior con vibración, `aria-live` y foco; «Pausar escaneo». Apagado por defecto (`ESCANEO_VIVO_ACTIVO`); mismos topes que la foto más `throttle_scope` «escaneo»; ADR-0026 | `/escanear/fotograma/` (POST; 204 si no hay nada) | `test_etiqueta.py`, `test_escaneo.py`, `test_coincidencia.py`, `test_reconocedor_claude.py`, `test_escaneo_vivo.py`, `e2e/test_escaneo_vivo_navegador.py` |
 | RF-06 + PU-05 Duplicados | `normalizar_nombre` y `son_posibles_duplicados` (umbral 0,85, TDD); la solicitud muestra productos similares mientras se escribe y queda pendiente | `/catalogo/solicitar/` | `test_duplicados.py`, `test_solicitud_catalogo.py` |
 | RF-07 SIPSA | Importa el CSV del DANE con fuente «sipsa»; la comparación lo muestra como referencia mayorista fuera del orden; `ClienteSipsa` en línea, pendiente | `importar_sipsa archivo.csv` | `test_sipsa.py`, `test_importar_sipsa.py` |
 | RF-08 Directorio | Establecimientos aprobados con filtros por municipio, barrio y tipo | `/establecimientos/` | `test_establecimientos.py` |
 | RF-09 Mapa | Enlace a OpenStreetMap con las coordenadas, sin API key | «Ver en el mapa» en el directorio | `test_mapas.py`, `test_establecimientos.py` |
 | RF-10 Sugerir establecimiento | Queda pendiente e inactivo (restricción en la base de datos) y no se usa en la comparación ni en el registro hasta aprobarse | `/establecimientos/sugerir/` | `test_establecimientos.py` |
+| RF-11 Registrar desde la etiqueta (numeración de la matriz de trazabilidad; ver D-6) | «Registrar este precio» abre el registro rápido con producto, presentación (solo si coincide exacta), tienda y precio prellenados; un toque para guardar. Exige sesión y pasa por el mismo servicio (30 por hora, anomalías, idempotencia, caché). Guarda `origen` (`manual` o `etiqueta`), que no sale en la API pública. Nunca crea tiendas: ofrece «Sugerir este establecimiento» | `/precios/registrar/?producto=&presentacion=&establecimiento=&precio=&origen=etiqueta` | `test_escaneo_vivo.py`, `e2e/test_escaneo_vivo_navegador.py` |
 | RF-14 Sigue igual | Confirmación idempotente por usuario, reporte y día; renueva la vigencia y suma confianza; máximo 30 por hora | botón en cada resultado | `test_renovacion.py`, `test_sigue_igual.py` |
 | RF-19 Filtros | Municipio, barrio y **rango de precio total** en la comparación (solo reducen; el orden no cambia); marca y categoría en el listado de productos; el criterio de orden siempre visible. El rango acepta el formato colombiano (`2.500`, `$2.500`, `2500,50`) y, si es inválido, avisa y no filtra | `/productos/<id>/?municipio=&barrio=&precio_min=&precio_max=`, `/productos/?marca=&categoria=` | `test_filtros.py`, `test_filtro_precio.py`, `test_interpretar_monto.py`, `test_filtros_comparacion.py`, `test_filtro_precio_comparacion.py`, `test_busqueda.py` |
 | RF-20 Denunciar | Motivo y detalle; una sola denuncia por usuario y reporte | «Denunciar» en cada resultado | `test_moderacion.py` |
@@ -54,7 +57,7 @@ Si la variable no existe al crear los usuarios, se genera una contraseña aleato
 ## API v1
 
 Todas aparecen en `/api/docs/`. Ninguna respuesta incluye al autor de un reporte ni a quien sugirió
-un establecimiento (EC-07). Los serializers usan lista blanca de campos.
+un establecimiento (EC-15). Los serializers usan lista blanca de campos.
 
 | Método y ruta | Permiso | Throttle |
 |---|---|---|
@@ -65,6 +68,29 @@ un establecimiento (EC-07). Los serializers usan lista blanca de campos.
 | `POST /api/v1/moderacion/denuncias/` | autenticado | `denuncias` 20/h (409 si se repite) |
 | `GET /api/v1/moderacion/reportes-en-revision/` | moderador o staff | anon/user |
 | `GET, PATCH /api/v1/moderacion/reportes-en-revision/{id}/` | moderador o staff | `moderacion` 600/h |
+| `GET /api/v1/comparacion/{producto_id}/` | público | anon/user. Aditivo en `/v1` (D-3, ADR-018): `usuarios_reportan` por resultado y el arreglo `promociones` |
+| `GET /api/v1/comercios/perfil/` | rol comercio | `comercios` 60/h |
+| `GET, POST /api/v1/comercios/precios/` | rol comercio (POST: verificado) | `comercios` 60/h |
+| `POST /api/v1/comercios/precios/confirmar/` | rol comercio verificado | `comercios` 60/h |
+| `GET, POST /api/v1/comercios/promociones/` | rol comercio (POST: verificado) | `comercios` 60/h |
+| `POST /api/v1/comercios/promociones/{id}/terminar/` | rol comercio verificado, solo las propias | `comercios` 60/h |
+
+## Módulo comercial (Corte 3)
+
+ADR-012 a ADR-018. Línea base y componentes en
+[registro-esfuerzo-modulo-comercial.md](../arquitectura/registro-esfuerzo-modulo-comercial.md).
+RF-C08, RF-C09 y RF-C10 quedan fuera de la línea base.
+
+| Requisito | Qué hace | Ruta | Pruebas |
+|---|---|---|---|
+| RF-C01 Perfil | Perfil voluntario ligado a un establecimiento aprobado; queda pendiente con un código de verificación. Un perfil activo por establecimiento y por persona (`UNIQUE` condicional en la BD); moderación no puede ser comercio | `/comercios/` | `comercios/test_servicios_comercio.py`, `comercios/test_portal_y_api.py` |
+| RF-C02 Verificación (ADR-015) | Un moderador (con 2FA obligatoria) verifica o no, con motivo obligatorio para no verificar; guarda `verificado_por` y `verificado_en` en el propio módulo; asigna el rol con `cuentas.services.asegurar_comercio`; correo «perfil verificado» | `/comercios/verificacion/` | `comercios/test_servicios_comercio.py`, `e2e/test_comercio_navegador.py` |
+| RF-C03 Precio oficial | Solo un comercio verificado; uno por presentación (`UNIQUE`), positivo (`CHECK`); vigente 30 días desde `confirmado_en` | `/comercios/precios/` | `comercios/test_servicios_comercio.py` |
+| RF-C04 Promociones (ADR-014) | Descuento porcentual (mayor que 0 y menor que 100 %), precio especial (menor que el oficial) y «pague X lleve Y» (paga menos de lo que lleva); vigencia; motivo y, si es «próximo a vencer», fecha de vencimiento; condiciones visibles junto al precio | `/comercios/promociones/` | `unit/comercios/test_promociones.py`, `comercios/test_servicios_comercio.py` |
+| RF-C05 Integración (ADR-018) | El oficial verificado y vigente reemplaza al reporte de su tienda con la etiqueta «Oficial»; con 2 o más reportes en 7 días que difieren más de 10 %, «Usuarios reportan $X» y confianza media. Promociones como etiqueta y en el arreglo `promociones`. `_clave_neutral` sin cambios | `/productos/<id>/`, `/api/v1/comparacion/<id>/` | `unit/comparacion/test_oficial.py`, `comercios/test_comparacion_con_comercios.py` |
+| RF-C06 Corrección | El comercio pide corregir datos de su tienda o un precio reportado en ella (sin ver al autor); moderación resuelve y llega el correo «corrección resuelta» | `/comercios/correcciones/` | `comercios/test_servicios_comercio.py` |
+| RF-C07 Confirmar con un toque | «Mis precios siguen igual» renueva todos sus precios oficiales otros 30 días | botón del portal, `POST /api/v1/comercios/precios/confirmar/` | `comercios/test_portal_y_api.py` |
+| Datos de prueba (ADR-0023) | `migrate` siembra «Tienda Doña Gloria» (`comercio_prueba`) y «Tienda El Paisa» verificadas, con precios oficiales y una promoción de cada tipo | `comercios.0002_semilla_comercios_prueba` | `comercios/test_semilla_comercios.py` |
 
 ## Cómo probar a mano
 
@@ -94,6 +120,9 @@ un establecimiento (EC-07). Los serializers usan lista blanca de campos.
 1. **RF-04:** en inicio, escribe `CAFE`; aparece «Café molido». En `/productos/` escribe un código de
    barras completo. Con `cargar_demo`, el botón de código de barras del buscador acepta
    `2000000000015` (Arroz blanco 500 g): escríbelo en el diálogo o sube una foto de ese código.
+   **Escáner en vivo (ADR-0026):** con `ANTHROPIC_API_KEY` y `ESCANEO_VIVO_ACTIVO=True`, abre el
+   escáner desde un celular (HTTPS) o desde `localhost` y apunta a una etiqueta de precio sin tocar
+   nada; la hoja aparece sola. Detalle en `docs/integraciones/escaner.md`.
 2. **RF-14:** ingresa como `demo_ana` y abre la comparación de «Frijol cargamanto». Pulsa
    «Sigue igual»; la segunda vez dice «Ya lo confirmaste hoy».
 3. **Vigencia (EC-02):** en «Frijol cargamanto» solo aparecen Supermercado del Parque (oficial, 29
@@ -118,7 +147,11 @@ un establecimiento (EC-07). Los serializers usan lista blanca de campos.
 
 - **`ranking.py` sin cambios.** El selector arma `FilaComparacion` (resultado, reporte, ubicación,
   última confirmación) y ordena solo los `ResultadoComparacion` con `ordenar_neutral`. Los filtros
-  se aplican después y solo reducen. La API de comparación devuelve exactamente lo mismo que antes.
+  se aplican después y solo reducen. La API de comparación conserva todos sus campos; desde el
+  Corte 3 solo **agrega** `usuarios_reportan` y `promociones` (D-3).
+- **El módulo comercial entra por un puerto.** `comparacion/domain/extensiones.py` define qué datos
+  comerciales acepta; `core/extensiones.py` guarda el registro y `comercios` se registra en
+  `ready()`. Si la extensión falla, la comparación muestra solo los reportes y lo registra en el log.
 - **Moderación orquesta servicios.** `moderacion.services` llama a los servicios de cada módulo y
   nunca escribe en su ORM. La bandeja y las acciones de `/admin/` dejan el mismo registro en
   `DecisionModeracion`, que es de solo lectura.

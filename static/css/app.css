@@ -196,6 +196,13 @@ a.chip:hover { text-decoration: none; background: var(--borde); }
 .chip-promo { background: var(--ambar-fondo); color: var(--ambar-texto); }
 .chip-alerta { background: var(--error-fondo); color: var(--error); }
 .chip-positivo { background: var(--positivo-fondo); color: var(--positivo); }
+/* Promociones del módulo comercial (ADR-014): etiqueta con condiciones junto al precio, sin orden */
+.tp-promos { list-style: none; margin: .5rem 0 0; padding: 0; display: grid; gap: .5rem; }
+.tp-promo { padding: .5rem .75rem; border-radius: 14px; background: var(--superficie-2); }
+.tp-promo-titulo, .tp-promo-condiciones { margin: 0; font-size: .875rem; line-height: 1.4; }
+.tp-promo-condiciones { color: var(--texto-suave, var(--texto)); }
+.tile-oscuro .tp-promo { background: rgb(255 255 255 / .12); }
+.tile-oscuro .tp-promo-condiciones { color: var(--sobre-oscura-suave); }
 
 .lista-filas { list-style: none; padding: 0; margin: 0; display: grid; }
 .lista-filas a { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 60px; padding: .65rem .25rem; border-top: 1px solid var(--borde); color: var(--texto); }
@@ -439,6 +446,21 @@ textarea { width: 100%; min-height: 90px; padding: .6rem .95rem; font: inherit; 
 @keyframes esc-sube { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .esc-hoja { animation: none; } }
 .esc-hoja .btn { margin-top: .5rem; }
+/* La hoja es siempre clara: sus fragmentos usan los tokens del tema claro aunque el sistema esté en
+   modo oscuro, para no bajar del contraste 4.5:1 (1.4.3) sobre su fondo blanco. */
+.esc-hoja { --texto: #1d1d1f; --texto-suave: #5f5f64; --marca: #0071e3; --marca-hover: #0062c4;
+  --marca-enlace: #0066cc; --marca-suave: #eaf3fd; --borde: #e5e5ea; --superficie-2: #f5f5f7;
+  --ambar-fondo: #fff4dc; --ambar-texto: #7a4a00; --sobre-marca: #ffffff; }
+/* Escáner en vivo (ADR-0026) */
+.esc-vivo { display: flex; justify-content: center; gap: .5rem; }
+.esc-vivo .btn { min-height: 44px; }
+.esc-vivo [data-pausar] { background: rgb(255 255 255 / .14); color: #fff; border-color: transparent; }
+.esc-vivo [data-pausar][aria-pressed="true"] { background: #fff; color: #1d1d1f; }
+.esc-vivo [hidden] { display: none; }
+.esc-precio { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; margin: 0; font-size: 2.4rem; font-weight: 750; letter-spacing: -.03em; line-height: 1.1; }
+.esc-promo { padding: .2rem .7rem; border-radius: 999px; background: var(--ambar-fondo); color: var(--ambar-texto); font-size: .9rem; font-weight: 650; letter-spacing: 0; }
+.esc-promo::before { content: "★ "; } /* además del color: no depende solo de él (1.4.1) */
+.esc-dato { margin: 0; }
 .escaner[data-sincamara] .esc-marco { display: none; }
 .esc-vacio p { margin: 0; max-width: 26ch; }
 
@@ -850,3 +872,6 @@ select:disabled { cursor: not-allowed; opacity: .6; }
 .tarjeta-enlace .nombre:focus-visible { outline: none; }
 .tarjeta-enlace .nombre:focus-visible::after { outline: 3px solid var(--marca-enlace); outline-offset: 2px; }
 .tarjeta-enlace .tp-mapa { position: relative; z-index: 1; }
+
+/* Enlace de respaldo del formulario de denuncia (sin JS): objetivo táctil >= 24 px (WCAG 2.5.8) */
+.panel-plegable a { display: inline-flex; align-items: center; min-height: 24px; }

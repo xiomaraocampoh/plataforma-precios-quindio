@@ -69,7 +69,7 @@ CUENTAS_PRUEBA: tuple[CuentaPrueba, ...] = (
         "comercio_prueba",
         "comercio",
         "comercio+comercio@example.com",
-        "Rol comercio sin portal (Corte III): ve lo mismo que un consumidor con cuenta.",
+        "Portal /comercios/: «Tienda Doña Gloria» verificada, con precios oficiales y promociones.",
     ),
     CuentaPrueba(
         "suspendido_prueba",

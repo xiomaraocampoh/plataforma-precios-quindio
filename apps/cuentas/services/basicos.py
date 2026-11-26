@@ -132,6 +132,29 @@ def asegurar_moderador(*, username: str, password: str) -> tuple[Usuario, bool]:
     return usuario, creado
 
 
+# Roles que pueden pasar a «comercio» al verificarse su perfil. A moderación, edición del catálogo
+# o administración nunca se les baja el rol: perderían sus permisos sin que nadie lo decida.
+_ROLES_QUE_PASAN_A_COMERCIO = frozenset({Usuario.Rol.REPORTANTE, Usuario.Rol.COMERCIO})
+
+
+@transaction.atomic
+def asegurar_comercio(*, usuario_id: int) -> Usuario:
+    """RF-C02 / ADR-015: asigna el rol «comercio» a quien un moderador verificó como titular.
+
+    Es idempotente. El módulo comercial la llama en vez de escribir `Usuario.rol` con el ORM.
+    """
+    usuario = Usuario.objects.select_for_update().get(pk=usuario_id)
+    if usuario.rol == Usuario.Rol.COMERCIO:
+        return usuario
+    if usuario.rol not in _ROLES_QUE_PASAN_A_COMERCIO or usuario.is_staff or usuario.is_superuser:
+        raise ValidationError("Esta cuenta tiene un rol de la plataforma; no puede ser comercio.")
+    if not usuario.is_active:
+        raise ValidationError("La cuenta está suspendida.")
+    usuario.rol = Usuario.Rol.COMERCIO
+    usuario.save(update_fields=["rol"])  # la señal sincroniza el grupo (el comercio no tiene)
+    return usuario
+
+
 def actualizar_datos(*, usuario: Usuario, username: str, email: str) -> Usuario:
     """RF-03: el titular actualiza sus datos (Ley 1581, derecho de rectificación)."""
     cambio_correo = usuario.email.lower() != (email or "").lower()

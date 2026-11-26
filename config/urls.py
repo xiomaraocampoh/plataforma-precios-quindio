@@ -12,6 +12,7 @@ api_v1 = [
     path("catalogo/", include("apps.catalogo.api.urls")),
     path("establecimientos/", include("apps.establecimientos.api.urls")),
     path("moderacion/", include("apps.moderacion.api.urls")),
+    path("comercios/", include("apps.comercios.api.urls")),  # Corte III (ADR-012)
 ]
 
 urlpatterns = [
@@ -33,5 +34,6 @@ urlpatterns = [
     path("catalogo/", include("apps.catalogo.urls")),
     path("establecimientos/", include("apps.establecimientos.urls")),
     path("moderacion/", include("apps.moderacion.urls")),
+    path("comercios/", include("apps.comercios.urls")),  # portal de comercios (Corte III)
     path("", include("apps.comparacion.urls")),
 ]

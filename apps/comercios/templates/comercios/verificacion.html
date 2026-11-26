@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block titulo %}Verificar comercios · AhorraPues{% endblock %}
+{% block contenido %}
+<div class="encabezado">
+  <div>
+    <p class="etiqueta">Moderación</p>
+    <h1>Comercios</h1>
+  </div>
+  <a class="btn btn-sec" href="{% url 'moderacion:bandeja' %}">Bandeja de moderación</a>
+</div>
+<p class="suave">Verifica que quien pide el perfil es el dueño o encargado (ADR-015): NIT o RUT, o una foto de la fachada con el código. Cada decisión guarda quién la tomó y cuándo.</p>
+
+<section class="seccion" style="margin-top:1.5rem" aria-labelledby="t-perfiles">
+  <h2 id="t-perfiles">Perfiles por verificar</h2>
+  {% if perfiles %}<ul class="lista-filas">
+    {% for p in perfiles %}<li class="tile" style="margin-top:.75rem">
+      <p><strong>{{ p.establecimiento.nombre }}</strong> · {{ p.establecimiento.direccion }}{% if p.establecimiento.barrio %}, {{ p.establecimiento.barrio }}{% endif %}</p>
+      <p class="suave">Cuenta: {{ p.usuario.username }} · Contacto: {{ p.nombre_contacto }}{% if p.telefono %} · {{ p.telefono }}{% endif %} · Código: <span class="num">{{ p.codigo_verificacion }}</span></p>
+      <p>Evidencia: «{{ p.evidencia }}»</p>
+      {% url 'comercios:decidir_perfil' p.pk as url_perfil %}
+      {% include "comercios/partials/_acciones.html" with url=url_perfil prefijo="perfil" objeto=p.pk si="Verificar" no="No verificar" %}
+    </li>{% endfor %}
+  </ul>{% else %}<p class="tile tile-tenue">No hay perfiles pendientes.</p>{% endif %}
+</section>
+
+<section class="seccion" style="margin-top:2rem" aria-labelledby="t-correcciones-mod">
+  <h2 id="t-correcciones-mod">Solicitudes de corrección</h2>
+  {% if correcciones %}<ul class="lista-filas">
+    {% for c in correcciones %}<li class="tile" style="margin-top:.75rem">
+      <p><strong>{{ c.get_tipo_display }}</strong> · {{ c.perfil.establecimiento.nombre }}{% if c.reporte %} · {{ c.reporte.presentacion }} a <span class="num">${{ c.reporte.precio|floatformat:0 }}</span>{% endif %}</p>
+      <p>«{{ c.descripcion }}»</p>
+      {% url 'comercios:decidir_correccion' c.pk as url_correccion %}
+      {% include "comercios/partials/_acciones.html" with url=url_correccion prefijo="correccion" objeto=c.pk si="Resolver" no="No procede" etiqueta="Respuesta al comercio" requerido="opcional" %}
+    </li>{% endfor %}
+  </ul>{% else %}<p class="tile tile-tenue">No hay solicitudes pendientes.</p>{% endif %}
+</section>
+{% endblock %}

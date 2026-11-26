@@ -124,7 +124,7 @@ El comando imprime la tabla de cuentas, sin la contraseña:
 | `moderador_prueba` | moderador | Cola de moderación: reportes en revisión, denuncias, solicitudes |
 | `editor_prueba` | editor de catálogo | Panel de catálogo |
 | `reportante_prueba`, `reportante_ana`, `reportante_luis` | reportante | Registrar, «Sigue igual», denunciar |
-| `comercio_prueba` | comercio | El rol existe; el portal es del Corte III |
+| `comercio_prueba` | comercio | Portal `/comercios/`: «Tienda Doña Gloria» verificada, con precios oficiales y promociones (semilla `comercios.0002`) |
 | `suspendido_prueba` | suspendida | Debe rechazar el ingreso |
 
 Si cierras la terminal, la variable se pierde; solo hace falta definirla otra vez para volver a

@@ -1,0 +1,22 @@
+<section class="seccion" id="sec-correcciones" aria-labelledby="t-correcciones" style="margin-top:2rem">
+  <h2 id="t-correcciones">Solicitudes de corrección</h2>
+  {% include "comercios/partials/_mensaje.html" %}
+  <p class="suave">¿Hay un dato equivocado de tu negocio? Moderación lo revisa y te responde por correo. No ves quién reportó un precio: esa información es privada.</p>
+  {% if correcciones %}<ul class="lista-filas">
+    {% for c in correcciones %}<li class="tile" style="margin-top:.75rem">
+      <p><span class="chip">{{ c.get_estado_display }}</span> <strong>{{ c.get_tipo_display }}</strong>{% if c.reporte %} · {{ c.reporte.presentacion }}{% endif %}</p>
+      <p class="suave">«{{ c.descripcion }}»{% if c.respuesta %} · Respuesta: {{ c.respuesta }}{% endif %}</p>
+    </li>{% endfor %}
+  </ul>{% endif %}
+  <details class="panel-plegable" {% if form_correccion.errors %}open{% endif %} style="margin-top:1rem">
+    <summary>Pedir una corrección</summary>
+    <form method="post" action="{% url 'comercios:solicitar_correccion' %}" novalidate
+          hx-post="{% url 'comercios:solicitar_correccion' %}" hx-target="#sec-correcciones" hx-swap="outerHTML" hx-disabled-elt="find button">
+      {% csrf_token %}
+      {% include "partials/_campo.html" with campo=form_correccion.tipo %}
+      {% include "partials/_campo.html" with campo=form_correccion.reporte %}
+      {% include "partials/_campo.html" with campo=form_correccion.descripcion %}
+      <button class="btn" type="submit">Enviar solicitud</button>
+    </form>
+  </details>
+</section>

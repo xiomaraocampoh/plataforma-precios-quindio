@@ -1,0 +1,26 @@
+# Lo que NO se sube a Vercel con `vercel deploy` desde la CLI (ADR-0031). Con la integración de Git
+# solo se usan los archivos versionados, pero la CLI sube la carpeta local: sin esta lista subiría
+# el .env con secretos de desarrollo, y config/settings/base.py lo leería en la función.
+.env
+.env.*
+*.pem
+*.key
+db.sqlite3
+db.sqlite3-journal
+.venv
+venv
+env
+.coverage
+coverage.xml
+htmlcov
+.pytest_cache
+.ruff_cache
+.import_linter_cache
+staticfiles
+evidencia-*.txt
+
+# No corren en la función ni en el build (data/ sí: la usan las migraciones de siembra)
+docs
+tests
+docker-compose*.yml
+Dockerfile

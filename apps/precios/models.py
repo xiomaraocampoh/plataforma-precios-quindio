@@ -12,6 +12,12 @@ class ReportePrecio(models.Model):
         EN_REVISION = "en_revision", "En revisión"
         RECHAZADO = "rechazado", "Rechazado"
 
+    class Origen(models.TextChoices):
+        """Cómo se capturó el precio (ADR-0026). Dato interno para medir M-01: no va a la API."""
+
+        MANUAL = "manual", "Escrito a mano"
+        ETIQUETA = "etiqueta", "Leído de la etiqueta"
+
     presentacion = models.ForeignKey(
         "catalogo.Presentacion", on_delete=models.PROTECT, related_name="reportes"
     )
@@ -28,6 +34,7 @@ class ReportePrecio(models.Model):
     fecha_observacion = models.DateTimeField()
     creado_en = models.DateTimeField(auto_now_add=True)
     estado = models.CharField(max_length=12, choices=Estado.choices, default=Estado.PUBLICADO)
+    origen = models.CharField(max_length=10, choices=Origen.choices, default=Origen.MANUAL)
     # Idempotencia para registros hechos sin señal y sincronizados después (M-22)
     id_cliente = models.UUIDField(null=True, blank=True, unique=True)
     # Datos de prueba (cargar_datos_prueba): se pueden borrar con --limpiar. Nunca va a la API.

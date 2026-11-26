@@ -10,6 +10,7 @@ from . import correo, cuentas_prueba, segundo_factor
 from .basicos import (
     actualizar_datos,
     asegurar_administrador,
+    asegurar_comercio,
     asegurar_grupo,
     asegurar_moderador,
     asignar_rol,
@@ -24,6 +25,7 @@ from .basicos import (
 __all__ = [
     "actualizar_datos",
     "asegurar_administrador",
+    "asegurar_comercio",
     "asegurar_grupo",
     "asegurar_moderador",
     "asignar_rol",

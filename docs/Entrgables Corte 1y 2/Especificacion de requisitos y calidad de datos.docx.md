@@ -163,10 +163,10 @@ Los escenarios se expresan en el formato de seis partes de Bass et al. (2021). L
 | EC-04 | 500 consumidores | Consultan comparaciones en simultáneo | Aplicación completa | Fin de semana de quincena | Responde sin errores ni degradación | p95 ≤ 2 s; error ≤ 1 % |
 | EC-05 | Docente (nuevo requisito) | Se incorpora el módulo comercial | Código y arquitectura | Tiempo de desarrollo, corte 2 y 3 | Cambio concentrado en un módulo nuevo y puntos de extensión | 0 cambios estructurales; desviación ≤ ±30 % |
 | EC-06 | Comercio | Publica una promoción | Comparación | Operación normal | Orden según criterio declarado; promoción distinguida | 100 % de los casos |
-| EC-07 | Tercero | Consulta la API pública buscando al reportante | API REST | Operación normal | Ninguna respuesta incluye identidad ni ubicación | 0 exposiciones |
-| EC-08 | Reportante | Pierde la señal al enviar un registro | Interfaz y servicio de registro | Conectividad intermitente | El registro se reenvía al recuperar la conexión, sin duplicarse | ≥ 98 % (objetivo 100 %) |
+| EC-15 | Tercero | Consulta la API pública buscando al reportante | API REST | Operación normal | Ninguna respuesta incluye identidad ni ubicación | 0 exposiciones |
+| EC-16 | Reportante | Pierde la señal al enviar un registro | Interfaz y servicio de registro | Conectividad intermitente | El registro se reenvía al recuperar la conexión, sin duplicarse | ≥ 98 % (objetivo 100 %) |
 
-*Nota.* Formato de escenario de Bass et al. (2021).
+*Nota.* Formato de escenario de Bass et al. (2021). Privacidad y registro sin conexión se numeraban EC-07 y EC-08; el 2026-11-25 el equipo los renombró EC-15 y EC-16 para conservar la numeración del Anexo 1 del Corte 3 (EC-07 a EC-14).
 
 # **Calidad de los Datos (ISO/IEC 25012\)** {#calidad-de-los-datos-(iso/iec-25012)}
 
@@ -216,20 +216,20 @@ La Tabla 6 presenta la matriz de trazabilidad.
 
 | Requisito | Escenario | Métrica | Prueba |
 | ----- | ----- | ----- | ----- |
-| RF-01, RNF-17 | EC-07 | — | PS-01 Registro de cuenta sin autorización es rechazado |
+| RF-01, RNF-17 | EC-15 | — | PS-01 Registro de cuenta sin autorización es rechazado |
 | RF-04, RF-05 | — | M-07 | PS-02 Búsqueda y detalle de producto |
 | RF-06 | — | D-05 | PU-05 Normalización de nombres y detección de duplicados; PS-03 Alta con aviso de duplicados |
 | RF-11, RNF-02 | EC-01 | M-02, D-06 | PI-04 Precio cero es rechazado; PI-05 presentación inexistente devuelve 400 |
 | RF-11, RNF-07 | — | M-13 | PI-01 Registrar exige autenticación |
 | RF-11, RNF-08 | — | M-14 | PI-02 Reportante registra precio con autor y fecha |
-| RF-12, RNF-15 | EC-08 | M-22 | PI-03 Reenvío con el mismo id\_cliente no duplica; PS-04 pérdida de red simulada |
+| RF-12, RNF-15 | EC-16 | M-22 | PI-03 Reenvío con el mismo id\_cliente no duplica; PS-04 pérdida de red simulada |
 | RF-11, RNF-01, RNF-04 | EC-01 | M-01, M-04 | PUX-01 Prueba con usuarios, red 3G |
 | RF-15, RNF-05 | EC-02 | D-02 | PU-02 Vigencia (7 días, perecedero 3, oficial 30\) |
 | RF-15 | EC-02 | D-01 | PI-06 Nuevo reporte invalida la caché |
 | RF-16 | EC-06 | M-05 | PU-01 Normalización por unidad |
 | RF-17 | EC-06 | M-06 | PU-04 Orden neutral; la promoción no altera el orden |
 | RF-18, RNF-11 | EC-03 | D-03, M-11, M-12 | PU-03 Detección de anomalías y nivel de confianza; dataset sembrado |
-| RF-15, RNF-09 | EC-07 | M-15 | PI-07 La respuesta pública no expone al reportante; PSeg-01 OWASP ZAP |
+| RF-15, RNF-09 | EC-15 | M-15 | PI-07 La respuesta pública no expone al reportante; PSeg-01 OWASP ZAP |
 | RNF-10 | EC-03 | M-16 | PSeg-02 Límite de tasa; SonarQube y pip-audit |
 | RNF-06 | EC-04 | M-08, M-09, M-10 | PC-01 k6 con 500 usuarios virtuales |
 | RNF-03 | — | M-03 | PUX-02 Auditoría WCAG 2.2 AA |

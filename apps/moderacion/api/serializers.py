@@ -16,7 +16,7 @@ class DenunciaSalidaSerializer(serializers.Serializer):
 
 
 class ReporteEnRevisionSerializer(serializers.ModelSerializer):
-    """Lista blanca: NUNCA el autor, ni siquiera para moderación por API (EC-07, M-15)."""
+    """Lista blanca: NUNCA el autor, ni siquiera para moderación por API (EC-15, M-15)."""
 
     presentacion = serializers.CharField(source="presentacion.__str__", read_only=True)
     establecimiento = serializers.CharField(source="establecimiento.nombre", read_only=True)

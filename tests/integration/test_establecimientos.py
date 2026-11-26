@@ -107,7 +107,7 @@ def test_api_lista_establecimientos_sin_datos_del_sugerente(api, tiendas, calarc
     nombres = {e["nombre"] for e in r.json()["results"]}
     assert nombres == {"Tienda Doña Rosa", "Súper Quindío"}
     item = r.json()["results"][0]
-    assert "sugerido_por" not in item and "revisado_por" not in item  # EC-07
+    assert "sugerido_por" not in item and "revisado_por" not in item  # EC-15
     assert item["enlace_mapa"].startswith("https://www.openstreetmap.org/")
 
 
