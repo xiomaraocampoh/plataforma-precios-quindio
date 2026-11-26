@@ -66,3 +66,31 @@ def test_una_frase_compuesta_no_es_una_orden_corta(texto):
         Tipo.ORDENAR_COBERTURA,
         Tipo.REINICIAR,
     )
+
+
+@pytest.mark.parametrize(
+    "texto",
+    [
+        "¿Cómo registro un precio?",
+        "como creo una cuenta",
+        "ayuda",
+        "necesito ayuda",
+        "primeros pasos",
+        "no entiendo cómo funciona",
+        "dónde veo mis aportes",
+        "qué es AhorraPues",
+        "¿Para qué sirve esto?",
+        "explícame cómo comparar",
+        "qué puedes hacer",
+    ],
+)
+def test_pedir_ayuda_es_una_pregunta_sobre_la_app(texto):
+    assert detectar_intencion(texto).tipo is Tipo.AYUDA
+
+
+@pytest.mark.parametrize(
+    "texto",
+    ["2 kg arroz, 1 L leche", "arroz", "arroz\nleche\nhuevos", "agrega leche", "menor total"],
+)
+def test_una_lista_o_una_orden_no_es_ayuda(texto):
+    assert detectar_intencion(texto).tipo is not Tipo.AYUDA
