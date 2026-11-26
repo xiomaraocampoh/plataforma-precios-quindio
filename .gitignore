@@ -60,3 +60,6 @@ desktop.ini
 
 # ── Node (si se usa para assets) ──────────────────────
 node_modules/
+
+# ── Vercel (ADR-0031) ────────────────────────────────
+.vercel/
