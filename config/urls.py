@@ -35,6 +35,6 @@ urlpatterns = [
     path("establecimientos/", include("apps.establecimientos.urls")),
     path("moderacion/", include("apps.moderacion.urls")),
     path("comercios/", include("apps.comercios.urls")),  # portal de comercios (Corte III)
-    path("canasta/", include("apps.canasta.urls")),
+    path("asistente/", include("apps.canasta.urls")),
     path("", include("apps.comparacion.urls")),
 ]

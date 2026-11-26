@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+{% block titulo %}Asistente de compras · AhorraPues{% endblock %}
+{% block head %}{{ block.super }}<script src="{% static 'js/asistente.js' %}?v=1" defer></script>{% endblock %}
+{% block contenido %}
+<section class="chat" aria-labelledby="t-chat">
+  <header class="chat-cab">
+    <div>
+      <h1 id="t-chat">Asistente de compras</h1>
+      <p class="suave">Cuéntame qué vas a comprar y te digo en qué tienda te sale más barato llevarlo todo.</p>
+    </div>
+    <form method="post" action="{% url 'canasta:enviar' %}" hx-post="{% url 'canasta:enviar' %}" hx-target="#chat-hilo" hx-swap="innerHTML">
+      {% csrf_token %}<input type="hidden" name="reiniciar" value="1">
+      <button class="btn btn-sec btn-pequeno" type="submit">Nueva conversación</button>
+    </form>
+  </header>
+
+  <div id="chat-hilo" class="chat-hilo" role="log" aria-live="polite" aria-label="Conversación con el asistente">
+    {% include "canasta/partials/_hilo.html" %}
+  </div>
+
+  <form class="chat-entrada" method="post" action="{% url 'canasta:enviar' %}" enctype="multipart/form-data"
+        hx-post="{% url 'canasta:enviar' %}" hx-target="#chat-hilo" hx-swap="innerHTML" hx-encoding="multipart/form-data"
+        hx-disabled-elt="find button[type=submit]">
+    {% csrf_token %}
+    <label class="chat-adjuntar" title="Adjuntar tu lista (.txt)">
+      <svg class="ico" aria-hidden="true"><use href="#i-clip"/></svg>
+      <span class="sr-only">Adjuntar un archivo con tu lista (.txt)</span>
+      <input type="file" name="archivo" accept=".txt,.csv,.md,text/plain,image/*" class="sr-only" data-archivo>
+    </label>
+    <label class="sr-only" for="chat-mensaje">Tu mensaje</label>
+    <textarea id="chat-mensaje" name="mensaje" rows="1" maxlength="4000" placeholder="Escribe o pega tu lista del mercado…" autocomplete="off"></textarea>
+    <button class="chat-enviar" type="submit"><svg class="ico" aria-hidden="true"><use href="#i-enviar"/></svg><span class="sr-only">Enviar</span></button>
+    <p class="chat-archivo" data-nombre-archivo hidden></p>
+  </form>
+  <p class="suave chat-pie">Los precios son los que reporta la comunidad; los totales son estimados. Enter envía y Mayús+Enter baja de línea.</p>
+</section>
+{% endblock %}

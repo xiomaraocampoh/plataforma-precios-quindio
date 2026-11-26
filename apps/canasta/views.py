@@ -1,88 +1,51 @@
-"""Canasta de compra: la persona arma su lista y ve en qué tienda le sale mejor comprarla toda."""
+"""Asistente de compras: una conversación para saber dónde comprar toda la lista más barato."""
 
-from django.http import Http404
 from django.shortcuts import render
 from django.views.decorators.http import require_GET, require_POST
 
 from . import selectors, services
-from .domain.canasta import CanastaInvalidaError
+
+EXTENSIONES_TEXTO = (".txt", ".csv", ".md")
+EJEMPLO = "2 kg arroz\n1 L leche\n12 huevos\n1 kg azúcar\n500 g café"
 
 
-def _panel(request, error: str = ""):
-    criterio = request.GET.get("criterio") or request.POST.get("criterio", "")
-    contexto = {
-        "panel": selectors.panel(services.leer(request.session), criterio),
-        "criterios": selectors.CRITERIOS,
-        "error": error,
+def _contexto(request) -> dict:
+    estado = services.leer(request.session)
+    mensajes = estado["mensajes"]
+    ultima = max((n for n, m in enumerate(mensajes) if m["tarjeta"]), default=None)
+    resultado = None
+    if ultima is not None and estado["pedido"]:
+        resultado = selectors.resultado(estado["pedido"], estado["criterio"])
+    return {
+        "mensajes": mensajes,
+        "indice_tarjeta": ultima,
+        "resultado": resultado,
+        "ejemplo": EJEMPLO,
     }
-    return render(request, "canasta/partials/_panel.html", contexto)
+
+
+def _adjunto(archivo):
+    if archivo is None:
+        return None
+    if (archivo.content_type or "").startswith("image/"):
+        return services.Adjunto(archivo.name, es_imagen=True)
+    if not archivo.name.lower().endswith(EXTENSIONES_TEXTO) or archivo.size > 200_000:
+        return services.Adjunto(archivo.name, es_imagen=False, texto="")
+    texto = archivo.read(services.MAX_ADJUNTO * 4).decode("utf-8", errors="replace")
+    return services.Adjunto(archivo.name, texto=texto)
 
 
 @require_GET
 def inicio(request):
-    contexto = {
-        "panel": selectors.panel(services.leer(request.session)),
-        "criterios": selectors.CRITERIOS,
-        "error": "",
-    }
-    return render(request, "canasta/canasta.html", contexto)
-
-
-@require_GET
-def buscar(request):
-    texto = request.GET.get("q", "").strip()
-    productos = list(selectors.productos_buscables(texto)) if len(texto) >= 2 else []
-    en_lista = {i["producto_id"] for i in services.leer(request.session)}
-    return render(
-        request,
-        "canasta/partials/_buscar.html",
-        {"productos": productos, "texto": texto, "en_lista": en_lista, "corto": len(texto) < 2},
-    )
-
-
-@require_GET
-def resultado(request):
-    return _panel(request)
+    return render(request, "canasta/asistente.html", _contexto(request))
 
 
 @require_POST
-def agregar(request):
-    producto_id = request.POST.get("producto_id", "")
-    producto = selectors.producto_de(int(producto_id)) if producto_id.isdigit() else None
-    if producto is None:
-        raise Http404("Producto no encontrado.")
-    try:
-        services.agregar(request.session, producto.pk, selectors.unidades_de(producto)[0])
-    except CanastaInvalidaError as exc:
-        return _panel(request, str(exc))
-    return _panel(request)
-
-
-@require_POST
-def cambiar(request, producto_id: int):
-    producto = selectors.producto_de(producto_id)
-    if producto is None:
-        raise Http404("Producto no encontrado.")
-    try:
-        services.cambiar(
-            request.session,
-            producto_id,
-            request.POST.get("cantidad", ""),
-            request.POST.get("unidad", ""),
-            selectors.unidades_de(producto),
-        )
-    except CanastaInvalidaError as exc:
-        return _panel(request, str(exc))
-    return _panel(request)
-
-
-@require_POST
-def quitar(request, producto_id: int):
-    services.quitar(request.session, producto_id)
-    return _panel(request)
-
-
-@require_POST
-def vaciar(request):
-    services.vaciar(request.session)
-    return _panel(request)
+def enviar(request):
+    texto = request.POST.get("mensaje", "")
+    if request.POST.get("reiniciar"):
+        services.reiniciar(request.session)
+    else:
+        services.responder(request.session, texto[:4000], _adjunto(request.FILES.get("archivo")))
+    plantilla = "canasta/partials/_hilo.html" if request.htmx else "canasta/asistente.html"
+    return render(request, plantilla, _contexto(request))

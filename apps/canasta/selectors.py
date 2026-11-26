@@ -1,4 +1,4 @@
-"""Lectura de la canasta: arma el panel con los precios vigentes (ADR-0027).
+"""Lectura de la canasta: arma el resultado con los precios vigentes (ADR-0027).
 
 Los precios salen de `comparacion.selectors.filas_vigentes_de` (la misma caché por producto que la
 comparación). El cálculo y el orden son del dominio; aquí solo se prepara lo que se muestra.
@@ -34,16 +34,28 @@ def unidades_de(producto) -> tuple[str, ...]:
             base = a_unidad_base(Decimal(1), p.unidad)[1].value
             if base not in bases:
                 bases.append(base)
-    base = bases[0] if bases else Unidad.UNIDAD.value
-    return _ALTERNAS[base]
+    return _ALTERNAS[bases[0] if bases else Unidad.UNIDAD.value]
 
 
-@dataclass
-class FilaPedido:
-    producto: object
-    cantidad: str
-    unidad: str
-    unidades: tuple[str, ...]
+def elegir_producto(texto: str):
+    """El producto del catálogo que corresponde a lo que escribió la persona.
+
+    Entre los que coinciden con el nombre se elige el que más establecimientos con precio vigente
+    tiene (más datos, sin criterio comercial); el empate se resuelve por nombre. Devuelve también
+    hasta tres alternativas para poder avisar.
+    """
+    candidatos = list(catalogo.buscar_productos(texto, limite=10))
+    if not candidatos and len(texto) > 3 and texto.endswith("s"):
+        candidatos = list(catalogo.buscar_productos(texto[:-1], limite=10))  # «huevos» → «huevo»
+    if not candidatos:
+        return None, []
+    filas = filas_vigentes_de([p.pk for p in candidatos])
+    orden = sorted(candidatos, key=lambda p: (-len(filas.get(p.pk, [])), str(p).casefold()))
+    return orden[0], orden[1:4]
+
+
+def nombres_de(producto_ids: list[int]) -> dict[int, str]:
+    return {p.pk: str(p) for p in catalogo.productos_publicos().filter(pk__in=producto_ids)}
 
 
 @dataclass
@@ -56,20 +68,11 @@ class OpcionVista:
 
 
 @dataclass
-class Panel:
-    pedido: list
+class Resultado:
     opciones: list
     criterio: str
     texto_criterio: str
     sin_precios: bool
-
-
-def productos_buscables(texto: str):
-    return catalogo.buscar_productos(texto, limite=8)
-
-
-def producto_de(producto_id: int):
-    return catalogo.con_fotos(catalogo.productos_publicos()).filter(pk=producto_id).first()
 
 
 def _linea_vista(ln) -> dict:
@@ -80,30 +83,19 @@ def _linea_vista(ln) -> dict:
     }
 
 
-def panel(items_sesion: list[dict], criterio: str = CRITERIO_COBERTURA) -> Panel:
+def resultado(pedido: list[dict], criterio: str = CRITERIO_COBERTURA) -> Resultado:
+    """Las tiendas ordenadas con el total, la cobertura y los faltantes de cada una."""
     if criterio not in CRITERIOS:
         criterio = CRITERIO_COBERTURA
-    ids = [i["producto_id"] for i in items_sesion]
-    productos = {
-        p.pk: p
-        for p in catalogo.con_fotos(catalogo.productos_publicos())
-        .filter(pk__in=ids)
-        .prefetch_related("presentaciones")
-    }
-    pedido = [
-        FilaPedido(
-            productos[i["producto_id"]],
-            i["cantidad"],
-            i["unidad"],
-            unidades_de(productos[i["producto_id"]]),
-        )
-        for i in items_sesion
-        if i["producto_id"] in productos
-    ]
+    nombres = nombres_de([i["producto_id"] for i in pedido])
     items = [
-        ItemCanasta(f.producto.pk, str(f.producto), Decimal(f.cantidad), f.unidad) for f in pedido
+        ItemCanasta(
+            i["producto_id"], nombres[i["producto_id"]], Decimal(i["cantidad"]), i["unidad"]
+        )
+        for i in pedido
+        if i["producto_id"] in nombres
     ]
-    filas = filas_vigentes_de([f.producto.pk for f in pedido]) if pedido else {}
+    filas = filas_vigentes_de([i.producto_id for i in items]) if items else {}
     ofertas, lugares = [], {}
     for pid, lista in filas.items():
         for fila in lista:
@@ -119,8 +111,8 @@ def panel(items_sesion: list[dict], criterio: str = CRITERIO_COBERTURA) -> Panel
                 )
             )
             lugares[r.establecimiento_id] = (r.establecimiento, fila)
-    nombres = {eid: nombre for eid, (nombre, _) in lugares.items()}
-    ordenadas = ordenar_opciones(calcular_canasta(items, ofertas, nombres), criterio)
+    locales = {eid: nombre for eid, (nombre, _) in lugares.items()}
+    ordenadas = ordenar_opciones(calcular_canasta(items, ofertas, locales), criterio)
     opciones = []
     for n, o in enumerate(ordenadas):
         fila = lugares[o.establecimiento_id][1]
@@ -134,6 +126,4 @@ def panel(items_sesion: list[dict], criterio: str = CRITERIO_COBERTURA) -> Panel
                 lineas=[_linea_vista(ln) for ln in o.lineas],
             )
         )
-    return Panel(
-        pedido, opciones, criterio, texto_criterio(criterio), bool(pedido) and not opciones
-    )
+    return Resultado(opciones, criterio, texto_criterio(criterio), bool(items) and not opciones)

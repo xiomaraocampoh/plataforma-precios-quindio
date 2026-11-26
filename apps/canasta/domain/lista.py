@@ -63,7 +63,7 @@ _UNIDADES = {
 }
 _ALIAS = "|".join(sorted(_UNIDADES, key=len, reverse=True))
 _PALABRAS_NUM = "|".join(sorted(_NUMEROS, key=len, reverse=True))
-_NUM = rf"(?:\d+(?:[.,]\d+)?|{_PALABRAS_NUM})"
+_NUM = rf"(?:\d+(?:[.,]\d+)?|(?:{_PALABRAS_NUM})(?![a-záéíóúñ]))"
 
 _INICIO = re.compile(
     rf"^(?P<num>{_NUM})\s*(?:(?P<uni>{_ALIAS})(?![a-záéíóúñ]))?\s*(?:de\s+)?(?P<producto>.+)$"

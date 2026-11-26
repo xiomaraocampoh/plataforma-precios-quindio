@@ -1,4 +1,4 @@
-"""Entender una lista de mercado escrita a mano: «2 kg arroz», «leche 1 L», «una docena de huevos»."""
+"""Entender una lista de mercado escrita a mano: «2 kg arroz», «leche 1 L», «una docena»."""
 
 from decimal import Decimal
 
@@ -98,6 +98,8 @@ def test_normaliza_mayusculas_y_espacios():
     assert _uno("  2  KG   Arroz  Blanco ") == ("arroz blanco", Decimal("2"), "kg")
 
 
-@pytest.mark.parametrize("texto", ["unicornio azul", "dosificador", "tresillo", "mediano", "unidad"])
+@pytest.mark.parametrize(
+    "texto", ["unicornio azul", "dosificador", "tresillo", "mediano", "unidad"]
+)
 def test_una_palabra_que_empieza_como_un_numero_no_es_una_cantidad(texto):
     assert _uno(texto) == (texto, None, None)

@@ -1,0 +1,52 @@
+{% if resultado.sin_precios or not resultado.opciones %}
+<p class="suave">¿Ayudas? <a href="{% url 'precios:registrar' %}">Registra un precio</a> de esos productos.</p>
+{% else %}
+{% with mejor=resultado.opciones.0 %}
+<article class="cc-res es-mejor" aria-label="Tienda recomendada: {{ mejor.opcion.establecimiento }}">
+  <span class="etiqueta">{% if resultado.criterio == "total" %}Menor total{% else %}Más conveniente{% endif %}</span>
+  <h3>{{ mejor.opcion.establecimiento }}</h3>
+  <p class="suave">{{ mejor.lugar }}</p>
+  <p class="precio">{{ mejor.total_texto }}</p>
+  {% if mejor.opcion.completa %}
+  <p><span class="chip chip-positivo"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Tiene todo ({{ mejor.opcion.cobertura }})</span></p>
+  {% else %}
+  <p><span class="chip chip-alerta"><svg class="ico" aria-hidden="true"><use href="#i-info"/></svg>Tiene {{ mejor.opcion.cobertura }}</span></p>
+  <p class="cn-faltan"><strong>Sin precio vigente:</strong> {% for f in mejor.opcion.faltantes %}{{ f.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}.</p>
+  {% endif %}
+  <details class="panel-plegable">
+    <summary>Cuánto cuesta cada producto<span class="sr-only"> en {{ mejor.opcion.establecimiento }}</span></summary>
+    <ul class="cn-detalle">
+      {% for l in mejor.lineas %}
+      <li><span>{{ l.linea.nombre }}<span class="suave"> · {{ l.presentacion_texto }}{% if l.linea.empaques > 1 %} (llevarías {{ l.linea.empaques }}){% endif %}</span></span><strong>{{ l.costo_texto }}</strong></li>
+      {% endfor %}
+    </ul>
+  </details>
+</article>
+{% if resultado.opciones|length > 1 %}
+<details class="panel-plegable cc-otras">
+  <summary>Ver las otras {{ resultado.opciones|length|add:"-1" }} tiendas</summary>
+  <ol class="cc-lista">
+    {% for o in resultado.opciones|slice:"1:" %}
+    <li><span>{{ o.opcion.establecimiento }}<span class="suave"> · {{ o.opcion.cobertura }}{% if not o.opcion.completa %} · faltan {{ o.opcion.faltantes|length }}{% endif %}</span></span><strong>{{ o.total_texto }}</strong></li>
+    {% endfor %}
+  </ol>
+</details>
+{% endif %}
+<p class="suave cn-nota">{{ resultado.texto_criterio }}. Total estimado según el precio por unidad de cada tienda.</p>
+<div class="respuestas-rapidas">
+  {% if resultado.criterio == "cobertura" %}
+  <form method="post" action="{% url 'canasta:enviar' %}" hx-post="{% url 'canasta:enviar' %}" hx-target="#chat-hilo" hx-swap="innerHTML">
+    {% csrf_token %}<input type="hidden" name="mensaje" value="menor total"><button class="chip-resp" type="submit">Ordenar por menor total</button>
+  </form>
+  {% else %}
+  <form method="post" action="{% url 'canasta:enviar' %}" hx-post="{% url 'canasta:enviar' %}" hx-target="#chat-hilo" hx-swap="innerHTML">
+    {% csrf_token %}<input type="hidden" name="mensaje" value="más productos disponibles"><button class="chip-resp" type="submit">Ordenar por más productos</button>
+  </form>
+  {% endif %}
+  <form method="post" action="{% url 'canasta:enviar' %}" hx-post="{% url 'canasta:enviar' %}" hx-target="#chat-hilo" hx-swap="innerHTML">
+    {% csrf_token %}<input type="hidden" name="mensaje" value="empezar de nuevo"><button class="chip-resp" type="submit">Empezar de nuevo</button>
+  </form>
+</div>
+<p class="suave cn-nota">Puedes decirme «agrega leche» o «quita el arroz».</p>
+{% endwith %}
+{% endif %}
