@@ -228,7 +228,9 @@ def test_el_cierre_del_asistente_no_comparte_atributo_con_el_escaner(client):
 
 
 # --- el detalle de cada producto se explica solo ------------------------------------------------
-def test_el_detalle_dice_cuanto_pediste_y_cuantos_empaques_llevas(client, reportante, arroz, tiendas):
+def test_el_detalle_dice_cuanto_pediste_y_cuantos_empaques_llevas(
+    client, reportante, arroz, tiendas
+):
     _, p500, _ = arroz
     _precio(reportante, p500, tiendas[0], 2650)  # empaque de 500 g
     html = _decir(client, "1 kg arroz").content.decode()

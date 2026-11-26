@@ -17,9 +17,10 @@
     <summary>Cuánto cuesta cada producto<span class="sr-only"> en {{ mejor.opcion.establecimiento }}</span></summary>
     <ul class="cn-detalle">
       {% for l in mejor.lineas %}
-      <li><span>{{ l.linea.nombre }}<span class="suave"> · {{ l.presentacion_texto }}{% if l.linea.empaques > 1 %} (llevarías {{ l.linea.empaques }}){% endif %}</span></span><strong>{{ l.costo_texto }}</strong></li>
+      <li><span>{{ l.linea.nombre }}<span class="suave"> · {{ l.detalle_texto }}</span></span><strong>{{ l.costo_texto }}</strong></li>
       {% endfor %}
     </ul>
+    <p class="suave cn-nota">El costo es por la cantidad que pediste. Si no alcanza un número exacto de empaques, en la tienda se paga el empaque completo.</p>
   </details>
 </article>
 {% if resultado.opciones|length > 1 %}

@@ -104,10 +104,19 @@ class Resultado:
 
 
 def _linea_vista(ln) -> dict:
+    """Lo que dice cada renglón: qué pediste y cuántos empaques de qué tamaño llevarías."""
+    empaque = f"{formatear_cantidad(ln.tamano)} {ln.unidad_presentacion}"
+    pediste = f"{formatear_cantidad(ln.cantidad_base)} {ln.unidad_base}"
+    llevas = (
+        f"llevas {ln.empaques} empaques de {empaque}"
+        if ln.empaques > 1
+        else f"empaque de {empaque}"
+    )
     return {
         "linea": ln,
         "costo_texto": formatear_pesos(ln.costo),
-        "presentacion_texto": f"{formatear_cantidad(ln.tamano)} {ln.unidad_presentacion}",
+        "presentacion_texto": empaque,
+        "detalle_texto": f"pediste {pediste} · {llevas}",
     }
 
 
