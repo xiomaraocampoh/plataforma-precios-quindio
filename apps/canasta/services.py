@@ -191,7 +191,9 @@ def _texto_de_tema(tema: Tema) -> str:
 def _sugerir(estado: dict, temas, **extras) -> None:
     estado["_extras"] = {
         **extras,
-        "sugerencias": [{"texto": t.titulo, "tema": t.id} for t in temas],
+        "sugerencias": [
+            {"texto": t.titulo, "tema": t.id, "etiqueta": t.corto, "icono": t.icono} for t in temas
+        ],
     }
 
 

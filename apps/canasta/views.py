@@ -24,7 +24,7 @@ def _contexto(request) -> dict:
         "resultado": resultado,
         "ejemplo": EJEMPLO,
         "atajos": [
-            {"texto": t.titulo, "tema": t.id}
+            {"texto": t.titulo, "tema": t.id, "etiqueta": t.corto, "icono": t.icono}
             for t in (tema_por_id(i) for i in services.PRINCIPALES)
         ],
     }

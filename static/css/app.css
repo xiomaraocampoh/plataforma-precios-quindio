@@ -1185,3 +1185,22 @@ select:disabled { cursor: not-allowed; opacity: .6; }
 @media (prefers-reduced-motion: reduce) { .asistente-lanzador { animation: none; } }
 /* Con el chat abierto el botón se esconde (en cualquier tamaño): se cierra con la X o con Esc */
 body.asistente-abierto .asistente-lanzador { display: none; }
+
+/* Botones de K-nasta: atajos parejos en dos columnas y respuestas rápidas en píldoras alineadas ----- */
+.atajos-titulo { margin: .25rem 0 0; font-size: .9rem; }
+.atajos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
+.atajo-form, .atajo-ancho { display: contents; }
+.atajo { display: flex; align-items: center; gap: .6rem; width: 100%; min-height: 56px; padding: .5rem .75rem; text-align: left; font: inherit; font-size: .875rem; font-weight: 600; line-height: 1.2; color: var(--texto); background: var(--superficie); border: 1px solid var(--borde); border-radius: 16px; cursor: pointer; transition: border-color .2s ease, background-color .2s ease, transform .2s ease, box-shadow .2s ease; }
+.atajo .ico { flex: none; box-sizing: content-box; width: 18px; height: 18px; padding: 7px; border-radius: 50%; background: var(--marca-suave); color: var(--marca-enlace); }
+.atajo:hover { border-color: var(--marca); background: var(--marca-suave); transform: translateY(-1px); box-shadow: 0 8px 18px -12px rgb(0 80 200 / .6); }
+.atajo:active { transform: none; }
+.atajo:focus-visible { outline: 3px solid var(--marca); outline-offset: 2px; }
+.atajo.ejemplo { grid-column: 1 / -1; width: auto; border-style: dashed; color: var(--marca-enlace); }
+.atajo-ancho { display: block; }
+.atajo-ancho .atajo { width: 100%; }
+.chip-form { display: contents; }
+.chip-resp { display: inline-flex; align-items: center; gap: .4rem; text-align: left; line-height: 1.2; }
+.chip-resp .ico { flex: none; width: 16px; height: 16px; }
+.respuestas-rapidas { align-items: stretch; }
+@media (max-width: 380px) { .atajos { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .atajo { transition: none; } .atajo:hover { transform: none; } }

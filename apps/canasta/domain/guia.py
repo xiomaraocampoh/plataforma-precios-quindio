@@ -18,6 +18,35 @@ class Tema:
     acciones: tuple[tuple[str, str], ...]  # (texto del botón, «app:nombre» de la ruta)
     patrones: tuple[tuple[str, int], ...]  # (expresión sobre texto sin tildes, peso)
 
+    @property
+    def corto(self) -> str:
+        """Etiqueta breve para un botón (la conversación muestra el título completo)."""
+        return _VISTA[self.id][0]
+
+    @property
+    def icono(self) -> str:
+        return _VISTA[self.id][1]
+
+
+# id → (etiqueta corta del botón, ícono del sprite)
+_VISTA = {
+    "que_es": ("¿Qué es AhorraPues?", "i-info"),
+    "comparar": ("Comparar precios", "i-scale"),
+    "cuenta": ("Crear una cuenta", "i-user"),
+    "registrar": ("Registrar un precio", "i-plus"),
+    "confirmar": ("Confirmar o denunciar", "i-check"),
+    "escanear": ("Usar la cámara", "i-camara"),
+    "vigencia": ("Precios vigentes", "i-clock"),
+    "producto_faltante": ("Un producto no está", "i-search"),
+    "tienda_faltante": ("Una tienda no está", "i-store"),
+    "mis_aportes": ("Mis aportes", "i-chart"),
+    "apariencia": ("Modo claro u oscuro", "i-info"),
+    "comercio": ("Tengo un comercio", "i-store"),
+    "privacidad": ("Mis datos", "i-shield"),
+    "contrasena": ("Olvidé mi contraseña", "i-user"),
+    "canasta": ("Armar mi mercado", "i-box"),
+}
+
 
 def _t(id, titulo, pasos, acciones, patrones) -> Tema:
     return Tema(id, titulo, tuple(pasos), tuple(acciones), tuple(patrones))
