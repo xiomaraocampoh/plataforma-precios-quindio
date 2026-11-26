@@ -75,3 +75,9 @@ def test_cada_tema_tiene_pasos_palabras_y_destinos_validos():
 def test_tema_por_id():
     assert tema_por_id("registrar").titulo.startswith("¿Cómo registro un precio")
     assert tema_por_id("no-existe") is None
+
+
+def test_cada_tema_tiene_una_etiqueta_corta_y_un_icono_para_sus_botones():
+    for t in TEMAS:
+        assert 1 <= len(t.corto) <= 26, t.id  # cabe en un botón de dos columnas
+        assert t.icono.startswith("i-"), t.id

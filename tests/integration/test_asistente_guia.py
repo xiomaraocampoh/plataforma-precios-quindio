@@ -167,3 +167,28 @@ def test_las_preguntas_de_ayuda_con_ia_van_a_la_ia_pero_el_boton_de_tema_no(clie
     falso = ia_activa()  # no debe llamarse: el botón de un tema es gratis
     _decir(client, "¿Cómo creo una cuenta?", tema="cuenta")
     assert falso.recibido == []
+
+
+def test_los_iconos_de_los_botones_existen_en_el_sprite():
+    from pathlib import Path
+
+    sprite = (Path(__file__).resolve().parents[2] / "templates/partials/_iconos.html").read_text()
+    for t in TEMAS:
+        assert f'id="{t.icono}"' in sprite, (t.id, t.icono)
+
+
+def test_el_saludo_muestra_atajos_parejos_con_etiqueta_corta(client):
+    html = client.get(reverse("canasta:inicio")).content.decode()
+    assert html.count('class="atajo"') == 4
+    for etiqueta in (
+        "Registrar un precio",
+        "Comparar precios",
+        "Crear una cuenta",
+        "Armar mi mercado",
+    ):
+        assert etiqueta in html
+
+
+def test_al_tocar_un_atajo_la_conversacion_muestra_la_pregunta_completa(client):
+    html = _decir(client, "¿Cómo registro un precio?", tema="registrar")
+    assert "<strong>¿Cómo registro un precio?</strong>" in html
