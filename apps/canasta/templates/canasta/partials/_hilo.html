@@ -5,7 +5,6 @@
   <div class="cuerpo">
     <p>¡Hola! Soy K-nasta, tu asistente de compras. Pásame tu lista del mercado, escrita o pegada, y te digo en qué tienda te sale más barato comprarlo todo.</p>
     <p class="suave">Por ejemplo: <em>2 kg arroz, 1 L leche, 12 huevos</em>{% if asistente_ia %}, o algo como <em>mercado para 4 personas</em>{% endif %}. También puedes adjuntar {% if asistente_ia %}una foto o {% endif %}un archivo de texto con tu lista.</p>
-    {% if asistente_ia %}<p class="suave cn-nota">K-nasta usa IA de Anthropic: lo que escribes (o la foto de tu lista) se envía para entenderlo y no se guarda. No escribas datos personales. <a href="{% url 'cuentas:politica_datos' %}">Más información</a></p>{% endif %}
     <form method="post" action="{% url 'canasta:enviar' %}" hx-post="{% url 'canasta:enviar' %}" hx-target="#chat-hilo" hx-swap="innerHTML">
       {% csrf_token %}<input type="hidden" name="mensaje" value="{{ ejemplo }}">
       <button class="chip-resp" type="submit">Probar con una lista de ejemplo</button>
