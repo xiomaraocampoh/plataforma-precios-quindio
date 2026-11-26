@@ -47,6 +47,38 @@ jobs:
           name: coverage
           path: coverage.xml
 
+  # Despliegue alternativo en Vercel (ADR-0031): con SOLO requirements.txt (lo que instala Vercel),
+  # los ajustes de producción cargan, collectstatic genera el manifiesto y el WSGI arranca. Las
+  # URLs son ficticias: ningún paso se conecta a la base de datos ni a Redis.
+  vercel:
+    runs-on: ubuntu-latest
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings.prod
+      VERCEL: "1"
+      SECRET_KEY: solo-para-ci-vercel-no-es-un-secreto-real-0123456789abcdef
+      DATABASE_URL: postgres://u:p@ep-ejemplo-pooler.us-east-1.aws.neon.tech:5432/precios
+      REDIS_URL: rediss://default:x@ejemplo.upstash.io:6379
+      DOMINIOS_VERCEL: ahorrapues-ci.vercel.app
+      SITIO_URL: https://ahorrapues-ci.vercel.app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: .python-version
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - run: pip install -r requirements.txt
+      - name: Comprobaciones de Django en modo producción
+        run: python manage.py check --deploy --fail-level ERROR
+      - name: Estáticos con manifiesto (CompressedManifestStaticFilesStorage)
+        run: |
+          python manage.py collectstatic --noinput
+          test -s staticfiles/staticfiles.json
+      - name: Arranque en frío del WSGI y nombres con hash
+        run: |
+          python -c "import config.wsgi; from django.templatetags.static import static; \
+          url = static('css/app.css'); print(url); assert url != '/static/css/app.css'"
+
   # Reproducibilidad del despliegue (ADR-017): la imagen de producción debe construir sin errores.
   imagen:
     runs-on: ubuntu-latest

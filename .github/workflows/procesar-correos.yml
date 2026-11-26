@@ -1,9 +1,11 @@
-# Reintentos del correo en Render gratuito, que no tiene procesos en segundo plano (ADR-021).
+# Reintentos del correo sin procesos en segundo plano: Render gratuito (ADR-021) o Vercel (ADR-0031).
 # Cada 10 minutos llama POST /interno/correos/procesar/ con el token. La llamada también despierta
 # el servicio si está dormido (la primera respuesta puede tardar ~1 min).
+# En Vercel NO se usa su cron: en el plan Hobby solo corre una vez al día (docs/operacion/despliegue-vercel.md).
 # Secrets (Settings → Secrets and variables → Actions → New repository secret):
-#   PROD_URL           https://plataforma-precios-quindio.onrender.com   (sin «/» al final)
-#   CORREO_CRON_TOKEN  el mismo valor que CORREO_CRON_TOKEN en Render → Environment
+#   PROD_URL           https://plataforma-precios-quindio.onrender.com   o   https://<proyecto>.vercel.app
+#                      (sin «/» al final; el despliegue que esté en producción)
+#   CORREO_CRON_TOKEN  el mismo valor que CORREO_CRON_TOKEN en Render o en Vercel → Environment Variables
 name: procesar-correos
 
 on:
