@@ -1,4 +1,8 @@
+import os
+
 from django.core.exceptions import ImproperlyConfigured
+
+from core.despliegue import ajustar_bd_serverless, es_vercel, validar_dominios_vercel
 
 from .base import *
 
@@ -14,6 +18,11 @@ STORAGES = {
     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
 }
 
+# Vercel (ADR-0031): funciones efímeras detrás del pooler de Neon. Sin VERCEL (Render, Docker) la
+# conexión persistente de base.py no cambia.
+EN_VERCEL = es_vercel(os.environ)
+DATABASES["default"] = ajustar_bd_serverless(DATABASES["default"], en_vercel=EN_VERCEL)
+
 # Caché compartida entre réplicas (EC-04: escalado horizontal en quincena)
 CACHES = {
     "default": {
@@ -27,6 +36,16 @@ CACHES = {
 FORZAR_HTTPS = env.bool("FORZAR_HTTPS", default=True)
 # Orígenes con los que el proveedor sirve el sitio (https://dominio); casi todos los exigen.
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
+# Dominios exactos <proyecto>.vercel.app (ADR-0031). Nunca un comodín: «.vercel.app» aceptaría
+# peticiones dirigidas a cualquier proyecto ajeno alojado en Vercel.
+try:
+    DOMINIOS_VERCEL = validar_dominios_vercel(env.list("DOMINIOS_VERCEL", default=[]))
+except ValueError as error:
+    raise ImproperlyConfigured(str(error)) from error
+ALLOWED_HOSTS = list(dict.fromkeys([*ALLOWED_HOSTS, *DOMINIOS_VERCEL]))
+CSRF_TRUSTED_ORIGINS = list(
+    dict.fromkeys([*CSRF_TRUSTED_ORIGINS, *(f"https://{d}" for d in DOMINIOS_VERCEL)])
+)
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_SSL_REDIRECT = FORZAR_HTTPS

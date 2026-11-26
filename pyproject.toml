@@ -3,6 +3,24 @@ name = "plataforma-precios-quindio"
 version = "0.1.0"
 description = "Plataforma colaborativa de comparación de precios entre tiendas y supermercados (Armenia / Quindío)"
 requires-python = ">=3.12"
+# Lo que instala Vercel (ADR-0031). Igual a requirements.txt; la fuente es requirements/prod.txt.
+# tests/unit/test_requisitos_vercel.py falla si se desalinean. Docker y Render no leen esta lista.
+dependencies = [
+  "Django==5.2.18",
+  "djangorestframework==3.18.3",
+  "drf-spectacular==0.30.0",
+  "django-environ==0.14.0",
+  "django-htmx==1.29.0",
+  "psycopg[binary]==3.3.7",
+  "redis==8.1.0",
+  "anthropic==2.9.0",
+  "pyotp==2.12.0",
+  "qrcode==8.2",
+  "defusedxml==0.7.1",
+  "django-anymail[brevo]==15.2",
+  "gunicorn==23.0.0",
+  "whitenoise==6.11.0",
+]
 
 # ── Ruff: linter + formateador (PEP 8) ────────────────
 [tool.ruff]
