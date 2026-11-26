@@ -2,7 +2,7 @@
 
 import pytest
 
-from apps.canasta.domain.guia import TEMAS, buscar_temas, tema_por_id
+from apps.canasta.domain.guia import TEMAS, TIPOS_VISUAL, buscar_temas, tema_por_id
 
 pytestmark = pytest.mark.unit
 
@@ -67,7 +67,7 @@ def test_cada_tema_tiene_pasos_palabras_y_destinos_validos():
     assert len(ids) == len(set(ids)) and len(ids) >= 12
     for t in TEMAS:
         assert t.titulo and len(t.pasos) >= 1 and t.patrones
-        assert all(paso.strip() for paso in t.pasos)
+        assert all(paso.texto.strip() for paso in t.pasos)
         for texto, ruta in t.acciones:
             assert texto and ":" in ruta  # «app:nombre», para resolverla con reverse
 
@@ -81,3 +81,33 @@ def test_cada_tema_tiene_una_etiqueta_corta_y_un_icono_para_sus_botones():
     for t in TEMAS:
         assert 1 <= len(t.corto) <= 26, t.id  # cabe en un botón de dos columnas
         assert t.icono.startswith("i-"), t.id
+
+
+# --- minitutoriales visuales ------------------------------------------------------------------
+def test_cada_tema_se_explica_con_imagenes_en_la_mayoria_de_sus_pasos():
+    for t in TEMAS:
+        con_imagen = [p for p in t.pasos if p.visuales]
+        assert con_imagen, t.id
+        assert len(con_imagen) >= len(t.pasos) / 2, t.id  # un tutorial, no un texto con adornos
+
+
+def test_las_imagenes_son_de_un_tipo_conocido_y_tienen_lo_que_necesitan():
+    for t in TEMAS:
+        for paso in t.pasos:
+            for v in paso.visuales:
+                assert v.tipo in TIPOS_VISUAL, (t.id, v.tipo)
+                if v.tipo in {"boton", "boton_sec", "chip", "casilla", "simbolo"}:
+                    assert v.texto.strip(), (t.id, v.tipo)
+                if v.tipo == "campo":
+                    assert v.texto.strip() and v.valor.strip(), t.id
+                if v.tipo == "opciones":
+                    assert len(v.opciones) >= 2 and -1 <= v.activa < len(v.opciones), t.id
+                if v.tipo == "filas":
+                    assert len(v.filas) >= 2, t.id
+                if v.tipo == "icono":
+                    assert v.icono.startswith("i-") and v.texto.strip(), t.id
+
+
+def test_los_pasos_de_texto_siguen_disponibles_para_la_ia():
+    t = tema_por_id("registrar")
+    assert t.textos[0].startswith("Necesitas una cuenta") and len(t.textos) == len(t.pasos)

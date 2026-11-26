@@ -9,7 +9,7 @@ import pytest
 from django.core.cache import cache
 from django.urls import reverse
 
-from apps.canasta.domain.guia import TEMAS, buscar_temas
+from apps.canasta.domain.guia import TEMAS, buscar_temas, tema_por_id
 from apps.integraciones import services as integraciones
 from apps.integraciones.clients.asistente import RespuestaModelo
 
@@ -198,3 +198,69 @@ def test_el_saludo_ofrece_enviar_el_mercado_con_un_enlace_que_lleva_a_la_caja(cl
     html = client.get(reverse("canasta:inicio")).content.decode()
     assert 'href="#chat-mensaje"' in html and "data-enviar-mercado" in html  # funciona sin JS
     assert "Enviar mi mercado" in html
+
+
+# --- minitutoriales visuales --------------------------------------------------------------------
+_CLASE_DE = {
+    "boton": "mini-boton",
+    "boton_sec": "mini-boton",
+    "campo": "mini-campo",
+    "buscador": "mini-buscador",
+    "opciones": "mini-opciones",
+    "filas": "mini-filas",
+    "chip": "mini-chip",
+    "icono": "mini-icono",
+    "simbolo": "mini-icono",
+    "casilla": "mini-casilla",
+}
+
+
+def test_la_respuesta_es_un_paso_a_paso_con_una_imagen_en_cada_paso(client):
+    html = _decir(client, "¿Cómo registro un precio?")
+    assert html.count('class="tuto"') == 1
+    assert html.count('class="tuto-paso"') == len(tema_por_id("registrar").pasos)
+    assert "mini-boton" in html and "mini-campo" in html and "mini-opciones" in html
+
+
+def test_las_imagenes_son_decorativas_y_el_texto_de_cada_paso_se_lee(client):
+    html = _decir(client, "¿Cómo registro un precio?")
+    assert (
+        html.count('class="tuto-visual" aria-hidden="true"') >= 4
+    )  # lo dibujado no se lee 2 veces
+    assert "Paso 1: busca el producto" in html  # el texto real sí (lectores de pantalla)
+
+
+@pytest.mark.parametrize("tema", [t.id for t in TEMAS])
+def test_todos_los_temas_se_dibujan_completos(client, tema):
+    guia = tema_por_id(tema)
+    html = _decir(client, guia.titulo, tema=tema)
+    assert html.count('class="tuto-paso"') == len(guia.pasos)
+    for paso in guia.pasos:
+        for v in paso.visuales:
+            assert _CLASE_DE[v.tipo] in html, (tema, v.tipo)
+    assert "Ejemplo ilustrativo" in html  # no se confunde con datos reales
+
+
+def test_el_mensaje_guarda_el_tema_y_no_la_copia_del_tutorial(client):
+    _decir(client, "¿Cómo registro un precio?")
+    guardado = client.session["asistente_v1"]["mensajes"][-1]
+    assert guardado["tema"] == "registrar" and "pasos" not in guardado
+
+
+def test_solo_el_ultimo_tutorial_se_dibuja_completo(client):
+    _decir(client, "¿Cómo registro un precio?")
+    html = _decir(client, "¿Cómo creo una cuenta?")
+    assert html.count('class="tuto"') == 2  # los dos siguen visibles en la conversación
+
+
+def test_con_ia_el_sistema_dibuja_el_tutorial_debajo_de_la_explicacion(client, ia_activa):
+    ia_activa(_usa_guia("cómo registro un precio"), _texto("Es rápido: te lo muestro paso a paso."))
+    html = _decir(client, "no sé cómo subir un precio")
+    assert "Es rápido: te lo muestro paso a paso." in html
+    assert html.count('class="tuto"') == 1 and "mini-boton" in html
+
+
+def test_con_ia_se_le_pide_no_repetir_los_pasos_que_el_sistema_dibuja():
+    from apps.integraciones.domain.asistente import INSTRUCCIONES
+
+    assert "no repitas todos los pasos" in INSTRUCCIONES.lower()
