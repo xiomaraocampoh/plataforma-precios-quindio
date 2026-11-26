@@ -6,6 +6,7 @@ from django.db.models.lookups import Exact
 from core.models import ModeloConMarcasDeTiempo
 
 from .domain.duplicados import normalizar_nombre
+from .domain.grupos import GRUPOS
 from .domain.normalizacion import Unidad, formatear_cantidad
 
 
@@ -29,9 +30,30 @@ class Marca(models.Model):
 
 
 class Categoria(models.Model):
+    class Grupo(models.TextChoices):
+        """Departamento amplio (como en un supermercado); mismos valores que domain/grupos.py."""
+
+        MERCADO = "mercado", "Mercado"
+        FRUTAS_VERDURAS = "frutas_verduras", "Frutas y verduras"
+        CARNES_PESCADO = "carnes_pescado", "Carnes y pescado"
+        LACTEOS_HUEVOS = "lacteos_huevos", "Lácteos y huevos"
+        BEBIDAS = "bebidas", "Bebidas"
+        ASEO_HOGAR = "aseo_hogar", "Aseo del hogar"
+        SALUD_BELLEZA = "salud_belleza", "Salud y belleza"
+        OTROS = "otros", "Otros"
+
     nombre = models.CharField(max_length=80, unique=True)
+    grupo = models.CharField(max_length=20, choices=Grupo.choices, default=Grupo.OTROS)
     perecedera = models.BooleanField(default=False)
     activa = models.BooleanField(default=True)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(grupo__in=[g.valor for g in GRUPOS]),
+                name="categoria_grupo_valido",
+            )
+        ]
 
     def __str__(self) -> str:
         return self.nombre
