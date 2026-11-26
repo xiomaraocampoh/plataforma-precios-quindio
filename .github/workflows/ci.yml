@@ -78,6 +78,13 @@ jobs:
         run: |
           python -c "import config.wsgi; from django.templatetags.static import static; \
           url = static('css/app.css'); print(url); assert url != '/static/css/app.css'"
+      - name: Logo de los correos con hash y presente tras collectstatic
+        run: |
+          python -c "import config.wsgi, pathlib; from django.conf import settings; \
+          from django.templatetags.static import static; \
+          url = static('img/logo-horizontal-600.png'); print(url); \
+          assert url != '/static/img/logo-horizontal-600.png' and url.endswith('.png'); \
+          assert (pathlib.Path(settings.STATIC_ROOT) / url.removeprefix('/static/')).is_file()"
 
   # Reproducibilidad del despliegue (ADR-017): la imagen de producción debe construir sin errores.
   imagen:
