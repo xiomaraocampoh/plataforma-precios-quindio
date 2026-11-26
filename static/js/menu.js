@@ -26,4 +26,10 @@
     if (boton.getAttribute("aria-expanded") === "true" && !cabecera.contains(e.target)) poner(false);
   });
   escritorio.addEventListener("change", (e) => { if (e.matches) poner(false); });
+
+  // Sombra suave de la barra cuando la página baja (se quita arriba del todo)
+  let pendiente = false;
+  const sombra = () => { pendiente = false; cabecera.classList.toggle("sombra", window.scrollY > 4); };
+  window.addEventListener("scroll", () => { if (!pendiente) { pendiente = true; requestAnimationFrame(sombra); } }, { passive: true });
+  sombra();
 })();
