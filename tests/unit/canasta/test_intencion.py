@@ -48,3 +48,21 @@ def test_lo_demas_es_una_lista():
 
 def test_texto_vacio_es_una_lista_vacia():
     assert detectar_intencion("   ").tipo is Tipo.LISTA
+
+
+@pytest.mark.parametrize(
+    "texto",
+    [
+        "quita el arroz y ordénalo por menor total",
+        "agrega leche y que tenga todo",
+        "empezar de nuevo pero con menos productos y más barato",
+    ],
+)
+def test_una_frase_compuesta_no_es_una_orden_corta(texto):
+    # Una orden corta no se traga una frase con varias peticiones: la entiende la IA (o el sistema)
+    assert detectar_intencion(texto).tipo in (Tipo.LISTA, Tipo.QUITAR, Tipo.AGREGAR)
+    assert detectar_intencion(texto).tipo not in (
+        Tipo.ORDENAR_TOTAL,
+        Tipo.ORDENAR_COBERTURA,
+        Tipo.REINICIAR,
+    )
