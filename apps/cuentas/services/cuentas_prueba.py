@@ -26,9 +26,18 @@ def asegurar_cuentas_prueba(*, contrasena: str | None) -> list[tuple[CuentaPrueb
     utilizable y las existentes conservan la suya.
     """
     if contrasena:
+        correos = semilla.correos()  # CUENTAS_PRUEBA_CORREO_BASE inválida: se detiene aquí
         for cuenta in CUENTAS_PRUEBA:  # con cada cuenta: el validador compara con usuario y correo
-            validate_password(contrasena, Usuario(username=cuenta.usuario, email=cuenta.correo))
+            correo = correos[cuenta.usuario]
+            validate_password(contrasena, Usuario(username=cuenta.usuario, email=correo))
     return semilla.sembrar(registro, contrasena=contrasena, fijar_en_existentes=True)
+
+
+@transaction.atomic
+def actualizar_correos_prueba() -> list[tuple[CuentaPrueba, str]]:
+    """Fija en las cuentas de prueba existentes el correo de CUENTAS_PRUEBA_CORREO_BASE, sin tocar
+    contraseña ni rol. Devuelve (cuenta, correo) de las actualizadas."""
+    return semilla.actualizar_correos(registro)
 
 
 def usuarios_de_prueba() -> dict[str, Usuario]:
