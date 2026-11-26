@@ -258,6 +258,13 @@ def test_migrate_no_cambia_la_contrasena_de_una_cuenta_existente(db, clave, monk
     assert Usuario.objects.get(username="admin_prueba").check_password(clave)
 
 
+@override_settings(DEBUG=True, CUENTAS_PRUEBA_CORREO_BASE="equipo@correo.test")
+def test_la_semilla_usa_el_correo_base(db, sin_clave):
+    importlib.import_module(MIGRACIONES["cuentas"]).sembrar(registro, None)
+    correos = dict(Usuario.objects.values_list("username", "email"))
+    assert correos == {c.usuario: f"equipo+{c.sufijo}@correo.test" for c in CUENTAS_PRUEBA}
+
+
 # ---------- producción ----------
 
 
