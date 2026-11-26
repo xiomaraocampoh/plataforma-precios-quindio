@@ -383,10 +383,11 @@ def comparar_filas(producto_id: int) -> list[FilaComparacion]:
     )
 
 
-def primeras_filas(producto_ids: list[int]) -> dict[int, FilaComparacion | None]:
-    """Listado de productos: la primera fila en el orden neutral de cada uno (o None).
+def filas_vigentes_de(producto_ids: list[int]) -> dict[int, list[FilaComparacion]]:
+    """Filas vigentes de varios productos, en el orden neutral de cada uno (ADR-0027).
 
-    Usa la misma caché por producto que la comparación y calcula las que faltan en un solo lote.
+    Usa la misma caché por producto que la comparación y calcula las que faltan en un solo lote:
+    un precio nuevo invalida la clave del producto y la siguiente consulta ya lo ve (EC-02).
     """
     claves = {clave_comparacion(pid): pid for pid in producto_ids}
     en_cache = cache.get_many(list(claves))
@@ -397,8 +398,14 @@ def primeras_filas(producto_ids: list[int]) -> dict[int, FilaComparacion | None]
             {clave_comparacion(pid): filas for pid, filas in calculadas.items()},
             ttl_comparacion(),
         )
-    todas = {pid: en_cache.get(clave, calculadas.get(pid)) for clave, pid in claves.items()}
-    return {pid: (filas[0] if filas else None) for pid, filas in todas.items()}
+    return {pid: en_cache.get(clave, calculadas.get(pid, [])) for clave, pid in claves.items()}
+
+
+def primeras_filas(producto_ids: list[int]) -> dict[int, FilaComparacion | None]:
+    """Listado de productos: la primera fila en el orden neutral de cada uno (o None)."""
+    return {
+        pid: (filas[0] if filas else None) for pid, filas in filas_vigentes_de(producto_ids).items()
+    }
 
 
 def tarjetas_de_productos(productos) -> list[tuple]:

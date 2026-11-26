@@ -41,6 +41,7 @@ LOCAL_APPS = [
     "apps.integraciones",
     "apps.notificaciones",  # correo transaccional (ADR-021)
     "apps.administracion",  # panel propio en /panel/ (roles, catálogo, auditoría)
+    "apps.canasta",  # Canasta de compra (ADR-0027 a 0029); el asistente irá encima (ADR-0030)
     "apps.comercios",  # Comercios (Corte III, ADR-012): se integra por el puerto de comparacion
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

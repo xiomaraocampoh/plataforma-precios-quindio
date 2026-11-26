@@ -44,6 +44,8 @@
            {% if ruta.url_name == 'productos' or ruta.app_name == 'catalogo' %}aria-current="page"{% endif %}>Productos</a>
         <a href="{% url 'establecimientos:directorio' %}"
            {% if ruta.app_name == 'establecimientos' %}aria-current="page"{% endif %}>Establecimientos</a>
+        <a href="{% url 'canasta:inicio' %}"
+           {% if ruta.app_name == 'canasta' %}aria-current="page"{% endif %}>Canasta</a>
         {% if not user.is_authenticated %}<a class="nav-solo-angosto" href="{% url 'cuentas:registro' %}">Crear cuenta</a>{% endif %}
       </nav>
       {% endwith %}

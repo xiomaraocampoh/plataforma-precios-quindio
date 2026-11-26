@@ -1047,3 +1047,37 @@ select:disabled { cursor: not-allowed; opacity: .6; }
    (si ambos tuvieran margen automático se repartirían el sobrante y el botón quedaría a alturas distintas). */
 .tarjeta-precio .acciones-fila { margin-top: auto; }
 .tarjeta-precio .acciones-fila + .ir { margin-top: .5rem; }
+
+/* Canasta de compra ---------------------------------------------------------------------------- */
+.canasta { display: grid; gap: var(--gap); }
+.cn-buscador { display: grid; gap: .5rem; }
+.cn-buscador label { font-weight: 600; }
+.cn-buscador input[type="search"] { width: 100%; }
+.cn-sugerencias, .cn-lista, .cn-detalle, .cn-opciones { list-style: none; margin: 0; padding: 0; }
+.cn-sugerencias { display: grid; gap: .35rem; margin-top: .25rem; }
+.cn-sugerencias li, .cn-lista li { display: flex; align-items: center; gap: .75rem; padding: .35rem .25rem; }
+.cn-sugerencias .foto-chip, .cn-lista .foto-chip { width: 40px; height: 40px; }
+.cn-nombre { flex: 1; min-width: 0; font-weight: 500; }
+.cn-nota { margin: 0; font-size: .875rem; }
+.cn-cabecera { display: flex; align-items: center; justify-content: space-between; gap: .75rem; flex-wrap: wrap; }
+.cn-cabecera h2 { margin: 0; }
+.cn-lista { display: grid; gap: .15rem; margin-top: .5rem; }
+.cn-lista li { border-top: 1px solid var(--borde); }
+.cn-cantidad { display: inline-flex; gap: .35rem; align-items: center; }
+.cn-cantidad input, .cn-cantidad select, .cn-orden select { min-height: 40px; }
+.cn-cantidad input { width: 4.5rem; text-align: center; }
+.cn-quitar { display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; border: 0; background: transparent; color: var(--texto-suave); cursor: pointer; }
+.cn-quitar:hover { background: var(--superficie-2); color: var(--texto); }
+.cn-quitar:focus-visible { outline: 3px solid var(--marca); outline-offset: 2px; }
+.cn-orden { display: inline-flex; align-items: center; gap: .5rem; }
+.cn-opciones { display: grid; gap: var(--gap); margin-top: .75rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+.cn-opcion { display: flex; flex-direction: column; gap: .35rem; }
+.cn-opcion h3 { margin: 0; font-size: 1.15rem; }
+.cn-opcion .precio { margin: .25rem 0; }
+.cn-opcion.es-mejor { box-shadow: inset 0 0 0 2px var(--marca); }
+.cn-faltan { margin: 0; font-size: .875rem; color: var(--error); }
+.cn-detalle { display: grid; gap: .35rem; }
+.cn-detalle li { display: flex; justify-content: space-between; gap: .75rem; font-size: .9rem; }
+@media (max-width: 520px) { .cn-lista li { flex-wrap: wrap; } .cn-nombre { flex-basis: calc(100% - 60px); } }
+.cn-opciones > .tile { grid-column: auto; }
+.cn-orden label { white-space: nowrap; }
