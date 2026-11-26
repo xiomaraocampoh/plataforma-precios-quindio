@@ -1289,7 +1289,7 @@ body.asistente-abierto .asistente-lanzador { display: none; }
 
 /* Escritorio ancho: logo a la izquierda, pastilla centrada en la pantalla y botones a la derecha */
 @media (min-width: 1280px) {
-  .cabecera-in { max-width: 1440px; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); padding-inline: 1.25rem; }
+  .cabecera-in { max-width: 1440px; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); padding-inline: clamp(1.25rem, calc((100vw - 1280px) * .14 + 1.25rem), 4rem); }  /* más aire a los lados cuanto más ancha la pantalla */
   .cabecera-in { max-width: none; }
   .cabecera-in .marca { justify-self: start; }
   .cabecera-in .acciones { margin-left: 0; justify-self: end; flex-wrap: nowrap; }
