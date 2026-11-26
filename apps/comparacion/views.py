@@ -25,6 +25,7 @@ from .domain.ranking import CRITERIO_DECLARADO
 from .selectors import (
     MIN_CARACTERES_BUSQUEDA,
     buscar_productos,
+    categorias_frecuentes,
     comparar_con_resumen,
     comparar_filas,
     ejemplo_comparacion,
@@ -44,6 +45,7 @@ def inicio(request):
     contexto = {
         "resumen": resumen_plataforma(),
         "destacados": destacados,
+        "categorias_rapidas": categorias_frecuentes(),
         "ejemplo_producto": destacados[0] if destacados else None,
         "ejemplo": ejemplo_comparacion(destacados[0].pk) if destacados else [],
         "foto_activa": integraciones.reconocimiento_activo(),

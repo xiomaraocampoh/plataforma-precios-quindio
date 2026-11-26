@@ -1,5 +1,5 @@
 {% for p in productos %}
-  <li><a href="{% url 'comparacion:comparar' p.pk %}">{{ p }}</a></li>
+  <li><a class="sug-foto" href="{% url 'comparacion:comparar' p.pk %}">{% include "partials/_foto_producto.html" with producto=p clase="foto-chip" %}<span class="sug-nombre">{{ p }}</span></a></li>
 {% empty %}
   {% if muy_corto %}
   <li class="vacio">Escribe al menos dos letras.</li>

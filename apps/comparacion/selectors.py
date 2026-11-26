@@ -17,7 +17,7 @@ from django.utils import timezone
 
 from apps.catalogo import selectors as catalogo
 from apps.catalogo.domain.normalizacion import a_unidad_base, formatear_cantidad, precio_por_unidad
-from apps.catalogo.models import Presentacion, Producto
+from apps.catalogo.models import Categoria, Presentacion, Producto
 from apps.establecimientos.domain.mapas import enlace_mapa
 from apps.establecimientos.models import Establecimiento
 from apps.establecimientos.selectors import establecimiento_de_etiqueta
@@ -448,10 +448,31 @@ def resumen_plataforma() -> dict[str, int]:
     return cache.get_or_set(clave_resumen(), _calcular_resumen_plataforma, ttl_comparacion())
 
 
+def categorias_frecuentes(limite: int = 4):
+    """Categorías con más precios publicados, para los accesos rápidos de la portada.
+
+    Solo mide la actividad de la comunidad (sin criterio comercial); empata por nombre.
+    """
+    return list(
+        Categoria.objects.filter(activa=True)
+        .annotate(
+            n_reportes=Count(
+                "productos__presentaciones__reportes",
+                filter=Q(
+                    productos__activo=True,
+                    productos__presentaciones__reportes__estado=ReportePrecio.Estado.PUBLICADO,
+                ),
+            )
+        )
+        .filter(n_reportes__gt=0)
+        .order_by("-n_reportes", "nombre")[:limite]
+    )
+
+
 def productos_destacados(limite: int = 8):
     """Productos con más reportes publicados (un solo query; sin criterio comercial)."""
     return list(
-        catalogo.productos_publicos()
+        catalogo.con_fotos(catalogo.productos_publicos())
         .annotate(
             n_reportes=Count(
                 "presentaciones__reportes",
