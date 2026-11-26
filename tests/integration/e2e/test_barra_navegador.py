@@ -68,5 +68,7 @@ def test_la_pastilla_esta_centrada_y_el_logo_pegado_a_la_izquierda(page, live_se
     centro = nav["x"] + nav["width"] / 2
     assert abs(centro - ancho / 2) <= 3  # centrada en la pantalla
     logo = page.locator(".marca").bounding_box()
-    assert logo["x"] <= 40  # cerca del borde izquierdo
+    assert logo["x"] <= 80  # a la izquierda, pero sin quedar pegado al borde
+    if ancho >= 1440:
+        assert logo["x"] >= 36  # respira: no queda tan a la izquierda
     assert not page.evaluate("document.documentElement.scrollWidth > innerWidth")
