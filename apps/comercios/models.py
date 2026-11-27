@@ -1,7 +1,7 @@
 """Persistencia del módulo comercial (Corte III). Solo tablas nuevas: el núcleo no cambia (EC-05).
 
-Datos personales (Ley 1581): el usuario dueño del perfil, el teléfono y la evidencia de
-verificación NUNCA salen en una respuesta pública. La comparación solo recibe precios y
+Datos personales (Ley 1581): el usuario dueño del perfil, el teléfono y los documentos de
+verificación (ADR-0034) NUNCA salen en una respuesta pública. La comparación solo recibe precios y
 promociones por establecimiento, a través del puerto del ADR-012.
 """
 
@@ -9,6 +9,7 @@ from django.conf import settings
 from django.db import models
 from django.db.models import Q
 
+from .domain.documentos import MAX_BYTES_DOCUMENTO
 from .domain.promociones import MotivoPromocion, TipoPromocion
 
 
@@ -34,8 +35,9 @@ class PerfilComercio(models.Model):
     )
     nombre_contacto = models.CharField(max_length=120)
     telefono = models.CharField(max_length=20, blank=True)
-    # Evidencia simple (ADR-015): NIT/RUT o la foto de la fachada con el código entregado
-    evidencia = models.CharField(max_length=300)
+    # ADR-0034: la evidencia son dos PDF (DocumentoComercio). Este texto ya no se pide; la semilla
+    # lo usa como marcador de los perfiles de prueba (ADR-0023).
+    evidencia = models.CharField(max_length=300, blank=True)
     codigo_verificacion = models.CharField(max_length=12)
     estado = models.CharField(max_length=10, choices=Estado.choices, default=Estado.PENDIENTE)
     verificado_por = models.ForeignKey(
@@ -79,6 +81,52 @@ class PerfilComercio(models.Model):
     @property
     def verificado(self) -> bool:
         return self.estado == self.Estado.VERIFICADO
+
+
+class DocumentoComercio(models.Model):
+    """ADR-0034: PDF de evidencia (Cámara de Comercio o RUT) de una solicitud de perfil.
+
+    Solo moderación lo ve. Al decidir el perfil se borran los bytes (`contenido = NULL`) y quedan
+    tipo, tamaño, SHA-256 y fechas como constancia (Ley 1581, minimización). No se guarda el nombre
+    original del archivo.
+    """
+
+    class Tipo(models.TextChoices):
+        CAMARA_COMERCIO = "camara_comercio", "Certificado de Cámara de Comercio"
+        RUT = "rut", "RUT"
+
+    perfil = models.ForeignKey(PerfilComercio, on_delete=models.CASCADE, related_name="documentos")
+    tipo = models.CharField(max_length=20, choices=Tipo.choices)
+    contenido = models.BinaryField(null=True, editable=False)
+    tamano = models.PositiveIntegerField()
+    sha256 = models.CharField(max_length=64)
+    subido_en = models.DateTimeField(auto_now_add=True)
+    borrado_en = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = "documento de comercio"
+        verbose_name_plural = "documentos de comercio"
+        constraints = [
+            models.UniqueConstraint(fields=["perfil", "tipo"], name="un_documento_por_tipo"),
+            models.CheckConstraint(
+                condition=Q(tamano__gte=1, tamano__lte=MAX_BYTES_DOCUMENTO),
+                name="documento_entre_1_byte_y_2_mb",
+            ),
+            # Sin bytes siempre con fecha de borrado, y al revés
+            models.CheckConstraint(
+                condition=Q(contenido__isnull=True, borrado_en__isnull=False)
+                | Q(contenido__isnull=False, borrado_en__isnull=True),
+                name="documento_borrado_con_fecha",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        estado = "borrado" if self.borrado_en else "pendiente"
+        return f"{self.get_tipo_display()} · perfil {self.perfil_id} ({estado})"
+
+    @property
+    def disponible(self) -> bool:
+        return self.borrado_en is None
 
 
 class PrecioOficial(models.Model):
