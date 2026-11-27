@@ -347,7 +347,8 @@ a.chip:hover { text-decoration: none; background: var(--borde); }
 .tarjeta .nombre { font-size: 1.15rem; font-weight: 650; letter-spacing: -.02em; }
 .tarjeta .meta { color: var(--texto-suave); font-size: .875rem; }
 .tarjeta .ir { margin-top: auto; align-self: stretch; justify-content: center; }
-.tarjeta-enlace:hover .ir { background: var(--marca-suave); }
+.tarjeta-enlace:hover .ir { background: var(--marca-hover); border-color: var(--marca-hover); color: var(--sobre-marca); }
+.tarjeta-enlace:hover .ir.btn-sec { background: var(--marca-suave); border-color: var(--marca-enlace); color: var(--marca-enlace); }
 
 .cta-final { text-align: center; align-items: center; padding: clamp(2.5rem, 7vw, 4.5rem) 1.5rem; gap: 1.1rem; border-radius: var(--radio); }
 .cta-final h2 { font-size: clamp(2rem, 5.5vw, 3.4rem); font-weight: 700; letter-spacing: -.04em; max-width: 16ch; }
