@@ -41,8 +41,13 @@ def presentaciones_publicas():
 
 
 def _por_texto(texto: str) -> Q:
-    normal = normalizar_nombre(texto)
-    return Q(nombre_normalizado__contains=normal) | Q(marca__nombre_normalizado__contains=normal)
+    """Cada palabra debe estar en el nombre o en la marca (RF-04): «arroz diana» sí aparece."""
+    filtro = Q()
+    for palabra in normalizar_nombre(texto).split():
+        filtro &= Q(nombre_normalizado__contains=palabra) | Q(
+            marca__nombre_normalizado__contains=palabra
+        )
+    return filtro
 
 
 def _con_presentaciones():
