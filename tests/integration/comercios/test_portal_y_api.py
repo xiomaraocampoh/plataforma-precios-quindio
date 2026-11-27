@@ -12,6 +12,7 @@ from rest_framework.throttling import ScopedRateThrottle
 
 from apps.comercios import services
 from apps.comercios.models import PerfilComercio, PrecioOficial, Promocion
+from tests.integration.comercios.pdf import pdfs
 
 pytestmark = [pytest.mark.integration, pytest.mark.django_db]
 
@@ -57,7 +58,7 @@ def test_crear_el_perfil_por_htmx_devuelve_la_seccion_con_el_codigo(client, duen
             "establecimiento": tiendas[0].pk,
             "nombre_contacto": "Rosa",
             "telefono": "",
-            "evidencia": "NIT 1",
+            **pdfs(),
         },
         **HTMX,
     )
@@ -83,11 +84,11 @@ def test_la_bandeja_de_verificacion_es_solo_de_moderacion(client, duena, moderad
 
 def test_moderacion_verifica_desde_la_bandeja(client, duena, tiendas, moderador):
     perfil = services.crear_perfil(
-        usuario=duena, establecimiento_id=tiendas[0].pk, nombre_contacto="R", evidencia="NIT 7"
+        usuario=duena, establecimiento_id=tiendas[0].pk, nombre_contacto="R", **pdfs()
     )
     client.force_login(moderador)
     html = client.get(reverse("comercios:verificacion")).content.decode()
-    assert "NIT 7" in html and _controles_sin_etiqueta(html) == []
+    assert "Ver RUT" in html and _controles_sin_etiqueta(html) == []
     respuesta = client.post(
         reverse("comercios:decidir_perfil", args=[perfil.pk]), {"decision": "aprobar"}, **HTMX
     )
@@ -98,7 +99,7 @@ def test_moderacion_verifica_desde_la_bandeja(client, duena, tiendas, moderador)
 
 def test_un_reportante_no_decide_sobre_un_perfil(client, duena, crear_usuario, tiendas):
     perfil = services.crear_perfil(
-        usuario=duena, establecimiento_id=tiendas[0].pk, nombre_contacto="R", evidencia="x"
+        usuario=duena, establecimiento_id=tiendas[0].pk, nombre_contacto="R", **pdfs()
     )
     client.force_login(crear_usuario("curioso"))
     respuesta = client.post(
@@ -123,7 +124,7 @@ def test_el_comercio_verificado_publica_desde_el_portal(client, comercio, duena,
 
 def test_un_comercio_pendiente_ve_su_codigo_y_no_publica(client, duena, tiendas, arroz):
     perfil = services.crear_perfil(
-        usuario=duena, establecimiento_id=tiendas[0].pk, nombre_contacto="R", evidencia="x"
+        usuario=duena, establecimiento_id=tiendas[0].pk, nombre_contacto="R", **pdfs()
     )
     client.force_login(duena)
     assert perfil.codigo_verificacion in client.get(reverse("comercios:inicio")).content.decode()
@@ -370,7 +371,7 @@ def test_una_promocion_invalida_por_el_portal_explica_el_motivo(client, comercio
 
 def test_una_decision_sin_valor_valido_no_hace_nada(client, duena, tiendas, moderador):
     perfil = services.crear_perfil(
-        usuario=duena, establecimiento_id=tiendas[0].pk, nombre_contacto="R", evidencia="x"
+        usuario=duena, establecimiento_id=tiendas[0].pk, nombre_contacto="R", **pdfs()
     )
     client.force_login(moderador)
     respuesta = client.post(reverse("comercios:decidir_perfil", args=[perfil.pk]), {}, follow=True)
