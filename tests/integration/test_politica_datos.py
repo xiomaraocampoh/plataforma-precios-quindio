@@ -91,18 +91,33 @@ def test_la_politica_cumple_lo_basico_de_accesibilidad(client):
 # ───────────── Enlaces ─────────────
 
 
-def test_el_registro_enlaza_la_politica_junto_a_la_autorizacion(client):
+def _formulario(html: str) -> str:
+    return html.split("<form", 1)[1].split("</form>", 1)[0]
+
+
+def test_el_registro_enlaza_la_politica_una_sola_vez_dentro_de_la_autorizacion(client):
     html = client.get(reverse("cuentas:registro")).content.decode()
-    assert f'href="{reverse("cuentas:politica_datos")}"' in html
-    assert "se abre en una pestaña nueva" in html
-    assert 'id="id_acepto_tratamiento_datos_helptext"' in html
-    assert 'aria-describedby="id_acepto_tratamiento_datos_helptext"' in html
+    form = _formulario(html)
+    enlace = f'href="{reverse("cuentas:politica_datos")}"'
+    assert form.count(enlace) == 1  # un solo enlace: sin «lee la política» aparte
+    etiqueta = re.search(r'<label for="id_acepto_tratamiento_datos">(.*?)</label>', form, re.S)
+    assert etiqueta and enlace in etiqueta.group(1)  # el enlace es parte de la autorización
+    assert (
+        "Antes de aceptar" not in form
+        and "_helptext" not in form.split("tratamiento_datos")[1][:400]
+    )
     assert _referencias_rotas(html) == []
+
+
+def test_el_enlace_avisa_que_abre_otra_pestana_sin_repetir_texto_a_la_vista(client):
+    form = _formulario(client.get(reverse("cuentas:registro")).content.decode())
+    assert 'target="_blank"' in form and 'rel="noopener"' in form
+    assert 'class="sr-only"> (se abre en una pestaña nueva)' in form  # WCAG G201, solo lectores
 
 
 def test_el_enlace_del_registro_sigue_ahi_cuando_hay_errores(client):
     html = client.post(reverse("cuentas:registro"), {"username": ""}).content.decode()
-    assert f'href="{reverse("cuentas:politica_datos")}"' in html
+    assert _formulario(html).count(f'href="{reverse("cuentas:politica_datos")}"') == 1
     assert _referencias_rotas(html) == []
 
 
@@ -136,3 +151,41 @@ def test_las_pantallas_no_repiten_el_aviso_de_la_ia(client, settings):
     assert "enviamos a Anthropic" not in inicio and "se envían a Anthropic" not in inicio
     chat = client.get(reverse("canasta:cuerpo")).content.decode()
     assert "Anthropic" not in chat and "No escribas datos personales" not in chat
+
+
+# ───────────── Contenido al día: proveedores, IA y Anthropic ─────────────
+
+
+def _politica(client) -> str:
+    return client.get(reverse("cuentas:politica_datos")).content.decode()
+
+
+def test_la_politica_nombra_a_los_proveedores_reales(client):
+    html = _politica(client)
+    for proveedor in ("Vercel", "Neon", "Brevo", "Anthropic"):
+        assert proveedor in html
+    assert "Render" not in html  # el alojamiento ya no es Render
+
+
+def test_la_politica_dice_que_anthropic_implica_transmitir_datos_fuera_de_colombia(client):
+    html = _politica(client)
+    assert "Estados Unidos" in html and "fuera de Colombia" in html
+    assert "sus propias condiciones" in html  # no se promete lo que el proveedor no garantiza aquí
+
+
+def test_la_politica_describe_bien_lo_que_se_envia_a_k_nasta_y_donde_queda(client):
+    html = _politica(client)
+    assert "mensajes recientes" in html  # se reenvía el historial reciente
+    assert "vive solo en tu sesión del navegador" not in html  # la sesión es del servidor
+    assert "se guarda en tu sesión" in html and "reinicies el chat" in html
+    assert "la foto no se guarda" in html.lower()
+
+
+def test_los_datos_que_se_tratan_incluyen_los_del_asistente(client):
+    html = _politica(client)
+    datos = html.split('id="p-datos"')[1].split('id="p-finalidades"')[0]
+    assert "K-nasta" in datos and "opcional" in datos
+
+
+def test_la_politica_tiene_la_fecha_de_hoy(client):
+    assert "Última actualización: 26 de noviembre de 2026" in _politica(client)
