@@ -116,7 +116,6 @@ p a:not(.btn), .enlace-pie a { text-decoration: underline; text-underline-offset
 .marca:hover { text-decoration: none; }
 .marca-nombre { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } /* el logo ya trae el nombre; queda para lectores de pantalla */
 .marca-logo { width: auto; height: 36px; display: block; flex: none; }
-.marca-logo-icono { display: none; }
 /* Dos versiones del logo: la azul para fondo claro y la blanca para fondo oscuro */
 .logo-oscuro { display: none; }
 @media (prefers-color-scheme: dark) {
@@ -732,10 +731,6 @@ select:disabled { cursor: not-allowed; opacity: .6; }
 }
 /* Teléfonos angostos: el nombre se oculta a la vista (el logo queda y el nombre sigue en el HTML) para que
    quepan los dos botones y la hamburguesa. */
-@media (max-width: 520px) {
-  .marca-logo-ancho, :root .marca-logo-ancho { display: none !important; }
-  .marca-logo-icono { display: block; }
-}
 @media (max-width: 439px) {
   .acciones .btn { padding: 0 .75rem; font-size: .85rem; }
   .menu-cuenta summary { padding-inline: .6rem; }
@@ -796,9 +791,9 @@ select:disabled { cursor: not-allowed; opacity: .6; }
 .panel-filtros > summary { min-height: 44px; padding: 0 1.1rem; border: 1px solid var(--borde-fuerte); border-radius: 999px; background: var(--superficie); }
 .panel-filtros[open] > summary { margin-bottom: .75rem; }
 
-/* Teléfonos angostos: con «Registrar» a la vista, «Crear cuenta» pasa al menú para que quepan todos los botones */
+/* Pantallas pequeñas: con «Registrar» a la vista, «Crear cuenta» pasa al menú ☰ para que quepa el logo completo */
 .nav-solo-angosto { display: none !important; }
-@media (max-width: 439px) {
+@media (max-width: 700px) {
   .btn-crear-cuenta { display: none; }
   .js .nav a.nav-solo-angosto { display: inline-flex !important; }
 }
@@ -1267,7 +1262,6 @@ body.asistente-abierto .asistente-lanzador { display: none; }
 .marca { padding: .15rem 0; }
 .marca-logo { height: 46px; transition: transform .25s ease; }
 .marca:hover .marca-logo { transform: scale(1.035); }
-.marca-logo-icono { height: 42px; width: 42px; }
 .acciones { gap: .5rem; }
 
 .btn-crear-cuenta { box-shadow: 0 10px 20px -12px rgb(0 100 220 / .75); }
@@ -1294,23 +1288,21 @@ body.asistente-abierto .asistente-lanzador { display: none; }
 @media (min-width: 1280px) and (max-width: 1439px) { .btn-registrar .reg-largo { display: none; } }
 
 /* Celular angosto: el botón de apariencia es un poco más compacto para que quepa con el resto de la barra */
-@media (max-width: 439px) { .acciones { gap: .3rem; } .acciones .btn { padding-inline: .75rem; font-size: .85rem; } .js .tema-alternar { display: none; } }
-.tema-menu { display: none; }
-@media (max-width: 520px) { .js .tema-alternar { display: none; } }
-@media (max-width: 520px) {
-  .js .tema-menu { display: flex; align-items: center; gap: .6rem; width: 100%; min-height: 52px; padding: 0 .25rem; border: 0; border-top: 1px solid var(--borde); background: none; color: var(--texto-suave); font: inherit; font-size: 1.05rem; font-weight: 500; text-align: left; cursor: pointer; }
-  .tema-menu .ico { width: 20px; height: 20px; flex: none; }
-  .tema-menu:focus-visible { outline: 3px solid var(--marca); outline-offset: -3px; }
-  .tema-menu .sol { display: none; }
-  :root[data-tema-efectivo="dark"] .tema-menu .sol { display: block; }
-  :root[data-tema-efectivo="dark"] .tema-menu .luna { display: none; }
-}
-@media print { .tema-menu { display: none !important; } }
+@media (max-width: 439px) { .acciones { gap: .3rem; } .acciones .btn { padding-inline: .75rem; font-size: .85rem; } }
 
 
 
-/* Logo cuadrado en pantallas medianas: el ancho no cabe junto a los botones */
-@media (max-width: 700px) { .marca-logo-ancho, :root .marca-logo-ancho { display: none !important; } .marca-logo-icono { display: block; } }
+
 
 /* Celulares de menos de 400 px: del menú de usuario solo queda el ícono (el nombre sigue para lectores de pantalla) */
 @media (max-width: 399px) { .menu-cuenta-nombre { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } }
+
+/* Celular: el mismo logo horizontal que en el computador, y todo cabe en una fila ---------------------- */
+@media (max-width: 520px) { .marca-logo { height: 32px; } .cabecera-in { gap: .35rem; } }
+@media (max-width: 439px) { .js .tema-alternar { width: 38px; height: 38px; } }
+@media (max-width: 540px) {
+  /* «Registrar» queda como un «+» (el nombre sigue para lectores de pantalla) */
+  .btn-registrar { width: 42px; padding: 0; justify-content: center; }
+  .btn-registrar .reg-texto { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .btn-registrar .ico { width: 1.3em; height: 1.3em; }
+}
