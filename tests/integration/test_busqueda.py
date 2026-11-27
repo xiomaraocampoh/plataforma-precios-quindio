@@ -88,3 +88,17 @@ def test_pagina_de_productos_devuelve_el_fragmento_con_htmx(client, catalogo):
     html = r.content.decode()
     assert "<html" not in html
     assert "Café molido" in html
+
+
+# Búsqueda por palabras: cada palabra puede estar en el nombre o en la marca (RF-04)
+@pytest.mark.parametrize(
+    "texto", ["arroz diana", "diana arroz", "ARROZ  Diana", "arroz bla diana", "blanco diana"]
+)
+def test_busca_nombre_y_marca_juntos(catalogo, texto):
+    assert list(buscar_productos(texto)) == [catalogo["arroz"]]
+    assert list(listar_productos(texto=texto)) == [catalogo["arroz"]]
+
+
+def test_todas_las_palabras_deben_coincidir(catalogo):
+    assert list(buscar_productos("arroz aguila")) == []
+    assert list(buscar_productos("cafe diana")) == []
