@@ -925,19 +925,15 @@ select:disabled { cursor: not-allowed; opacity: .6; }
 .sugerencias .foto-chip { width: 36px; height: 36px; }
 
 /* Selector de apariencia (solo con JS): botón en la cabecera y grupo Automática/Clara/Oscura en el pie */
-.tema-alternar, .tema { display: none; }
+.tema-alternar { display: none; }
 .js .tema-alternar { display: inline-grid; place-items: center; width: 44px; height: 44px; flex: none; border-radius: 50%; border: 0; background: transparent; color: var(--texto); cursor: pointer; }
 .js .tema-alternar:hover { background: color-mix(in srgb, var(--texto) 9%, transparent); }
 .tema-alternar .ico { width: 20px; height: 20px; }
 .tema-alternar .sol { display: none; }
 :root[data-tema-efectivo="dark"] .tema-alternar .sol { display: block; }
 :root[data-tema-efectivo="dark"] .tema-alternar .luna { display: none; }
-.js .tema { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
-.tema button { min-height: 36px; padding: 0 .85rem; border-radius: 999px; border: 1px solid var(--borde-fuerte); background: transparent; color: var(--texto); font: inherit; font-size: .8125rem; cursor: pointer; }
-.tema button[aria-pressed="true"] { background: var(--marca); border-color: var(--marca); color: var(--sobre-marca); font-weight: 600; }
-.tema button:focus-visible, .tema-alternar:focus-visible { outline: 3px solid var(--marca); outline-offset: 2px; }
-@media (max-width: 520px) { .js .tema-alternar { display: none; } }
-@media print { .tema, .tema-alternar { display: none !important; } }
+.tema-alternar:focus-visible { outline: 3px solid var(--marca); outline-offset: 2px; }
+@media print { .tema-alternar { display: none !important; } }
 
 /* Modo oscuro: el hero y las bandas de supermercado se oscurecen (antes el hero era siempre claro y las bandas se ocultaban) */
 @media (prefers-color-scheme: dark) {
@@ -1273,11 +1269,12 @@ body.asistente-abierto .asistente-lanzador { display: none; }
 .marca:hover .marca-logo { transform: scale(1.035); }
 .marca-logo-icono { height: 42px; width: 42px; }
 .acciones { gap: .5rem; }
-.acciones .btn { min-height: 42px; padding-inline: 1.1rem; }
+
 .btn-crear-cuenta { box-shadow: 0 10px 20px -12px rgb(0 100 220 / .75); }
 .js .tema-alternar { border: 1px solid var(--borde); background: var(--superficie); }
 .js .tema-alternar:hover { border-color: var(--borde-fuerte); }
 @media (min-width: 1024px) {
+  .acciones .btn { min-height: 42px; padding-inline: 1.1rem; }  /* en tablet y celular se conserva el relleno compacto */
   .nav { gap: .15rem; padding: .25rem; border-radius: 999px; background: color-mix(in srgb, var(--texto) 6%, transparent); flex-wrap: nowrap; }
   .nav a { min-height: 38px; padding: 0 .8rem; font-size: .9rem; transition: background-color .2s ease, color .2s ease, box-shadow .2s ease; }
   .nav a:hover { background: color-mix(in srgb, var(--texto) 8%, transparent); }
@@ -1295,3 +1292,25 @@ body.asistente-abierto .asistente-lanzador { display: none; }
   .cabecera-in .acciones { margin-left: 0; justify-self: end; flex-wrap: nowrap; }
 }
 @media (min-width: 1280px) and (max-width: 1439px) { .btn-registrar .reg-largo { display: none; } }
+
+/* Celular angosto: el botón de apariencia es un poco más compacto para que quepa con el resto de la barra */
+@media (max-width: 439px) { .acciones { gap: .3rem; } .acciones .btn { padding-inline: .75rem; font-size: .85rem; } .js .tema-alternar { display: none; } }
+.tema-menu { display: none; }
+@media (max-width: 520px) { .js .tema-alternar { display: none; } }
+@media (max-width: 520px) {
+  .js .tema-menu { display: flex; align-items: center; gap: .6rem; width: 100%; min-height: 52px; padding: 0 .25rem; border: 0; border-top: 1px solid var(--borde); background: none; color: var(--texto-suave); font: inherit; font-size: 1.05rem; font-weight: 500; text-align: left; cursor: pointer; }
+  .tema-menu .ico { width: 20px; height: 20px; flex: none; }
+  .tema-menu:focus-visible { outline: 3px solid var(--marca); outline-offset: -3px; }
+  .tema-menu .sol { display: none; }
+  :root[data-tema-efectivo="dark"] .tema-menu .sol { display: block; }
+  :root[data-tema-efectivo="dark"] .tema-menu .luna { display: none; }
+}
+@media print { .tema-menu { display: none !important; } }
+
+
+
+/* Logo cuadrado en pantallas medianas: el ancho no cabe junto a los botones */
+@media (max-width: 700px) { .marca-logo-ancho, :root .marca-logo-ancho { display: none !important; } .marca-logo-icono { display: block; } }
+
+/* Celulares de menos de 400 px: del menú de usuario solo queda el ícono (el nombre sigue para lectores de pantalla) */
+@media (max-width: 399px) { .menu-cuenta-nombre { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } }

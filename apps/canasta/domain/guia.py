@@ -481,13 +481,15 @@ TEMAS: tuple[Tema, ...] = (
         "¿Cómo cambio entre modo claro y oscuro?",
         [
             un_paso(
-                "Toca el ícono de sol o luna, arriba a la derecha.",
+                "Toca el ícono de sol o luna, arriba a la derecha. En celulares angostos "
+                "está dentro del menú ☰, como «Modo oscuro».",
                 simbolo("☀ ☾", "Sol o luna"),
             ),
             un_paso(
-                "Abajo en cada página, en «Apariencia», eliges Automática (sigue a tu "
-                "dispositivo), Clara u Oscura. La app recuerda tu elección.",
-                opciones("Apariencia", "Automática", "Clara", "Oscura"),
+                "Cada toque alterna entre claro y oscuro al instante, y la app recuerda tu "
+                "elección en este dispositivo.",
+                chip("Modo claro"),
+                chip("Modo oscuro"),
             ),
         ],
         [],

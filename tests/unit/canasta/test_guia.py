@@ -111,3 +111,9 @@ def test_las_imagenes_son_de_un_tipo_conocido_y_tienen_lo_que_necesitan():
 def test_los_pasos_de_texto_siguen_disponibles_para_la_ia():
     t = tema_por_id("registrar")
     assert t.textos[0].startswith("Necesitas una cuenta") and len(t.textos) == len(t.pasos)
+
+
+def test_la_guia_de_apariencia_solo_habla_del_boton_de_la_barra():
+    texto = " ".join(tema_por_id("apariencia").textos).lower()
+    assert "sol" in texto and "luna" in texto and "menú" in texto  # en celular está dentro del menú
+    assert "abajo" not in texto and "automática" not in texto  # el grupo del pie ya no existe
