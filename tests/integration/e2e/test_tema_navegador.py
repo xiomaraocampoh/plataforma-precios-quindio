@@ -1,4 +1,4 @@
-"""Un solo control de apariencia: en la barra (≥ 440 px) o dentro del menú ☰ (celulares angostos)."""
+"""Un solo control de apariencia: en la barra (≥ 521 px) o en el menú ☰ (celulares angostos)."""
 
 import pytest
 from playwright.sync_api import expect
@@ -7,10 +7,11 @@ pytestmark = pytest.mark.django_db(transaction=True)
 
 
 def _sin_desborde(page):
+    page.wait_for_load_state("networkidle")  # con la hoja de estilos ya asentada
     return not page.evaluate("document.documentElement.scrollWidth > innerWidth")
 
 
-@pytest.mark.parametrize("ancho", [440, 768, 1280])
+@pytest.mark.parametrize("ancho", [521, 768, 1280])
 def test_en_pantallas_normales_el_boton_esta_en_la_barra(page, live_server, ancho):
     page.set_viewport_size({"width": ancho, "height": 800})
     page.goto(live_server.url + "/productos/")
@@ -19,7 +20,7 @@ def test_en_pantallas_normales_el_boton_esta_en_la_barra(page, live_server, anch
     assert _sin_desborde(page)
 
 
-@pytest.mark.parametrize("ancho", [360, 390])
+@pytest.mark.parametrize("ancho", [360, 390, 440, 520])
 @pytest.mark.parametrize("con_sesion", [False, True])
 def test_en_celulares_angostos_va_dentro_del_menu_y_nada_desborda(
     page, pagina_con_sesion, live_server, ancho, con_sesion
@@ -57,3 +58,14 @@ def test_cambia_el_tema_desde_la_barra_y_se_recuerda(page, live_server):
     assert page.evaluate("document.documentElement.dataset.theme") == "dark"
     page.click(".tema-alternar")
     assert page.evaluate("document.documentElement.dataset.theme") == "light"
+
+
+ANCHOS = [340, 360, 390, 440, 480, 520, 540, 600, 680, 720, 800, 900, 1023, 1024, 1100, 1280]
+
+
+def test_la_barra_no_desborda_en_ningun_ancho_ni_con_sesion(page, pagina_con_sesion, live_server):
+    for pagina in (page, pagina_con_sesion):
+        for ancho in ANCHOS:
+            pagina.set_viewport_size({"width": ancho, "height": 700})
+            pagina.goto(live_server.url + "/productos/")
+            assert _sin_desborde(pagina), f"la barra desborda a {ancho} px"
