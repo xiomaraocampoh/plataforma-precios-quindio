@@ -16,6 +16,7 @@
       <li><strong>De tus aportes:</strong> los precios que reportas, con el establecimiento elegido y la fecha. Guardamos quién los envió solo para auditoría y moderación; nunca se publica. No almacenamos tu geolocalización: el reporte se asocia al establecimiento, no a ti.</li>
       <li><strong>De seguridad:</strong> una huella del dispositivo (calculada con el navegador y una IP truncada, nunca la IP completa), códigos de verificación y de respaldo (solo se guardan cifrados) y, si activas la verificación en dos pasos, el secreto de tu app autenticadora.</li>
       <li><strong>De tus sugerencias</strong> de establecimientos o productos: quién las envió, solo para moderación.</li>
+      <li><strong>Del perfil de comercio (opcional):</strong> el nombre y el teléfono de contacto, y el certificado de Cámara de Comercio y el RUT en PDF. Solo los ve moderación para verificar que representas al comercio. Los documentos se borran al decidir tu solicitud; como constancia quedan el tipo, el tamaño, una huella del archivo (SHA-256) y las fechas. En la comparación solo aparece el nombre del establecimiento.</li>
       <li><strong>Del asistente K-nasta (opcional):</strong> los mensajes que le escribes, tu lista del mercado y, si la adjuntas, la foto de tu lista. La conversación se guarda en tu sesión hasta que reinicies el chat o la sesión caduque; la foto no se guarda.</li>
       <li><strong>Cookies técnicas:</strong> la de sesión, la de protección de formularios y, si eliges «confiar en este dispositivo», una cookie firmada por 30 días. No usamos cookies de publicidad ni de seguimiento.</li>
     </ul>
@@ -49,7 +50,7 @@
     <p>{% if politica.CORREO_CONTACTO %}Escribe a <a href="mailto:{{ politica.CORREO_CONTACTO }}">{{ politica.CORREO_CONTACTO }}</a>{% else %}Escríbenos desde tu cuenta, en <a href="{% url 'cuentas:mis_datos' %}">Mis datos</a>,{% endif %} para hacer una consulta o un reclamo. Respondemos las consultas en un máximo de 10 días hábiles y los reclamos en un máximo de 15 días hábiles; si necesitamos más tiempo, te avisamos el motivo y la nueva fecha, dentro de los plazos de la ley.</p>
 
     <h2 id="p-conservacion">Cuánto tiempo guardamos tus datos</h2>
-    <p>Mientras tu cuenta esté activa. Al suprimirla, tus datos personales se eliminan y tus aportes quedan anonimizados.</p>
+    <p>Mientras tu cuenta esté activa. Al suprimirla, tus datos personales se eliminan y tus aportes quedan anonimizados. Los documentos del perfil de comercio se borran antes: cuando moderación decide la solicitud.</p>
 
     <h2 id="p-cambios">Cambios</h2>
     <p>Si esta política cambia, publicaremos la nueva versión en esta página y, cuando el cambio sea importante, te lo avisaremos por correo.</p>
