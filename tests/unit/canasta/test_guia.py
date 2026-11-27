@@ -118,3 +118,9 @@ def test_la_guia_de_apariencia_solo_habla_del_boton_de_la_barra():
     assert "sol" in texto and "luna" in texto
     assert "menú" not in texto  # en todos los tamaños está en la barra
     assert "abajo" not in texto and "automática" not in texto  # el grupo del pie ya no existe
+
+
+def test_la_guia_dice_donde_esta_el_menu_de_la_cuenta_en_celular_y_en_el_computador():
+    for tema in ("mis_aportes", "comercio"):
+        texto = " ".join(tema_por_id(tema).textos)
+        assert "menú ☰" in texto and "arriba a la derecha" in texto, tema

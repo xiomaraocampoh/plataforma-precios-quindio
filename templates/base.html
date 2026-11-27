@@ -45,6 +45,15 @@
         <a href="{% url 'establecimientos:directorio' %}"
            {% if ruta.app_name == 'establecimientos' %}aria-current="page"{% endif %}>Establecimientos</a>
         {% if not user.is_authenticated %}<a class="nav-solo-angosto" href="{% url 'cuentas:registro' %}">Crear cuenta</a>{% endif %}
+        {% if user.is_authenticated %}
+        {# Con menú ☰ (hasta 1023 px) la cuenta vive aquí; en escritorio, en el desplegable de la barra #}
+        <div class="nav-cuenta" role="group" aria-label="Mi cuenta">
+          <p class="nav-cuenta-nombre"><svg class="ico" aria-hidden="true"><use href="#i-user"/></svg>{{ user.username }}</p>
+          <ul>
+            {% include "partials/_enlaces_cuenta.html" %}
+          </ul>
+        </div>
+        {% endif %}
       </nav>
       {% endwith %}
       <div class="acciones">
@@ -57,13 +66,7 @@
           <details class="menu-cuenta">
             <summary><svg class="ico" aria-hidden="true"><use href="#i-user"/></svg><span class="menu-cuenta-nombre">{{ user.username }}</span><span class="sr-only">: menú de tu cuenta</span></summary>
             <ul>
-              <li><a href="{% url 'precios:mis_aportes' %}">Mis aportes</a></li>
-              <li><a href="{% url 'cuentas:mis_datos' %}">Mis datos</a></li>
-              <li><a href="{% url 'cuentas:seguridad' %}">Seguridad</a></li>
-              {% if panel_disponible %}<li><a href="{% url 'panel:inicio' %}">Panel de administración</a></li>{% endif %}
-              {% if user.is_staff or user.rol == "moderador" or user.rol == "administrador" %}<li><a href="{% url 'moderacion:bandeja' %}">Moderación</a></li>
-              <li><a href="{% url 'comercios:verificacion' %}">Verificar comercios</a></li>{% else %}<li><a href="{% url 'comercios:inicio' %}">{% if user.rol == "comercio" %}Mi comercio{% else %}¿Tienes un comercio?{% endif %}</a></li>{% endif %}
-              <li><form method="post" action="{% url 'cuentas:salir' %}">{% csrf_token %}<button type="submit">Salir</button></form></li>
+              {% include "partials/_enlaces_cuenta.html" %}
             </ul>
           </details>
         {% else %}

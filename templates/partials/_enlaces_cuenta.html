@@ -1,0 +1,8 @@
+{# Los enlaces de la cuenta: los usan el desplegable de escritorio y el menú ☰ (una sola lista) #}
+<li><a href="{% url 'precios:mis_aportes' %}">Mis aportes</a></li>
+<li><a href="{% url 'cuentas:mis_datos' %}">Mis datos</a></li>
+<li><a href="{% url 'cuentas:seguridad' %}">Seguridad</a></li>
+{% if panel_disponible %}<li><a href="{% url 'panel:inicio' %}">Panel de administración</a></li>{% endif %}
+{% if user.is_staff or user.rol == "moderador" or user.rol == "administrador" %}<li><a href="{% url 'moderacion:bandeja' %}">Moderación</a></li>
+<li><a href="{% url 'comercios:verificacion' %}">Verificar comercios</a></li>{% else %}<li><a href="{% url 'comercios:inicio' %}">{% if user.rol == "comercio" %}Mi comercio{% else %}¿Tienes un comercio?{% endif %}</a></li>{% endif %}
+<li><form method="post" action="{% url 'cuentas:salir' %}">{% csrf_token %}<button type="submit">Salir</button></form></li>

@@ -1294,8 +1294,6 @@ body.asistente-abierto .asistente-lanzador { display: none; }
 
 
 
-/* Celulares de menos de 400 px: del menú de usuario solo queda el ícono (el nombre sigue para lectores de pantalla) */
-@media (max-width: 399px) { .menu-cuenta-nombre { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } }
 
 /* Celular: el mismo logo horizontal que en el computador, y todo cabe en una fila ---------------------- */
 @media (max-width: 520px) { .marca-logo { height: 32px; } .cabecera-in { gap: .35rem; } }
@@ -1305,4 +1303,17 @@ body.asistente-abierto .asistente-lanzador { display: none; }
   .btn-registrar { width: 42px; padding: 0; justify-content: center; }
   .btn-registrar .reg-texto { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .btn-registrar .ico { width: 1.3em; height: 1.3em; }
+}
+
+/* Cuenta dentro del menú ☰ (donde hay hamburguesa); en escritorio queda el desplegable de la barra --------- */
+.nav-cuenta { display: none; }
+@media (max-width: 1023px) {
+  .js .menu-cuenta { display: none; }
+  .js .nav-cuenta { display: block; margin-top: .35rem; padding-top: .35rem; border-top: 2px solid var(--borde); }
+  .nav-cuenta-nombre { display: flex; align-items: center; gap: .5rem; margin: 0; min-height: 44px; font-weight: 650; font-size: 1rem; color: var(--texto); }
+  .nav-cuenta-nombre .ico { width: 20px; height: 20px; color: var(--texto-suave); }
+  .nav-cuenta ul { list-style: none; margin: 0; padding: 0; }
+  .js .nav .nav-cuenta li a, .nav-cuenta li button { display: flex; align-items: center; width: 100%; min-height: 52px; padding: 0 .25rem; border: 0; border-bottom: 1px solid var(--borde); border-radius: 0; background: none; color: var(--texto-suave); font: inherit; font-size: 1.05rem; font-weight: 500; text-align: left; cursor: pointer; }
+  .nav-cuenta li:last-child button { border-bottom: 0; }
+  .nav-cuenta li button:focus-visible { outline: 3px solid var(--marca); outline-offset: -3px; }
 }
