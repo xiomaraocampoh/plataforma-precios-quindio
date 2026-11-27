@@ -8,6 +8,7 @@ confirmarse la transacción (ADR-0002). Ninguna escribe en tablas del núcleo, s
 usuario, que se asigna con `cuentas.services.asegurar_comercio`.
 """
 
+import hashlib
 import secrets
 from datetime import date, datetime
 from decimal import Decimal
@@ -27,8 +28,15 @@ from core.cache import invalidar_comparacion
 from core.limites import permitir
 
 from . import selectors
+from .domain.documentos import CABECERA_PDF, DocumentoInvalidoError, validar_pdf
 from .domain.promociones import MotivoPromocion, PromocionInvalidaError, exigir_datos_del_motivo
-from .models import PerfilComercio, PrecioOficial, Promocion, SolicitudCorreccion
+from .models import (
+    DocumentoComercio,
+    PerfilComercio,
+    PrecioOficial,
+    Promocion,
+    SolicitudCorreccion,
+)
 from .permisos import es_moderador
 
 ROLES_QUE_PUEDEN_SER_COMERCIO = frozenset({"reportante", "comercio"})
@@ -79,10 +87,47 @@ def _codigo() -> str:
 # ---------- RF-C01 y RF-C02 ----------
 
 
+def _leer_pdf(archivo, etiqueta: str) -> bytes:
+    """Valida con el dominio (ADR-0034) y devuelve los bytes. `archivo` es un UploadedFile."""
+    if archivo is None:
+        raise ValidationError(f"Adjunta el {etiqueta} en PDF.")
+    tamano = getattr(archivo, "size", 0) or 0
+    try:
+        archivo.seek(0)
+        validar_pdf(getattr(archivo, "name", "") or "", tamano, archivo.read(len(CABECERA_PDF)))
+        archivo.seek(0)
+        contenido = archivo.read()
+        # Por si el tamaño declarado no coincide con lo leído
+        validar_pdf(archivo.name, len(contenido), contenido[: len(CABECERA_PDF)])
+    except DocumentoInvalidoError as exc:
+        raise ValidationError(f"{etiqueta[:1].upper()}{etiqueta[1:]}: {exc}") from exc
+    return contenido
+
+
+def _guardar_documentos(perfil: PerfilComercio, documentos: dict[str, bytes]) -> None:
+    DocumentoComercio.objects.bulk_create(
+        DocumentoComercio(
+            perfil=perfil,
+            tipo=tipo,
+            contenido=contenido,
+            tamano=len(contenido),
+            sha256=hashlib.sha256(contenido).hexdigest(),
+        )
+        for tipo, contenido in documentos.items()
+    )
+
+
 @transaction.atomic
 def crear_perfil(
-    *, usuario, establecimiento_id: int, nombre_contacto: str, evidencia: str, telefono: str = ""
+    *,
+    usuario,
+    establecimiento_id: int,
+    nombre_contacto: str,
+    camara_comercio,
+    rut,
+    telefono: str = "",
 ) -> PerfilComercio:
+    """RF-C01: perfil pendiente con sus dos PDF (ADR-0034). Si un archivo falla, no se crea nada."""
     if getattr(usuario, "rol", "") not in ROLES_QUE_PUEDEN_SER_COMERCIO or usuario.is_staff:
         raise ValidationError("Una cuenta de moderación o administración no puede ser un comercio.")
     if selectors.perfil_de(usuario) is not None:
@@ -94,26 +139,41 @@ def crear_perfil(
         raise ValidationError("Elige un establecimiento del directorio.")
     if selectors.establecimiento_tiene_perfil(local.pk):
         raise ValidationError("Ese establecimiento ya tiene un perfil de comercio.")
+    documentos = {
+        DocumentoComercio.Tipo.CAMARA_COMERCIO: _leer_pdf(
+            camara_comercio, "certificado de Cámara de Comercio"
+        ),
+        DocumentoComercio.Tipo.RUT: _leer_pdf(rut, "RUT"),
+    }
     _limitar(usuario)
     try:
         with transaction.atomic():
-            return PerfilComercio.objects.create(
+            perfil = PerfilComercio.objects.create(
                 usuario=usuario,
                 establecimiento=local,
                 nombre_contacto=nombre_contacto.strip(),
                 telefono=telefono.strip(),
-                evidencia=evidencia.strip(),
                 codigo_verificacion=_codigo(),
             )
+            _guardar_documentos(perfil, documentos)
+            return perfil
     except IntegrityError as exc:  # dos solicitudes a la vez: decide la restricción de la BD
         raise ValidationError("Ese establecimiento ya tiene un perfil de comercio.") from exc
+
+
+def _borrar_documentos(perfil: PerfilComercio, ahora) -> None:
+    """ADR-0034 (minimización): se borran los bytes; quedan tipo, tamaño, SHA-256 y fechas."""
+    perfil.documentos.filter(borrado_en__isnull=True).update(contenido=None, borrado_en=ahora)
 
 
 @transaction.atomic
 def verificar_perfil(
     *, moderador, perfil_id: int, aprobar: bool, motivo: str = ""
 ) -> PerfilComercio:
-    """ADR-015: un moderador confirma (o no) que la persona representa al comercio."""
+    """ADR-015: un moderador confirma (o no) que la persona representa al comercio.
+
+    En la misma transacción se borran los bytes de sus documentos (ADR-0034).
+    """
     _exigir_moderador(moderador)
     perfil = (
         PerfilComercio.objects.select_for_update()
@@ -133,6 +193,7 @@ def verificar_perfil(
     perfil.verificado_en = timezone.now()
     perfil.motivo_decision = motivo.strip()[:300]
     perfil.save(update_fields=["estado", "verificado_por", "verificado_en", "motivo_decision"])
+    _borrar_documentos(perfil, perfil.verificado_en)
     encolar(
         tipo=Tipo.PERFIL_VERIFICADO,
         clave_idempotencia=f"perfil_verificado:{perfil.pk}",

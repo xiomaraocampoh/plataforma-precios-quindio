@@ -12,6 +12,7 @@ Fuente de métricas y umbrales: documento *Modelo Proyecto nuclear* (pasos 4 y 5
 | M-13 | Autenticidad | Escritura exige autenticación | `test_registrar_exige_autenticacion` |
 | M-14 | Responsabilidad | Autor y fecha en cada reporte | `test_reportante_registra_precio` |
 | M-15 | Confidencialidad | Respuesta pública sin autor | `test_respuesta_publica_no_expone_al_reportante` |
+| M-15 | Confidencialidad (RF-C02, ADR-0034) | Los PDF de evidencia del comercio no aparecen en respuestas públicas; solo moderación los descarga y los bytes se borran al decidir | `tests/integration/comercios/test_documentos_pdf.py` (`# M-13`, `# M-15`); reglas del PDF en `tests/unit/comercios/test_documentos.py` |
 | M-16 | Resistencia | Throttling `reportes`, ZAP, SonarQube. **SonarQube ejecutado el 2026-11-16** (ZAP sigue pendiente) | `config/settings/base.py`, CI; evidencia en `docs/calidad/evidencias/2026-11-16/sonarqube/` |
 | M-16 | Resistencia (RN-10) | Límite de registros por hora en el servicio (HTMX y API) | `tests/integration/test_limite_registros.py` |
 | M-17 | Modificabilidad | Línea base de esfuerzo del módulo comercial: 79 h (91 con 15 % de contingencia), por componente. *Planificado:* se mide en el Corte 3 con horas reales | `docs/arquitectura/analisis-impacto-modulo-comercial.md` (secciones 4 y 8) |

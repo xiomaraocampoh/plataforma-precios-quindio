@@ -19,6 +19,7 @@ from apps.comercios.models import PrecioOficial
 from apps.comparacion.domain.extensiones import PUNTO_DATOS_COMERCIALES
 from apps.comparacion.selectors import comparar_filas
 from core import extensiones
+from tests.integration.comercios.pdf import pdfs
 
 pytestmark = [pytest.mark.integration, pytest.mark.django_db]
 
@@ -116,7 +117,7 @@ def test_un_perfil_rechazado_o_pendiente_nunca_publica_en_la_comparacion(
     duena, tiendas, arroz, moderador
 ):
     perfil = services.crear_perfil(
-        usuario=duena, establecimiento_id=tiendas[0].pk, nombre_contacto="R", evidencia="x"
+        usuario=duena, establecimiento_id=tiendas[0].pk, nombre_contacto="R", **pdfs()
     )
     PrecioOficial.objects.create(  # aun si existiera, por error, un precio de un no verificado
         perfil=perfil, presentacion=arroz[2], precio=1, confirmado_en=timezone.now()
@@ -215,8 +216,8 @@ def test_la_api_publica_no_expone_al_comercio_ni_a_quien_reporta(
         reportante.username,
         moderador.username,
         "3001234567",  # teléfono del perfil
-        "NIT 900123456-7",  # evidencia
         comercio.codigo_verificacion,
+        *(d.sha256 for d in comercio.documentos.all()),  # constancia de la evidencia (ADR-0034)
     ):
         assert privado not in texto
 

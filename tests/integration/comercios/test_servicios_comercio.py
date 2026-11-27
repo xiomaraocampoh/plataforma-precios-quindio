@@ -15,6 +15,7 @@ from apps.comercios import services
 from apps.comercios.models import PerfilComercio, PrecioOficial, Promocion, SolicitudCorreccion
 from apps.cuentas.services import asegurar_comercio
 from apps.notificaciones.models import CorreoPendiente
+from tests.integration.comercios.pdf import pdfs
 
 pytestmark = [pytest.mark.integration, pytest.mark.django_db]
 
@@ -43,7 +44,7 @@ def test_crear_perfil_queda_pendiente_con_codigo(duena, tiendas):
         usuario=duena,
         establecimiento_id=tiendas[0].pk,
         nombre_contacto="Rosa",
-        evidencia="NIT 1",
+        **pdfs(),
     )
     assert perfil.estado == PerfilComercio.Estado.PENDIENTE
     assert len(perfil.codigo_verificacion) == services.LARGO_CODIGO
@@ -52,14 +53,14 @@ def test_crear_perfil_queda_pendiente_con_codigo(duena, tiendas):
 
 def test_un_establecimiento_tiene_un_solo_perfil_activo(duena, crear_usuario, tiendas):
     services.crear_perfil(
-        usuario=duena, establecimiento_id=tiendas[0].pk, nombre_contacto="R", evidencia="NIT"
+        usuario=duena, establecimiento_id=tiendas[0].pk, nombre_contacto="R", **pdfs()
     )
     with pytest.raises(ValidationError):
         services.crear_perfil(
             usuario=crear_usuario("otra"),
             establecimiento_id=tiendas[0].pk,
             nombre_contacto="O",
-            evidencia="NIT",
+            **pdfs(),
         )
 
 
@@ -68,7 +69,6 @@ def test_la_bd_tambien_impide_dos_perfiles_activos(duena, crear_usuario, tiendas
         usuario=duena,
         establecimiento=tiendas[0],
         nombre_contacto="R",
-        evidencia="x",
         codigo_verificacion="A",
     )
     with pytest.raises(IntegrityError), transaction.atomic():
@@ -76,7 +76,6 @@ def test_la_bd_tambien_impide_dos_perfiles_activos(duena, crear_usuario, tiendas
             usuario=crear_usuario("otra"),
             establecimiento=tiendas[0],
             nombre_contacto="O",
-            evidencia="x",
             codigo_verificacion="B",
         )
 
@@ -84,7 +83,7 @@ def test_la_bd_tambien_impide_dos_perfiles_activos(duena, crear_usuario, tiendas
 def test_moderacion_no_puede_crear_un_perfil(moderador, tiendas):
     with pytest.raises(ValidationError):
         services.crear_perfil(
-            usuario=moderador, establecimiento_id=tiendas[0].pk, nombre_contacto="M", evidencia="x"
+            usuario=moderador, establecimiento_id=tiendas[0].pk, nombre_contacto="M", **pdfs()
         )
 
 
@@ -94,7 +93,7 @@ def test_solo_establecimientos_aprobados(duena, tiendas):
     local.save()
     with pytest.raises(ValidationError):
         services.crear_perfil(
-            usuario=duena, establecimiento_id=local.pk, nombre_contacto="R", evidencia="x"
+            usuario=duena, establecimiento_id=local.pk, nombre_contacto="R", **pdfs()
         )
 
 
@@ -103,7 +102,7 @@ def test_solo_establecimientos_aprobados(duena, tiendas):
 
 def test_verificar_asigna_el_rol_guarda_quien_y_cuando_y_avisa(duena, tiendas, moderador):
     perfil = services.crear_perfil(
-        usuario=duena, establecimiento_id=tiendas[0].pk, nombre_contacto="R", evidencia="NIT"
+        usuario=duena, establecimiento_id=tiendas[0].pk, nombre_contacto="R", **pdfs()
     )
     services.verificar_perfil(moderador=moderador, perfil_id=perfil.pk, aprobar=True)
     perfil.refresh_from_db()
@@ -117,7 +116,7 @@ def test_verificar_asigna_el_rol_guarda_quien_y_cuando_y_avisa(duena, tiendas, m
 
 def test_no_verificar_exige_motivo_y_no_cambia_el_rol(duena, tiendas, moderador):
     perfil = services.crear_perfil(
-        usuario=duena, establecimiento_id=tiendas[0].pk, nombre_contacto="R", evidencia="NIT"
+        usuario=duena, establecimiento_id=tiendas[0].pk, nombre_contacto="R", **pdfs()
     )
     with pytest.raises(ValidationError):
         services.verificar_perfil(moderador=moderador, perfil_id=perfil.pk, aprobar=False)
@@ -131,17 +130,17 @@ def test_no_verificar_exige_motivo_y_no_cambia_el_rol(duena, tiendas, moderador)
 
 def test_tras_un_rechazo_se_puede_pedir_otra_vez(duena, tiendas, moderador):
     perfil = services.crear_perfil(
-        usuario=duena, establecimiento_id=tiendas[0].pk, nombre_contacto="R", evidencia="NIT"
+        usuario=duena, establecimiento_id=tiendas[0].pk, nombre_contacto="R", **pdfs()
     )
     services.verificar_perfil(moderador=moderador, perfil_id=perfil.pk, aprobar=False, motivo="x")
     services.crear_perfil(
-        usuario=duena, establecimiento_id=tiendas[0].pk, nombre_contacto="R", evidencia="RUT"
+        usuario=duena, establecimiento_id=tiendas[0].pk, nombre_contacto="R", **pdfs()
     )
 
 
 def test_quien_no_modera_no_verifica(duena, tiendas, crear_usuario):
     perfil = services.crear_perfil(
-        usuario=duena, establecimiento_id=tiendas[0].pk, nombre_contacto="R", evidencia="NIT"
+        usuario=duena, establecimiento_id=tiendas[0].pk, nombre_contacto="R", **pdfs()
     )
     with pytest.raises(PermissionDenied):
         services.verificar_perfil(moderador=crear_usuario("x"), perfil_id=perfil.pk, aprobar=True)
@@ -166,7 +165,7 @@ def test_asegurar_comercio_es_idempotente(comercio, duena):
 
 def test_comercio_no_verificado_no_publica(duena, tiendas, arroz):
     services.crear_perfil(
-        usuario=duena, establecimiento_id=tiendas[0].pk, nombre_contacto="R", evidencia="NIT"
+        usuario=duena, establecimiento_id=tiendas[0].pk, nombre_contacto="R", **pdfs()
     )
     with pytest.raises(services.ComercioNoVerificadoError):
         services.publicar_precio_oficial(

@@ -10,7 +10,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 
-from django.db.models import Q
+from django.db.models import Prefetch, Q
 from django.utils import timezone
 
 from apps.comparacion.domain.extensiones import (
@@ -25,7 +25,13 @@ from apps.precios.selectors import politica_vigencia
 
 from .domain.promociones import Promocion as PromocionDominio
 from .domain.promociones import Vigencia, estrategia_de, precio_efectivo_por_unidad
-from .models import PerfilComercio, PrecioOficial, Promocion, SolicitudCorreccion
+from .models import (
+    DocumentoComercio,
+    PerfilComercio,
+    PrecioOficial,
+    Promocion,
+    SolicitudCorreccion,
+)
 
 ACTIVOS = ~Q(estado=PerfilComercio.Estado.RECHAZADO)
 
@@ -175,11 +181,19 @@ def reportes_de_su_tienda(perfil: PerfilComercio, limite: int = 30):
 
 
 def perfiles_pendientes(limite: int = 50):
+    """Bandeja de moderación. Los documentos llegan sin sus bytes (ADR-0034)."""
+    documentos = DocumentoComercio.objects.defer("contenido").order_by("tipo")
     return list(
         PerfilComercio.objects.filter(estado=PerfilComercio.Estado.PENDIENTE)
         .select_related("establecimiento", "usuario")
+        .prefetch_related(Prefetch("documentos", queryset=documentos))
         .order_by("creado_en")[:limite]
     )
+
+
+def documento_de_perfil(perfil_id: int, tipo: str) -> DocumentoComercio | None:
+    """Un documento con sus bytes, solo para la vista de moderación (ADR-0034)."""
+    return DocumentoComercio.objects.filter(perfil_id=perfil_id, tipo=tipo).first()
 
 
 def correcciones_pendientes(limite: int = 50):

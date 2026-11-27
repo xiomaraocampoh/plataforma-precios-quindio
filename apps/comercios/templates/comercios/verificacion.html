@@ -8,7 +8,7 @@
   </div>
   <a class="btn btn-sec" href="{% url 'moderacion:bandeja' %}">Bandeja de moderación</a>
 </div>
-<p class="suave">Verifica que quien pide el perfil es el dueño o encargado (ADR-015): NIT o RUT, o una foto de la fachada con el código. Cada decisión guarda quién la tomó y cuándo.</p>
+<p class="suave">Verifica que quien pide el perfil es el dueño o encargado (ADR-015): revisa que el certificado de Cámara de Comercio y el RUT correspondan al establecimiento y a la persona de contacto. Al decidir, los documentos se borran (ADR-0034). Cada decisión guarda quién la tomó y cuándo.</p>
 
 <section class="seccion" style="margin-top:1.5rem" aria-labelledby="t-perfiles">
   <h2 id="t-perfiles">Perfiles por verificar</h2>
@@ -16,7 +16,10 @@
     {% for p in perfiles %}<li class="tile" style="margin-top:.75rem">
       <p><strong>{{ p.establecimiento.nombre }}</strong> · {{ p.establecimiento.direccion }}{% if p.establecimiento.barrio %}, {{ p.establecimiento.barrio }}{% endif %}</p>
       <p class="suave">Cuenta: {{ p.usuario.username }} · Contacto: {{ p.nombre_contacto }}{% if p.telefono %} · {{ p.telefono }}{% endif %} · Código: <span class="num">{{ p.codigo_verificacion }}</span></p>
-      <p>Evidencia: «{{ p.evidencia }}»</p>
+      <ul class="docs-evidencia" aria-label="Documentos de {{ p.establecimiento.nombre }}">
+        {% for d in p.documentos.all %}<li>{% if d.disponible %}<a class="btn btn-sec" href="{% url 'comercios:documento_perfil' p.pk d.tipo %}" target="_blank" rel="noopener">{% if d.tipo == "rut" %}Ver RUT{% else %}Ver Cámara de Comercio{% endif %}</a> <span class="suave">PDF · {{ d.tamano|filesizeformat }}</span>{% else %}<span class="suave">{{ d.get_tipo_display }}: ya se borró</span>{% endif %}</li>
+        {% empty %}<li class="suave">Sin documentos adjuntos (solicitud anterior al cambio a PDF).</li>{% endfor %}
+      </ul>
       {% url 'comercios:decidir_perfil' p.pk as url_perfil %}
       {% include "comercios/partials/_acciones.html" with url=url_perfil prefijo="perfil" objeto=p.pk si="Verificar" no="No verificar" %}
     </li>{% endfor %}

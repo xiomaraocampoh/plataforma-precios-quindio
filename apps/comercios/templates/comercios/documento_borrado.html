@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block titulo %}Documento no disponible · AhorraPues{% endblock %}
+{% block contenido %}
+<section class="seccion tile" aria-labelledby="t-borrado" style="margin-top:1rem">
+  <p class="etiqueta">Moderación</p>
+  <h1 id="t-borrado">Este documento ya no está disponible</h1>
+  <p>El documento «{{ documento.get_tipo_display }}» se borró el {{ documento.borrado_en|date:"j \d\e F \d\e Y" }}, cuando se decidió la solicitud. Así lo exige la minimización de datos (Ley 1581 de 2012).</p>
+  <p class="suave">Como constancia quedan el tipo, el tamaño ({{ documento.tamano|filesizeformat }}) y la fecha de subida.</p>
+  <a class="btn btn-sec" href="{% url 'comercios:verificacion' %}">Volver a Comercios</a>
+</section>
+{% endblock %}

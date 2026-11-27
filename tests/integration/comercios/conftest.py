@@ -8,6 +8,7 @@ from django.utils import timezone
 
 from apps.comercios import services
 from apps.precios.models import ReportePrecio
+from tests.integration.comercios.pdf import pdfs
 
 
 @pytest.fixture
@@ -51,7 +52,7 @@ def verificar(moderador):
             establecimiento_id=local.pk,
             nombre_contacto="Rosa",
             telefono="3001234567",
-            evidencia="NIT 900123456-7",
+            **pdfs(),
         )
         services.verificar_perfil(moderador=moderador, perfil_id=perfil.pk, aprobar=True)
         usuario.refresh_from_db()

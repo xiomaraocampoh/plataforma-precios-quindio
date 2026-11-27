@@ -7,12 +7,14 @@ no escriben con el ORM: llaman a `services` y leen con `selectors`.
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, ValidationError
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from . import selectors, services
 from .forms import CorreccionForm, DecisionForm, PerfilForm, PrecioOficialForm, PromocionForm
-from .permisos import solo_moderadores
+from .models import DocumentoComercio
+from .permisos import es_moderador, solo_moderadores
 
 ERRORES_DE_SERVICIO = (ValidationError, PermissionDenied, ObjectDoesNotExist, ValueError)
 
@@ -62,7 +64,7 @@ def inicio(request):
 @login_required
 @require_POST
 def crear_perfil(request):
-    form = PerfilForm(request.POST)
+    form = PerfilForm(request.POST, request.FILES)
     if not form.is_valid():
         return _responder(
             request, "perfil", "Revisa los datos del perfil.", False, form_perfil=form
@@ -74,7 +76,8 @@ def crear_perfil(request):
             establecimiento_id=d["establecimiento"].pk,
             nombre_contacto=d["nombre_contacto"],
             telefono=d["telefono"],
-            evidencia=d["evidencia"],
+            camara_comercio=d["camara_comercio"],
+            rut=d["rut"],
         )
     except ERRORES_DE_SERVICIO as exc:
         return _responder(request, "perfil", _mensaje_de(exc), False, form_perfil=form)
@@ -223,3 +226,29 @@ def decidir_correccion(request, solicitud_id: int):
         ),
     )
     return _respuesta_decision(request, mensaje, ok)
+
+
+NOMBRE_DESCARGA = {
+    DocumentoComercio.Tipo.CAMARA_COMERCIO: "camara-comercio",
+    DocumentoComercio.Tipo.RUT: "rut",
+}
+
+
+@login_required
+@require_GET
+def documento_perfil(request, perfil_id: int, tipo: str):
+    """ADR-0034: el PDF de evidencia, solo para moderación. Para los demás no existe (404)."""
+    if not es_moderador(request.user) or tipo not in NOMBRE_DESCARGA:
+        raise Http404
+    documento = selectors.documento_de_perfil(perfil_id, tipo)
+    if documento is None:
+        raise Http404
+    if documento.contenido is None:
+        contexto = {"documento": documento}
+        return render(request, "comercios/documento_borrado.html", contexto, status=410)
+    respuesta = HttpResponse(bytes(documento.contenido), content_type="application/pdf")
+    nombre = f"{NOMBRE_DESCARGA[tipo]}-{perfil_id}.pdf"
+    respuesta["Content-Disposition"] = f'inline; filename="{nombre}"'
+    respuesta["X-Content-Type-Options"] = "nosniff"
+    respuesta["Cache-Control"] = "private, no-store"
+    return respuesta

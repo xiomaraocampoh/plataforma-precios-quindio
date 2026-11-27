@@ -11,7 +11,8 @@ import pytest
 from django.urls import reverse
 from playwright.sync_api import expect
 
-from apps.comercios.models import PerfilComercio, PrecioOficial
+from apps.comercios.models import DocumentoComercio, PerfilComercio, PrecioOficial
+from tests.integration.comercios.pdf import CAMARA, RUT
 
 pytestmark = [pytest.mark.integration, pytest.mark.e2e]
 
@@ -73,7 +74,13 @@ def test_del_perfil_al_precio_oficial_en_la_comparacion(
     _accesible(pagina)
     pagina.get_by_label("Tu establecimiento").select_option(str(rosa.pk))
     pagina.get_by_label("Nombre de quien atiende el perfil").fill("Rosa")
-    pagina.get_by_label("Evidencia de que representas al comercio").fill("NIT 900123456-7")
+    # ADR-0034: dos PDF; HTMX los envía en multipart (hx-encoding)
+    pagina.get_by_label("Certificado de Cámara de Comercio (PDF)").set_input_files(
+        {"name": "camara.pdf", "mimeType": "application/pdf", "buffer": CAMARA}
+    )
+    pagina.get_by_label("RUT (PDF)").set_input_files(
+        {"name": "rut.pdf", "mimeType": "application/pdf", "buffer": RUT}
+    )
     pagina.get_by_role("button", name="Enviar a verificación").click()
     expect(pagina.get_by_role("heading", name="Tu perfil está en revisión")).to_be_visible()
     expect(pagina.locator("#sec-perfil [role=status]")).to_contain_text("Moderación lo revisará")
@@ -84,11 +91,13 @@ def test_del_perfil_al_precio_oficial_en_la_comparacion(
     # 2. Moderación lo verifica desde su bandeja
     _entrar_como(context, client, live_server, moderador)
     pagina.goto(live_server.url + reverse("comercios:verificacion"))
-    expect(pagina.get_by_text("NIT 900123456-7")).to_be_visible()
+    expect(pagina.get_by_role("link", name="Ver Cámara de Comercio")).to_be_visible()
+    expect(pagina.get_by_role("link", name="Ver RUT")).to_be_visible()
     _accesible(pagina)
     pagina.get_by_role("button", name="Verificar", exact=True).click()
     expect(pagina.locator(".lista-filas [role=status]")).to_have_text("Decisión registrada.")
     assert PerfilComercio.objects.get().verificado
+    assert not DocumentoComercio.objects.filter(contenido__isnull=False).exists()  # minimización
 
     # 3. El comercio publica su precio oficial
     _entrar_como(context, client, live_server, duena)

@@ -13,6 +13,7 @@ from django.utils import timezone
 from apps.catalogo import selectors as catalogo
 from apps.establecimientos.models import Establecimiento
 
+from .domain.documentos import CABECERA_PDF, DocumentoInvalidoError, validar_pdf
 from .models import PerfilComercio, Promocion, SolicitudCorreccion
 
 PRECIO_MAXIMO = Decimal("2000000")
@@ -20,6 +21,20 @@ PRECIO_MAXIMO = Decimal("2000000")
 
 def inicio_del_dia(dia) -> datetime:
     return timezone.make_aware(datetime.combine(dia, time.min))
+
+
+AYUDA_PDF = "PDF de máximo 2 MB. Solo lo ve moderación y se borra al revisar tu solicitud."
+
+
+def _pdf_valido(archivo):
+    """ADR-0034: la misma regla del dominio, para mostrar el error en el campo."""
+    try:
+        validar_pdf(archivo.name, archivo.size, archivo.read(len(CABECERA_PDF)))
+    except DocumentoInvalidoError as exc:
+        raise forms.ValidationError(str(exc)) from exc
+    finally:
+        archivo.seek(0)
+    return archivo
 
 
 class PerfilForm(forms.Form):
@@ -35,11 +50,17 @@ class PerfilForm(forms.Form):
         required=False,
         help_text="Solo lo ve moderación. Nunca se publica.",
     )
-    evidencia = forms.CharField(
-        label="Evidencia de que representas al comercio",
-        max_length=300,
-        help_text="NIT o RUT, o cuéntanos cómo enviarás la foto de la fachada con tu código.",
-        widget=forms.Textarea(attrs={"rows": 3}),
+    camara_comercio = forms.FileField(
+        label="Certificado de Cámara de Comercio (PDF)",
+        help_text=AYUDA_PDF,
+        error_messages={"required": "Adjunta el certificado de Cámara de Comercio en PDF."},
+        widget=forms.FileInput(attrs={"accept": "application/pdf,.pdf"}),
+    )
+    rut = forms.FileField(
+        label="RUT (PDF)",
+        help_text=AYUDA_PDF,
+        error_messages={"required": "Adjunta el RUT en PDF."},
+        widget=forms.FileInput(attrs={"accept": "application/pdf,.pdf"}),
     )
 
     def __init__(self, *args, **kwargs):
@@ -50,6 +71,12 @@ class PerfilForm(forms.Form):
             .exclude(pk__in=ocupados.values("establecimiento_id"))
             .order_by("nombre")
         )
+
+    def clean_camara_comercio(self):
+        return _pdf_valido(self.cleaned_data["camara_comercio"])
+
+    def clean_rut(self):
+        return _pdf_valido(self.cleaned_data["rut"])
 
 
 class _PresentacionField(forms.ModelChoiceField):
