@@ -27,6 +27,7 @@ Cada ADR sigue la plantilla [`0000-plantilla.md`](0000-plantilla.md) (formato de
 | [0030](0030-asistente-de-compras-con-tool-use.md) | Asistente de compras con IA: la IA interpreta, el dominio calcula | Propuesto (requiere aprobación) |
 | [0031](0031-despliegue-alternativo-en-vercel-serverless.md) | Despliegue alternativo en Vercel (serverless), sin cambiar Render | Propuesto (sin despliegue real todavía) |
 | [0032](0032-departamentos-del-catalogo.md) | Departamentos amplios sobre las categorías (Mercado, Salud y belleza…) | Propuesto |
+| [0033](0033-pipeline-de-entrega-continua.md) | Pipeline de entrega continua: staging, promoción manual y reversión | Propuesto |
 
 Los ADR de la ampliación del Anexo 1 (desde el 0027) usan la **plantilla 8.1 del Anexo**, que agrega
 a la de Nygard los campos *Escenarios relacionados* y *Verificación*.
