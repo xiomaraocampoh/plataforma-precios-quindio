@@ -1,4 +1,4 @@
-/* Apariencia: el botón de sol/luna (en la barra, o dentro del menú ☰ en celulares angostos) alterna entre clara y oscura. Sin elegir nada, manda el
+/* Apariencia: el botón de sol/luna de la barra alterna entre clara y oscura. Sin elegir nada, manda el
    dispositivo (automático). Mejora progresiva: sin JS manda el dispositivo. La elección se guarda solo en
    este navegador (localStorage). WCAG 1.4.3 y 1.4.11 se cumplen en ambos temas. */
 (() => {
