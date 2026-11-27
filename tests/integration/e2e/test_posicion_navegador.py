@@ -27,10 +27,11 @@ def test_paginar_no_devuelve_al_inicio(page, live_server, muchos_productos):
     page.goto(live_server.url + "/productos/")
     page.wait_for_load_state("networkidle")
     page.add_style_tag(content=".asistente-widget{display:none !important}")
-    page.evaluate("window.scrollTo(0, 700)")
+    siguiente = page.get_by_role("link", name="Siguiente")
+    siguiente.scroll_into_view_if_needed()  # como la persona: baja hasta el botón y lo pulsa
     antes = _y(page)
     assert antes > 0
-    page.get_by_role("link", name="Siguiente").click()
+    siguiente.click()
     page.wait_for_url("**pagina=2")
     page.wait_for_load_state("networkidle")
     assert abs(_y(page) - antes) <= 2
