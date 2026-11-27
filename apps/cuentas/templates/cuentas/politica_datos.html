@@ -5,7 +5,7 @@
   <article class="tile tile-4" aria-labelledby="t-politica">
     <p class="etiqueta">Legal</p>
     <h1 id="t-politica">Política de tratamiento de datos</h1>
-    <p class="suave">Última actualización: 25 de noviembre de 2026. Aplica la Ley Estatutaria 1581 de 2012 y el Decreto 1074 de 2015.</p>
+    <p class="suave">Última actualización: 26 de noviembre de 2026. Aplica la Ley Estatutaria 1581 de 2012 y el Decreto 1074 de 2015.</p>
 
     <h2 id="p-responsable">Responsable del tratamiento</h2>
     <p>Es {{ politica.RESPONSABLE }}. AhorraPues compara precios de la canasta familiar; no vende productos, no cobra y no es un sistema oficial de precios.</p>
@@ -16,6 +16,7 @@
       <li><strong>De tus aportes:</strong> los precios que reportas, con el establecimiento elegido y la fecha. Guardamos quién los envió solo para auditoría y moderación; nunca se publica. No almacenamos tu geolocalización: el reporte se asocia al establecimiento, no a ti.</li>
       <li><strong>De seguridad:</strong> una huella del dispositivo (calculada con el navegador y una IP truncada, nunca la IP completa), códigos de verificación y de respaldo (solo se guardan cifrados) y, si activas la verificación en dos pasos, el secreto de tu app autenticadora.</li>
       <li><strong>De tus sugerencias</strong> de establecimientos o productos: quién las envió, solo para moderación.</li>
+      <li><strong>Del asistente K-nasta (opcional):</strong> los mensajes que le escribes, tu lista del mercado y, si la adjuntas, la foto de tu lista. La conversación se guarda en tu sesión hasta que reinicies el chat o la sesión caduque; la foto no se guarda.</li>
       <li><strong>Cookies técnicas:</strong> la de sesión, la de protección de formularios y, si eliges «confiar en este dispositivo», una cookie firmada por 30 días. No usamos cookies de publicidad ni de seguimiento.</li>
     </ul>
 
@@ -28,10 +29,11 @@
     <p><strong>No vendemos tus datos</strong> ni los usamos para perfilarte. Tu nombre, tu correo y tu ubicación nunca aparecen en la comparación ni en la API pública.</p>
 
     <h2 id="p-terceros">Terceros que intervienen</h2>
-    <p>Para funcionar usamos proveedores que tratan datos por nuestra cuenta: el alojamiento y la base de datos (Render) y el envío de correos (Brevo).</p>
+    <p>Para funcionar usamos proveedores que tratan datos por nuestra cuenta: el alojamiento de la aplicación (Vercel), la base de datos (Neon), una caché temporal (Upstash) y el envío de correos (Brevo). Si usas las funciones opcionales con inteligencia artificial, interviene además Anthropic, como se explica abajo.</p>
+    <p><strong>Inteligencia artificial (Anthropic).</strong> La búsqueda por foto, el escaneo en vivo y K-nasta usan los servicios de Anthropic, una empresa de Estados Unidos. Al usarlas, los datos que se indican en cada función se transmiten fuera de Colombia, y Anthropic los trata según sus propias condiciones y su política de privacidad. Las tres funciones son opcionales: puedes usar toda la plataforma sin ellas.</p>
     <p><strong>Búsqueda por foto (opcional).</strong> Si usas esta función, la foto se reduce a 1024 px y se recodifica en tu navegador, con lo que se pierden sus metadatos (incluida la ubicación). Luego se envía a Anthropic, un tercero proveedor de inteligencia artificial, solo para identificar el producto, y no se guarda en nuestros servidores. La pantalla te avisa antes de usarla. Siempre puedes buscar por nombre o por código de barras; el código de barras se lee en tu navegador y no envía ninguna imagen.</p>
     <p><strong>Escaneo en vivo con IA (opcional).</strong> Si activas el escáner en vivo, tu navegador envía solo cuadros quietos y nítidos de la cámara (no un video), reducidos a 768 px y recodificados, sin metadatos ni ubicación. Cada cuadro se envía a Anthropic, un tercero proveedor de inteligencia artificial, solo para extraer el texto de la etiqueta o el empaque (producto, presentación, tienda y precio); ni la imagen ni los cuadros se guardan en nuestros servidores ni en los registros. Puedes pausar el escaneo en cualquier momento y la función es opcional: siempre puedes buscar por nombre o por código de barras y escribir el precio a mano.</p>
-    <p><strong>K-nasta, el asistente de compras con IA (opcional).</strong> Si le escribes a K-nasta, tu mensaje y tu lista del mercado (y la foto de la lista, si la adjuntas) se envían a Anthropic, un tercero proveedor de inteligencia artificial, solo para entender lo que pides y armar la respuesta. Los precios y totales no los calcula la IA: los calcula nuestro sistema con los precios que reporta la comunidad. No guardamos la foto; la conversación vive solo en tu sesión del navegador. No escribas datos personales en el chat. Puedes borrar la conversación con el botón de reiniciar y la función es opcional: siempre puedes usar el comparador sin ella.</p>
+    <p><strong>K-nasta, el asistente de compras con IA (opcional).</strong> Si le escribes a K-nasta, tu mensaje, tu lista del mercado, los mensajes recientes de la conversación y la foto de la lista (si la adjuntas) se envían a Anthropic, un tercero proveedor de inteligencia artificial, solo para entender lo que pides y armar la respuesta. Los precios y totales no los calcula la IA: los calcula nuestro sistema con los precios que reporta la comunidad. La foto no se guarda en nuestros servidores; el texto de la conversación se guarda en tu sesión hasta que reinicies el chat o la sesión caduque. No escribas datos personales en el chat. Puedes borrar la conversación con el botón de reiniciar y la función es opcional: siempre puedes usar el comparador sin ella.</p>
 
     <h2 id="p-derechos">Tus derechos</h2>
     <p>Como titular puedes:</p>

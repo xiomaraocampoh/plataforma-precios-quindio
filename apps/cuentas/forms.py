@@ -71,11 +71,12 @@ class RegistroForm(forms.Form):
         widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
     )
     acepto_tratamiento_datos = forms.BooleanField(
-        label="Autorizo el tratamiento de mis datos personales (Ley 1581 de 2012)",
-        # El enlace abre otra pestaña para no perder lo escrito; se avisa (WCAG 3.2.5 / G201)
-        help_text=format_html_lazy(
-            'Antes de aceptar, lee la <a href="{}" target="_blank" rel="noopener">'
-            "política de tratamiento de datos</a> (se abre en una pestaña nueva).",
+        # Un solo enlace, dentro de la autorización. Abre otra pestaña para no perder lo escrito
+        # y se avisa solo a lectores de pantalla (WCAG 3.2.5 / G201).
+        label=format_html_lazy(
+            "Autorizo el tratamiento de mis datos personales según la "
+            '<a href="{}" target="_blank" rel="noopener">política de tratamiento de datos</a>'
+            '<span class="sr-only"> (se abre en una pestaña nueva)</span> (Ley 1581 de 2012).',
             reverse_lazy("cuentas:politica_datos"),
         ),
         error_messages={
