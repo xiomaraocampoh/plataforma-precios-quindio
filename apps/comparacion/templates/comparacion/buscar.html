@@ -119,7 +119,7 @@
   <div class="hero-acciones">
     {# Sin cuenta, «Registrar precio» pasa por Ingresar y vuelve; crear la cuenta sigue en la barra #}
     <a class="btn btn-grande" href="{% url 'precios:registrar' %}">Registrar precio</a>
-    <a class="enlace-flecha" href="#como-funciona">Cómo funciona</a>
+    <a class="btn btn-sec btn-grande" href="#como-funciona">Cómo funciona</a>
   </div>
 </section>
 
@@ -157,7 +157,7 @@
         </li>
         {% endfor %}
       </ol>
-      <a class="enlace-flecha" href="{% url 'comparacion:comparar' ejemplo_producto.pk %}">Ver la comparación completa</a>
+      <a class="btn btn-sec" href="{% url 'comparacion:comparar' ejemplo_producto.pk %}">Ver la comparación completa</a>
       {% else %}
       <h3 id="t-ejemplo">Mira la diferencia antes de salir de casa.</h3>
       <p class="suave">Cuando haya precios reportados, aquí verás un ejemplo real.</p>
@@ -208,7 +208,7 @@
       <span class="meta"><svg class="ico ico-cat-chico" aria-hidden="true"><use href="#{{ p.categoria|icono_categoria }}"/></svg>{{ p.categoria }}</span>
       <span class="nombre">{{ p }}</span>
       <span class="meta">{{ p.n_reportes }} precio{{ p.n_reportes|pluralize }}</span>
-      <span class="ir">Comparar</span>
+      <span class="ir btn btn-sec btn-pequeno">Comparar</span>
     </a>
     {% endfor %}
   </div>

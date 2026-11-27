@@ -12,7 +12,7 @@ EC-06). Nunca hay datos del autor (M-15).
     <p class="etiqueta"><a href="{% url 'establecimientos:directorio' %}">Establecimientos</a> · {{ local.get_tipo_display }}</p>
     <h1>{{ local.nombre }}</h1>
     <p class="suave">{{ local.direccion }}{% if local.barrio %} · {{ local.barrio }}{% endif %}, {{ local.municipio }}</p>
-    {% if local.enlace_mapa %}<a class="tp-mapa" href="{{ local.enlace_mapa }}" target="_blank" rel="noopener noreferrer">Ver en el mapa<span class="sr-only"> «{{ local.nombre }}» en OpenStreetMap (se abre en otra pestaña)</span></a>{% endif %}
+    {% if local.enlace_mapa %}<a class="tp-mapa btn btn-sec btn-pequeno" href="{{ local.enlace_mapa }}" target="_blank" rel="noopener noreferrer"><svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg>Ver en el mapa<span class="sr-only"> «{{ local.nombre }}» en OpenStreetMap (se abre en otra pestaña)</span></a>{% endif %}
   </div>
   <a class="btn btn-sec" href="{% url 'precios:registrar' %}?establecimiento={{ local.pk }}"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>Registrar un precio aquí</a>
 </div>
@@ -23,7 +23,7 @@ EC-06). Nunca hay datos del autor (M-15).
   <li class="tarjeta tarjeta-precio" aria-labelledby="{{ fila.ancla }}">
     {% include "partials/_foto_producto.html" with producto=p clase="foto-grande" %}
     {% include "comparacion/partials/_tarjeta_precio.html" with destacada=False sin_comercio=True etiqueta=p.categoria.nombre icono=p.categoria|icono_categoria %}
-    <a class="ir" href="{% url 'comparacion:comparar' p.pk %}">Ver todos los precios<span class="sr-only"> de {{ p }}</span></a>
+    <a class="ir btn btn-sec btn-pequeno" href="{% url 'comparacion:comparar' p.pk %}">Ver todos los precios<span class="sr-only"> de {{ p }}</span></a>
   </li>
   {% endfor %}
 </ul>

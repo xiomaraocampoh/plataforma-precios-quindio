@@ -18,7 +18,7 @@ resumen (opcional: en el listado omite confirmar y denunciar, que viven en la co
 {% if not sin_comercio %}<div class="tp-comercio">
   <p class="nombre-tienda">{{ r.establecimiento }}</p>
   <p class="tp-tipo">{{ fila.tipo }}{% if fila.barrio or fila.municipio %} · {% if fila.barrio %}{{ fila.barrio }}{% if fila.municipio %}, {% endif %}{% endif %}{{ fila.municipio }}{% endif %}</p>
-  {% if fila.enlace_mapa %}<a class="tp-mapa" href="{{ fila.enlace_mapa }}" title="{{ fila.direccion }}" target="_blank" rel="noopener noreferrer">Ver en el mapa<span class="sr-only"> «{{ r.establecimiento }}», {{ fila.direccion }}, en OpenStreetMap (se abre en otra pestaña)</span></a>{% endif %}
+  {% if fila.enlace_mapa %}<a class="tp-mapa btn btn-sec btn-pequeno" href="{{ fila.enlace_mapa }}" title="{{ fila.direccion }}" target="_blank" rel="noopener noreferrer"><svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg>Ver en el mapa<span class="sr-only"> «{{ r.establecimiento }}», {{ fila.direccion }}, en OpenStreetMap (se abre en otra pestaña)</span></a>{% endif %}
 </div>
 {% endif %}
 <ul class="pie-tile tp-datos" aria-label="Origen y confianza del precio">

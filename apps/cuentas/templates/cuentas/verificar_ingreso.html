@@ -19,7 +19,7 @@
     {% if puede_correo %}
     <form method="post" action="{% url 'cuentas:ingresar_codigo' %}" class="enlace-pie">
       {% csrf_token %}
-      <button class="btn-texto" type="submit">{% if usa_app %}Prefiero recibir un código por correo{% else %}Enviarme otro código{% endif %}</button>
+      <button class="btn btn-sec btn-bloque" type="submit">{% if usa_app %}Prefiero recibir un código por correo{% else %}Enviarme otro código{% endif %}</button>
     </form>
     {% endif %}
     <p class="enlace-pie"><a href="{% url 'cuentas:ingresar' %}">Volver a ingresar</a></p>

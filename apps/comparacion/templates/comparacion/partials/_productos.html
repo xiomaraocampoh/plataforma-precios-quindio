@@ -19,7 +19,7 @@
       </div>
       {% endif %}{% endwith %}
     {% endif %}
-    <a class="ir" href="{% url 'comparacion:comparar' p.pk %}">{% if fila %}Ver todos los precios{% else %}Ver el producto{% endif %}<span class="sr-only"> de {{ p }}</span></a>
+    <a class="ir btn btn-sec btn-pequeno" href="{% url 'comparacion:comparar' p.pk %}">{% if fila %}Ver todos los precios{% else %}Ver el producto{% endif %}<span class="sr-only"> de {{ p }}</span></a>
   </li>
   {% endfor %}
 </ul>
