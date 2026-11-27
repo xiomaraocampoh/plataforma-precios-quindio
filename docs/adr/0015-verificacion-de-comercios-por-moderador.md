@@ -1,6 +1,7 @@
 # ADR-015: Verificar los comercios mediante un moderador
 
-- **Estado:** Propuesto
+- **Estado:** Propuesto · **Modificado por [ADR-0034](0034-evidencia-de-comercios-en-pdf.md)**
+  (la evidencia pasa de texto libre a dos PDF: Cámara de Comercio y RUT)
 - **Fecha:** 2026-11-16
 - **Autores:** Equipo (borrador C2-AS2-E4 del Drive, 14-nov-2026); adaptado al repositorio con apoyo de IA
 - **Escenarios de calidad afectados:** Seguridad (autenticidad), EC-03
@@ -21,6 +22,10 @@ comercio. La mayoría de tiendas de barrio no tiene dominio propio de correo.
 El perfil queda **pendiente** hasta que un moderador confirma, con una evidencia simple (foto de la
 fachada con un código entregado por la plataforma, o RUT/NIT), que el usuario representa al
 comercio. Solo un perfil verificado publica.
+
+> **Cambio (2026-11-27): evidencia en PDF.** El texto libre no permitía verificar. Ahora la evidencia
+> son dos PDF obligatorios: el certificado de Cámara de Comercio y el RUT. Se guardan en la base y se
+> borran al decidir. Ver [ADR-0034](0034-evidencia-de-comercios-en-pdf.md).
 
 **Detalle de diseño (hallazgo de la lectura del código).** La verificación se registra en el propio
 módulo (`PerfilComercio.verificado_por` y `fecha`), no en `moderacion.DecisionModeracion`, porque el

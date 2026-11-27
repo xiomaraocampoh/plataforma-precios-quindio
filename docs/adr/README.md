@@ -10,7 +10,7 @@ Cada ADR sigue la plantilla [`0000-plantilla.md`](0000-plantilla.md) (formato de
 | [0012](0012-modulo-comercial-como-modulo-nuevo.md) | Módulo comercial como módulo nuevo | Propuesto (DP-1 pendiente) |
 | [0013](0013-integracion-precio-oficial-con-reportado.md) | Precio oficial frente a reportado (el más reciente) | Reemplazado por 0018 |
 | [0014](0014-promociones-como-estrategias.md) | Promociones como estrategias, fuera del orden | Propuesto (D-3 pendiente) |
-| [0015](0015-verificacion-de-comercios-por-moderador.md) | Verificación de comercios por moderador | Propuesto |
+| [0015](0015-verificacion-de-comercios-por-moderador.md) | Verificación de comercios por moderador | Propuesto · modificado por ADR-0034 |
 | [0016](0016-alertas-de-bajada-de-precio-diferidas.md) | Alertas de bajada de precio diferidas | Propuesto |
 | [0017](0017-despliegue-en-paas-de-contenedores.md) | Despliegue en PaaS de contenedores | Propuesto (proveedor pendiente) |
 | [0018](0018-precio-oficial-verificado-como-principal.md) | Precio oficial verificado como principal | Propuesto |
@@ -27,6 +27,7 @@ Cada ADR sigue la plantilla [`0000-plantilla.md`](0000-plantilla.md) (formato de
 | [0030](0030-asistente-de-compras-con-tool-use.md) | Asistente de compras con IA: la IA interpreta, el dominio calcula | Propuesto (requiere aprobación) |
 | [0031](0031-despliegue-alternativo-en-vercel-serverless.md) | Despliegue alternativo en Vercel (serverless), sin cambiar Render | Propuesto (sin despliegue real todavía) |
 | [0032](0032-departamentos-del-catalogo.md) | Departamentos amplios sobre las categorías (Mercado, Salud y belleza…) | Propuesto |
+| [0034](0034-evidencia-de-comercios-en-pdf.md) | Evidencia de los comercios en PDF (Cámara de Comercio y RUT) guardada en la base y borrada al decidir | Propuesto |
 
 Los ADR de la ampliación del Anexo 1 (desde el 0027) usan la **plantilla 8.1 del Anexo**, que agrega
 a la de Nygard los campos *Escenarios relacionados* y *Verificación*.
