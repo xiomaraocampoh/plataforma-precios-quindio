@@ -20,6 +20,11 @@ urlpatterns = [
     path("verificacion/", views.verificacion, name="verificacion"),
     path("verificacion/perfil/<int:perfil_id>/", views.decidir_perfil, name="decidir_perfil"),
     path(
+        "verificacion/perfil/<int:perfil_id>/documento/<str:tipo>/",
+        views.documento_perfil,
+        name="documento_perfil",
+    ),
+    path(
         "verificacion/correccion/<int:solicitud_id>/",
         views.decidir_correccion,
         name="decidir_correccion",

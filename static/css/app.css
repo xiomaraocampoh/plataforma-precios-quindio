@@ -194,6 +194,20 @@ input:hover, select:hover { border-color: var(--texto-suave); }
 input:focus-visible, select:focus-visible { outline: 3px solid color-mix(in srgb, var(--marca) 40%, transparent); outline-offset: 0; border-color: var(--marca); }
 input[type=checkbox] { width: 24px; height: 24px; accent-color: var(--marca); flex: none; margin-top: .15rem; }
 .check { display: flex; gap: .65rem; align-items: flex-start; }
+/* Archivos (ADR-0034): mismo borde y radio que los demás controles; botón como .btn-sec, ≥ 24 px */
+input[type=file] {
+  width: 100%; min-height: 48px; padding: .45rem .6rem; color: var(--texto); background: var(--superficie);
+  border: 1px dashed var(--borde-fuerte); border-radius: var(--radio-sm); cursor: pointer;
+}
+input[type=file]::file-selector-button {
+  min-height: 36px; margin-right: .75rem; padding: 0 1rem; font: inherit; font-weight: 600;
+  color: var(--marca-enlace); background: transparent; border: 1px solid var(--marca-enlace); border-radius: 999px; cursor: pointer;
+}
+input[type=file]::file-selector-button:hover { background: var(--marca-suave); }
+input[type=file][aria-invalid="true"] { border: 2px solid var(--error); }
+.docs-evidencia { list-style: none; margin: .5rem 0; padding: 0; display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
+.docs-evidencia li { display: flex; align-items: center; gap: .5rem; }
+.docs-evidencia .btn { min-height: 44px; }
 .check label { margin: 0; font-weight: 400; }
 
 .buscador { position: relative; }
