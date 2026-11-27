@@ -115,5 +115,6 @@ def test_los_pasos_de_texto_siguen_disponibles_para_la_ia():
 
 def test_la_guia_de_apariencia_solo_habla_del_boton_de_la_barra():
     texto = " ".join(tema_por_id("apariencia").textos).lower()
-    assert "sol" in texto and "luna" in texto and "menú" in texto  # en celular está dentro del menú
+    assert "sol" in texto and "luna" in texto
+    assert "menú" not in texto  # en todos los tamaños está en la barra
     assert "abajo" not in texto and "automática" not in texto  # el grupo del pie ya no existe
