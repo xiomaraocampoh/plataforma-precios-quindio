@@ -460,7 +460,7 @@ TEMAS: tuple[Tema, ...] = (
         [
             un_paso(
                 "Ingresa a tu cuenta y abre el menú con tu nombre de usuario (arriba a "
-                "la derecha).",
+                "la derecha; en celular, dentro del menú ☰).",
                 boton_sec("tu_usuario ▾"),
             ),
             un_paso(
@@ -501,7 +501,8 @@ TEMAS: tuple[Tema, ...] = (
         "Tengo un comercio: ¿cómo publico mis precios?",
         [
             un_paso(
-                "Ingresa con tu cuenta y abre el menú con tu nombre de usuario.",
+                "Ingresa con tu cuenta y abre el menú con tu nombre de usuario (arriba a "
+                "la derecha; en celular, dentro del menú ☰).",
                 boton_sec("tu_usuario ▾"),
             ),
             un_paso(

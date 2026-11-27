@@ -1,4 +1,4 @@
-"""La cuenta vive dentro del menú ☰ donde hay hamburguesa (hasta 1023 px) y en un desplegable fuera."""
+"""La cuenta va en el menú ☰ donde hay hamburguesa (hasta 1023 px); fuera, en un desplegable."""
 
 import pytest
 from playwright.sync_api import expect
