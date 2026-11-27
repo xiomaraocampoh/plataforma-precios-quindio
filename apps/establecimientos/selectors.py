@@ -1,12 +1,21 @@
 """Lecturas del directorio de establecimientos (RF-08, RF-09)."""
 
 from .domain.coincidencia import elegir_establecimiento
-from .domain.mapas import enlace_openstreetmap
+from .domain.mapas import enlace_mapa
 from .models import Establecimiento
 
 
 def _aprobados():
     return Establecimiento.objects.filter(activo=True, estado=Establecimiento.Estado.APROBADO)
+
+
+def _con_enlace_de_mapa(e: Establecimiento) -> Establecimiento:
+    """«Ver en el mapa»: el punto exacto si hay coordenadas; si no, la búsqueda por su dirección
+    (igual que en la comparación). Solo sin dirección no hay mapa."""
+    e.enlace_mapa = enlace_mapa(
+        e.latitud, e.longitud, direccion=e.direccion, barrio=e.barrio, municipio=e.municipio
+    )
+    return e
 
 
 def directorio(*, municipio: str = "", barrio: str = "", tipo: str = "") -> list[Establecimiento]:
@@ -18,18 +27,13 @@ def directorio(*, municipio: str = "", barrio: str = "", tipo: str = "") -> list
         qs = qs.filter(barrio__iexact=barrio)
     if tipo:
         qs = qs.filter(tipo=tipo)
-    establecimientos = list(qs.order_by("nombre"))
-    for e in establecimientos:
-        e.enlace_mapa = enlace_openstreetmap(e.latitud, e.longitud)
-    return establecimientos
+    return [_con_enlace_de_mapa(e) for e in qs.order_by("nombre")]
 
 
 def establecimiento_publico(pk: int) -> Establecimiento | None:
     """Un establecimiento aprobado y activo, o None (el público no ve pendientes ni inactivos)."""
     e = _aprobados().filter(pk=pk).first()
-    if e is not None:
-        e.enlace_mapa = enlace_openstreetmap(e.latitud, e.longitud)
-    return e
+    return _con_enlace_de_mapa(e) if e is not None else None
 
 
 def opciones_directorio(municipio: str = "") -> dict:

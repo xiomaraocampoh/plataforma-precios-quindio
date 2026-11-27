@@ -7,6 +7,7 @@ from django.urls import reverse
 
 from apps.comparacion.selectors import comparar_producto
 from apps.establecimientos import services
+from apps.establecimientos.domain.mapas import enlace_busqueda
 from apps.establecimientos.models import Establecimiento
 from apps.precios import services as precios
 from apps.precios.forms import RegistroPrecioForm
@@ -44,11 +45,26 @@ def test_directorio_filtra_por_municipio_barrio_y_tipo(client, tiendas, calarca)
     assert "<html" not in r.content.decode()  # fragmento HTMX
 
 
-def test_directorio_enlaza_al_mapa_solo_con_coordenadas(client, tiendas, calarca):
+def test_directorio_enlaza_al_mapa_con_coordenadas_o_con_la_direccion(client, tiendas, calarca):
     html = client.get(reverse("establecimientos:directorio")).content.decode()
-    assert "https://www.openstreetmap.org/?mlat=4.533889&amp;mlon=-75.681111" in html
+    assert (
+        "https://www.openstreetmap.org/?mlat=4.533889&amp;mlon=-75.681111" in html
+    )  # punto exacto
     assert 'rel="noopener noreferrer"' in html
-    assert "Sin ubicación en el mapa" in html  # Mini Calarcá no tiene coordenadas
+    # Mini Calarcá no tiene coordenadas: se enlaza la búsqueda por su dirección (como al comparar)
+    esperado = enlace_busqueda(direccion="Cra 25 # 40-10", barrio="Centro", municipio="Calarcá")
+    assert esperado in html
+    assert "Sin ubicación en el mapa" not in html  # todo local con dirección tiene mapa
+
+
+def test_cada_local_del_directorio_tiene_su_enlace_al_mapa(client, tiendas, calarca):
+    html = client.get(reverse("establecimientos:directorio")).content.decode()
+    assert html.count("Ver en el mapa") == 3  # Doña Rosa, Súper Quindío y Mini Calarcá
+
+
+def test_la_pagina_de_un_comercio_sin_coordenadas_tambien_enlaza_el_mapa(client, calarca):
+    html = client.get(reverse("comparacion:establecimiento", args=[calarca.pk])).content.decode()
+    assert "Ver en el mapa" in html and "openstreetmap.org/search?query=" in html
 
 
 def test_sugerir_exige_sesion(client, db):
