@@ -51,7 +51,7 @@ def test_directorio_enlaza_al_mapa_con_coordenadas_o_con_la_direccion(client, ti
         "https://www.openstreetmap.org/?mlat=4.533889&amp;mlon=-75.681111" in html
     )  # punto exacto
     assert 'rel="noopener noreferrer"' in html
-    # Mini Calarcá no tiene coordenadas: se enlaza la búsqueda por su dirección, como en la comparación
+    # Mini Calarcá no tiene coordenadas: se enlaza la búsqueda por su dirección (como al comparar)
     esperado = enlace_busqueda(direccion="Cra 25 # 40-10", barrio="Centro", municipio="Calarcá")
     assert esperado in html
     assert "Sin ubicación en el mapa" not in html  # todo local con dirección tiene mapa
