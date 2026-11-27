@@ -14,7 +14,7 @@ o error sin presentación), la lista completa de siempre. Mismos nombres de camp
       {% include "partials/_foto_producto.html" with producto=producto clase="foto-chica" %}
       <div><p class="etiqueta">Producto</p><p class="producto-nombre">{{ producto }}</p></div>
     </div>
-    <a class="btn-texto" href="{{ url_registro }}">Cambiar producto<span class="sr-only"> (volver a buscar)</span></a>
+    <a class="btn btn-sec btn-pequeno" href="{{ url_registro }}">Cambiar producto<span class="sr-only"> (volver a buscar)</span></a>
   </div>
   {% endif %}
   {% for campo in form.visible_fields %}

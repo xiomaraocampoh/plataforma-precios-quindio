@@ -7,12 +7,12 @@
     <a class="nombre" href="{% url 'comparacion:establecimiento' e.pk %}">{{ e.nombre }}</a>
     <span>{{ e.direccion }}</span>
     <span class="meta">{% if e.barrio %}{{ e.barrio }} · {% endif %}{{ e.municipio }}</span>
-    <span class="ir" aria-hidden="true">Ver sus precios</span>
-    {% if e.enlace_mapa %}
-    <a class="tp-mapa" href="{{ e.enlace_mapa }}" target="_blank" rel="noopener noreferrer">Ver en el mapa<span class="sr-only"> «{{ e.nombre }}» en OpenStreetMap (se abre en otra pestaña)</span></a>
-    {% else %}
-    <span class="meta">Sin ubicación en el mapa</span>
-    {% endif %}
+    <div class="acciones-fila">
+      <span class="ir btn btn-pequeno" aria-hidden="true">Ver sus precios</span>
+      {% if e.enlace_mapa %}
+      <a class="tp-mapa btn btn-sec btn-pequeno" href="{{ e.enlace_mapa }}" target="_blank" rel="noopener noreferrer"><svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg>Ver en el mapa<span class="sr-only"> «{{ e.nombre }}» en OpenStreetMap (se abre en otra pestaña)</span></a>
+      {% endif %}
+    </div>
   </li>
   {% endfor %}
 </ul>

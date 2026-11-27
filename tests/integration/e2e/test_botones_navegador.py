@@ -31,7 +31,7 @@ def _como_boton(pagina, selector):
         assert estilo[0] >= 14, f"{selector}: sin esquinas de botón en {pagina.url}"
         assert estilo[1] >= 34, f"{selector}: muy bajo para tocar ({estilo[1]} px)"
         assert "underline" not in estilo[2], f"{selector}: subrayado"
-        e.hover()
+        e.hover(force=True)
         assert "underline" not in e.evaluate("e => getComputedStyle(e).textDecorationLine")
         assert e.evaluate("e => getComputedStyle(e, '::after').content") in ("none", "normal", '""')
 

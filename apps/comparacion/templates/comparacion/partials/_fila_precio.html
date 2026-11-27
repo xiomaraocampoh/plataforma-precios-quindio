@@ -11,7 +11,7 @@ Nunca hay datos del autor (M-15, EC-15). «Oficial» = precio de un comercio ver
   <h2 class="nombre-tienda" id="{{ fila.ancla }}">{{ r.establecimiento }}</h2>
   <p class="tp-tipo">{{ fila.tipo }}</p>
   <address class="tp-direccion">{{ fila.direccion }}{% if fila.barrio %}, {{ fila.barrio }}{% endif %}{% if fila.municipio %}, {{ fila.municipio }}{% endif %}</address>
-  {% if fila.enlace_mapa %}<a class="tp-mapa" href="{{ fila.enlace_mapa }}" target="_blank" rel="noopener noreferrer">Ver en el mapa<span class="sr-only"> «{{ r.establecimiento }}» en OpenStreetMap (se abre en otra pestaña)</span></a>{% endif %}
+  {% if fila.enlace_mapa %}<a class="tp-mapa btn btn-sec btn-pequeno" href="{{ fila.enlace_mapa }}" target="_blank" rel="noopener noreferrer"><svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg>Ver en el mapa<span class="sr-only"> «{{ r.establecimiento }}» en OpenStreetMap (se abre en otra pestaña)</span></a>{% endif %}
 </div>
 <div class="fp-precio">
   <p class="tp-presentacion"><span class="sr-only">Presentación: </span>{{ fila.presentacion_texto }}</p>

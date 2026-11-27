@@ -1,4 +1,4 @@
-"""Sistema de diseño: toda acción suelta es un botón; el texto subrayado es solo para enlaces en frases.
+"""Sistema de diseño: toda acción suelta es un botón; el subrayado es solo para enlaces en frases.
 
 Si una acción se ve como un enlace con flecha («Ver en el mapa ›»), la persona no sabe que es un
 botón y la app se ve inconsistente. Esta prueba revisa las plantillas para que no vuelva a pasar.
