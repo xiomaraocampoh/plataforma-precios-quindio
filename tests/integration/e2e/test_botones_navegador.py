@@ -69,3 +69,24 @@ def test_pagina_de_un_comercio(page, live_server, datos):
     _ir(page, live_server, f"/tiendas/{datos[1].pk}/")
     _como_boton(page, ".tp-mapa")
     _como_boton(page, ".tarjeta-precio a.ir")
+
+
+_CONTRASTE = """e => {
+  const lum = c => { const v = c.match(/[\\d.]+/g).slice(0, 3).map(Number).map(x => { x /= 255;
+    return x <= .03928 ? x / 12.92 : ((x + .055) / 1.055) ** 2.4; });
+    return .2126 * v[0] + .7152 * v[1] + .0722 * v[2]; };
+  const s = getComputedStyle(e), a = lum(s.color), b = lum(s.backgroundColor);
+  return (Math.max(a, b) + .05) / (Math.min(a, b) + .05);
+}"""
+
+
+@pytest.mark.parametrize("tema", ["light", "dark"])
+def test_directorio_boton_legible_al_pasar_por_la_tarjeta(page, live_server, datos, tema):
+    page.add_init_script(f"localStorage.setItem('ahorrapues-tema', '{tema}')")
+    _ir(page, live_server, "/establecimientos/")
+    tarjeta = page.locator(".tarjeta-enlace").first
+    tarjeta.hover(position={"x": 8, "y": 8})
+    ir = tarjeta.locator(".ir")
+    assert ir.evaluate(_CONTRASTE) >= 4.5, "«Ver sus precios» pierde contraste con el mouse encima"
+    assert ir.evaluate("e => getComputedStyle(e).cursor") == "pointer"
+    assert tarjeta.locator(".tp-mapa").evaluate("e => getComputedStyle(e).cursor") == "pointer"
