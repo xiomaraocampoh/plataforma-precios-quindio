@@ -1,6 +1,6 @@
-# ADR-0002: Separar lectura y escritura (CQRS ligero) con caché cache-aside
+# ADR-0004: Separar lectura y escritura (CQRS ligero) con caché cache-aside
 
-- **Estado:** Propuesto
+- **Estado:** Aceptado (aprobado por el equipo el 2026-11-27)
 - **Escenarios afectados:** EC-02, EC-04
 - **Métricas:** M-08, M-09, M-10, D-01
 

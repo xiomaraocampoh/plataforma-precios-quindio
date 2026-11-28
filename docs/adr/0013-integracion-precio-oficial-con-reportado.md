@@ -1,4 +1,4 @@
-# ADR-013: Integrar el precio oficial con el reportado (mostrar el más reciente)
+# ADR-0013: Integrar el precio oficial con el reportado (mostrar el más reciente)
 
 - **Estado:** Reemplazado por ADR-018
 - **Fecha:** 2026-11-14 (borrador del Drive); archivado en el repositorio el 2026-11-16

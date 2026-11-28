@@ -1,6 +1,6 @@
 # ADR-0026: Escaneo en vivo e interpretación de etiquetas de precio
 
-- **Estado:** Propuesto (apagado por defecto; requiere la aprobación del equipo y de la propietaria
+- **Estado:** Aceptado (aprobado por el equipo el 2026-11-27); apagado por defecto
   antes de activarse, como el ADR-022)
 - **Fecha:** 2026-11-24
 - **Autores:** Equipo; borrador con apoyo de IA, pendiente de revisión humana

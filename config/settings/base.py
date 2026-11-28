@@ -203,7 +203,7 @@ CUENTAS_PRUEBA_CORREO_BASE = env("CUENTAS_PRUEBA_CORREO_BASE", default="")
 # Búsqueda por foto: puntaje mínimo (0 a 1) para proponer un producto (catalogo/domain/coincidencia)
 UMBRAL_COINCIDENCIA_FOTO = env.float("UMBRAL_COINCIDENCIA_FOTO", default=0.45)
 
-# Reglas de negocio parametrizables (ver docs/adr/0003-vigencia-de-precios.md)
+# Reglas de negocio parametrizables (ver docs/adr/0005-vigencia-de-precios.md)
 PRECIOS = {
     "VIGENCIA_REPORTE_DIAS": env.int("VIGENCIA_REPORTE_DIAS", default=7),
     "VIGENCIA_PERECEDERO_DIAS": env.int("VIGENCIA_PERECEDERO_DIAS", default=3),

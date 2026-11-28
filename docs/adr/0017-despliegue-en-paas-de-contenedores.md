@@ -1,6 +1,6 @@
-# ADR-017: Desplegar en un PaaS de contenedores (proveedor por definir)
+# ADR-0017: Desplegar en un PaaS de contenedores (Render)
 
-- **Estado:** Propuesto, **pendiente de elegir proveedor** (decisión D-11 del equipo)
+- **Estado:** Aceptado (aprobado por el equipo el 2026-11-27); proveedor elegido: Render (decisión D-11)
 - **Fecha:** 2026-11-16
 - **Autores:** Equipo (borrador C2-AS2-E4 del Drive, 14-nov-2026); adaptado al repositorio con apoyo de IA
 - **Escenarios de calidad afectados:** EC-04, M-21

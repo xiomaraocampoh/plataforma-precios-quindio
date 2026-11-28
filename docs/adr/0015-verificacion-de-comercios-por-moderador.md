@@ -1,6 +1,6 @@
-# ADR-015: Verificar los comercios mediante un moderador
+# ADR-0015: Verificar los comercios mediante un moderador
 
-- **Estado:** Propuesto · **Modificado por [ADR-0034](0034-evidencia-de-comercios-en-pdf.md)**
+- **Estado:** Aceptado (aprobado por el equipo el 2026-11-27) · **Modificado por [ADR-0034](0034-evidencia-de-comercios-en-pdf.md)**
   (la evidencia pasa de texto libre a dos PDF: Cámara de Comercio y RUT)
 - **Fecha:** 2026-11-16
 - **Autores:** Equipo (borrador C2-AS2-E4 del Drive, 14-nov-2026); adaptado al repositorio con apoyo de IA

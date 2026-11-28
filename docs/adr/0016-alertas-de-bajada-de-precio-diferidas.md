@@ -1,6 +1,6 @@
-# ADR-016: Diferir las alertas de bajada de precio
+# ADR-0016: Diferir las alertas de bajada de precio
 
-- **Estado:** Propuesto
+- **Estado:** Aceptado (aprobado por el equipo el 2026-11-27)
 - **Fecha:** 2026-11-16
 - **Autores:** Equipo (borrador C2-AS2-E4 del Drive, 14-nov-2026); adaptado al repositorio con apoyo de IA
 - **Escenarios de calidad afectados:** EC-05

@@ -1,6 +1,6 @@
 # ADR-0034: Evidencia de los comercios en PDF guardada en la base de datos
 
-- **Estado:** Propuesto
+- **Estado:** Aceptado (aprobado por el equipo el 2026-11-27)
 - **Fecha:** 2026-11-27
 - **Autores:** Equipo; redactado con apoyo de IA
 - **Modifica:** [ADR-0015](0015-verificacion-de-comercios-por-moderador.md) (la evidencia de la verificación)

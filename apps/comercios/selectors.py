@@ -121,7 +121,7 @@ def precios_del_portal(perfil: PerfilComercio) -> list[PrecioDelPortal]:
         )
     )
     reportes = _reportes_recientes(perfil, [p.presentacion_id for p in precios], ahora)
-    ventana = timedelta(days=politica_vigencia().dias_oficial)  # ADR-003: 30 días
+    ventana = timedelta(days=politica_vigencia().dias_oficial)  # ADR-005: 30 días
     resultado = []
     for p in precios:
         aviso = discrepancia(p.precio, reportes.get(p.presentacion_id, []), ahora)

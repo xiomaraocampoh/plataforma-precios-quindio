@@ -70,7 +70,7 @@ Módulos (apps):
 | `integraciones` | — | Puertos/adaptadores a fuentes externas (SIPSA) con timeout |
 | `comercios` | Comercio | **Corte III**: perfil, precio oficial, promociones |
 
-Caché (ADR-0002): cache-aside por producto (`core.cache.clave_comparacion`), TTL 60 s,
+Caché (ADR-0004): cache-aside por producto (`core.cache.clave_comparacion`), TTL 60 s,
 invalidación en `transaction.on_commit` dentro del servicio que escribe. Toda clave nueva lleva
 prefijo de versión (`v1`).
 

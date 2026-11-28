@@ -4,7 +4,7 @@
 - RF-C04 promociones (ADR-014) · RF-C06 corrección · RF-C07 confirmar vigencia con un toque
 
 Cada escritura que cambia lo que muestra la comparación invalida su caché por producto al
-confirmarse la transacción (ADR-0002). Ninguna escribe en tablas del núcleo, salvo el rol del
+confirmarse la transacción (ADR-0004). Ninguna escribe en tablas del núcleo, salvo el rol del
 usuario, que se asigna con `cuentas.services.asegurar_comercio`.
 """
 

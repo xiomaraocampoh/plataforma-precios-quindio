@@ -1,6 +1,6 @@
 # ADR-0028: Productos sin precio vigente y criterios de orden declarados en la canasta
 
-- **Estado:** Propuesto
+- **Estado:** Aceptado (aprobado por el equipo el 2026-11-27)
 - **Fecha:** 2026-11-24
 - **Autores:** Equipo; borrador con apoyo de IA, pendiente de revisión humana
 - **Escenarios relacionados:** EC-07 (Anexo 1), EC-06

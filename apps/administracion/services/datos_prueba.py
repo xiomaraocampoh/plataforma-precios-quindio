@@ -47,7 +47,7 @@ __all__ = ["DatosDePruebaInvalidosError", "Resumen", "cargar", "limpiar", "refre
 
 
 def _invalidar_productos_demo() -> None:
-    """La comparación cacheada (ADR-0002) se recalcula tras confirmar la transacción."""
+    """La comparación cacheada (ADR-0004) se recalcula tras confirmar la transacción."""
     ids = set(
         ReportePrecio.objects.filter(es_demo=True).values_list(
             "presentacion__producto_id", flat=True

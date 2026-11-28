@@ -1,9 +1,9 @@
 # ADR-0031: Despliegue alternativo en Vercel (serverless)
 
-- **Estado:** Propuesto (configuración lista y verificada en CI; sin despliegue real todavía)
+- **Estado:** Aceptado (aprobado por el equipo el 2026-11-27); configuración verificada en el CI
 - **Fecha:** 2026-11-25
 - **Autores:** Equipo; borrador con apoyo de IA, pendiente de revisión humana
-- **Escenarios relacionados:** EC-04 (desempeño), EC-02 (vigencia), M-21 (disponibilidad); ADR-017, ADR-021, ADR-0002
+- **Escenarios relacionados:** EC-04 (desempeño), EC-02 (vigencia), M-21 (disponibilidad); ADR-017, ADR-021, ADR-0004
 - **Métricas que lo verifican:** M-08, M-09, M-10, M-21
 - **Plantilla:** 8.1 del Anexo 1 (adaptada de Nygard, 2011)
 
@@ -54,7 +54,7 @@ Se agrega Vercel como **despliegue alternativo**, con estas reglas:
   `CONN_MAX_AGE=0`, `sslmode` mínimo `require` y `DISABLE_SERVER_SIDE_CURSORS=True`.
 - **Base de datos:** Neon. La app usa `DATABASE_URL` (pooler, modo transacción); las migraciones,
   `DATABASE_URL_UNPOOLED`, a mano y antes de cada despliegue que las necesite.
-- **Caché:** Redis con TLS (`rediss://`, p. ej. Upstash). La caché del ADR-0002 no cambia.
+- **Caché:** Redis con TLS (`rediss://`, p. ej. Upstash). La caché del ADR-0004 no cambia.
 - **Dominios:** `DOMINIOS_VERCEL` con dominios exactos `<proyecto>.vercel.app`; un comodín impide
   arrancar.
 - **Región:** `iad1` (Washington D. C.), con la base y Redis en `us-east-1`. Se descartó `gru1`

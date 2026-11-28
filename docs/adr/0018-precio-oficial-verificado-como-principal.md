@@ -1,6 +1,6 @@
-# ADR-018: Mostrar el precio oficial verificado como principal, con advertencia de discrepancia
+# ADR-0018: Mostrar el precio oficial verificado como principal, con advertencia de discrepancia
 
-- **Estado:** Propuesto (reemplaza al [ADR-013](0013-integracion-precio-oficial-con-reportado.md)); pasa a Aceptado solo tras ratificarse con una muestra mayor
+- **Estado:** Aceptado (aprobado por el equipo el 2026-11-27); reemplaza al [ADR-0013](0013-integracion-precio-oficial-con-reportado.md)
 - **Fecha:** 2026-11-16
 - **Autores:** Equipo (borrador C2-AS2-E4 del Drive, 14-nov-2026); adaptado al repositorio con apoyo de IA
 - **Escenarios de calidad afectados:** EC-02, EC-03, EC-06

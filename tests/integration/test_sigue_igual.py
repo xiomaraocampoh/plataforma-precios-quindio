@@ -75,7 +75,7 @@ def test_la_confirmacion_renueva_un_precio_vencido_y_suma_confianza(
     )
     assert comparar_producto(producto.pk) == []
 
-    with django_capture_on_commit_callbacks(execute=True):  # invalida la caché (ADR-0002)
+    with django_capture_on_commit_callbacks(execute=True):  # invalida la caché (ADR-0004)
         services.confirmar_precio(usuario=vecina, reporte_id=viejo.pk)
     resultados = comparar_producto(producto.pk)
     assert [r.establecimiento for r in resultados] == ["Tienda Doña Rosa"]  # EC-02 renovado

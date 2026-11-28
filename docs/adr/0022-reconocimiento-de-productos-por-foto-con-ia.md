@@ -1,6 +1,6 @@
-# ADR-022: Reconocimiento de productos por foto con la API de Anthropic
+# ADR-0022: Reconocimiento de productos por foto con la API de Anthropic
 
-- **Estado:** Propuesto (requiere la aprobación del equipo y de la propietaria antes de activarse)
+- **Estado:** Aceptado (aprobado por el equipo el 2026-11-27); la función sigue apagada si no hay clave
 - **Fecha:** 2026-11-16
 - **Autores:** Equipo; borrador generado con apoyo de IA y pendiente de revisión humana
 - **Escenarios de calidad afectados:** EC-01 (rapidez de uso), EC-06 (neutralidad); riesgos de privacidad (Ley 1581) y costo

@@ -305,7 +305,7 @@ def test_refrescar_renueva_las_fechas_sin_mover_los_reales(
         fecha_observacion=hace_20_dias,
     )
     salida = StringIO()
-    with django_capture_on_commit_callbacks(execute=True):  # invalida la caché (ADR-0002)
+    with django_capture_on_commit_callbacks(execute=True):  # invalida la caché (ADR-0004)
         call_command("refrescar_precios_prueba", stdout=salida)
     assert "438 precios de prueba" in salida.getvalue()
     locales = _locales_en_comparacion(florhuila)

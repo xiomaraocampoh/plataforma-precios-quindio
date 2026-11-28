@@ -1,6 +1,6 @@
-# ADR-021: Correo transaccional con Brevo (API HTTPS o SMTP), outbox y verificación en dos pasos
+# ADR-0021: Correo transaccional con Brevo (API HTTPS o SMTP), outbox y verificación en dos pasos
 
-- **Estado:** Propuesto
+- **Estado:** Aceptado (aprobado por el equipo el 2026-11-27)
 - **Fecha:** 2026-11-16
 - **Autores:** Equipo; redactado con apoyo de IA
 - **Requisitos:** RF-02, RF-03, RF-22, RF-24, RF-25, RF-26, RF-27
