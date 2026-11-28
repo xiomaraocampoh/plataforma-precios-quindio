@@ -1,4 +1,4 @@
-# ADR-012: Incorporar el módulo comercial como un módulo nuevo
+# ADR-0012: Incorporar el módulo comercial como un módulo nuevo
 
 - **Estado:** Aceptado por el equipo el 2026-11-25 (DP-1 = opción B, puerto y registro de extensiones)
 - **Fecha:** 2026-11-16

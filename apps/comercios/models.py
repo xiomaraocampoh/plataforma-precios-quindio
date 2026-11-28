@@ -132,7 +132,7 @@ class DocumentoComercio(models.Model):
 class PrecioOficial(models.Model):
     """RF-C03: precio publicado por un comercio verificado, uno por presentación.
 
-    `confirmado_en` es la evidencia de vigencia (30 días, ADR-003 y ADR-018): la renuevan publicar
+    `confirmado_en` es la evidencia de vigencia (30 días, ADR-005 y ADR-018): la renuevan publicar
     y la confirmación con un toque (RF-C07).
     """
 

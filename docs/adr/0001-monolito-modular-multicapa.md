@@ -1,6 +1,6 @@
 # ADR-0001: Adoptar un monolito modular multicapa en Django
 
-- **Estado:** Propuesto (validar en revisión de diseño del Corte I)
+- **Estado:** Aceptado (aprobado por el equipo el 2026-11-27)
 - **Escenarios afectados:** EC-04, EC-05
 - **Métricas:** M-08, M-17, M-18, M-19, M-20
 

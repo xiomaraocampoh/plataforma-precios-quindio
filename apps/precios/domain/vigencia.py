@@ -1,6 +1,6 @@
 """Vigencia de un precio (EC-02, D-02). Python puro — TDD.
 
-Decisión provisional (ADR-0003): reportado 7 días, perecedero 3 días,
+Decisión provisional (ADR-0005): reportado 7 días, perecedero 3 días,
 oficial de comercio 30 días sin confirmar.
 """
 

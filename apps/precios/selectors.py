@@ -1,6 +1,6 @@
 """Lecturas del módulo precios (capa de aplicación).
 
-`politica_vigencia` traduce la configuración (settings.PRECIOS, ADR-0003) a la política de
+`politica_vigencia` traduce la configuración (settings.PRECIOS, ADR-0005) a la política de
 dominio. Vive aquí para que servicios de escritura y selectores de otros módulos usen la misma.
 """
 

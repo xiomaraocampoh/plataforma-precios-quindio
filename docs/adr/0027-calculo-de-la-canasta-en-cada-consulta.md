@@ -1,6 +1,6 @@
 # ADR-0027: Calcular la canasta en cada consulta sobre la caché de la comparación
 
-- **Estado:** Propuesto
+- **Estado:** Aceptado (aprobado por el equipo el 2026-11-27)
 - **Fecha:** 2026-11-24
 - **Autores:** Equipo; borrador con apoyo de IA, pendiente de revisión humana
 - **Escenarios relacionados:** EC-07 (Anexo 1), EC-02, EC-04
@@ -15,7 +15,7 @@ mínimo 5 min) y EC-07 (200 usuarios con canastas de 20 productos, p95 ≤ 3 s).
 Fuerzas y hechos (*verificados* en `main`):
 
 - La comparación ya tiene caché *cache-aside* por producto (TTL 60 s) con invalidación en
-  `transaction.on_commit` al registrar o confirmar un precio (ADR-0002, `core/cache.py`).
+  `transaction.on_commit` al registrar o confirmar un precio (ADR-0004, `core/cache.py`).
 - `comparacion.selectors._calcular_filas_de(producto_ids)` calcula las filas vigentes de varios
   productos con un número constante de consultas, y `primeras_filas` ya combina `cache.get_many` con
   el cálculo en lote de las claves que faltan.
@@ -29,7 +29,7 @@ Fuerzas y hechos (*verificados* en `main`):
 | **A. Calcular en cada consulta sobre la caché por producto de la comparación** | EC-02 se cumple sin código nuevo: la canasta lee lo mismo que la comparación y hereda su invalidación. Sirve igual con y sin cuenta. Sin tablas nuevas | Cada consulta repite el cálculo en Python; si la caché está fría, la primera consulta paga el lote completo (riesgo para EC-07 en picos) |
 | B. Precalcular el total de cada canasta guardada | Lectura inmediata | Cada precio nuevo obliga a invalidar todas las canastas que contienen el producto (dependencia N:M); las canastas sin cuenta no se pueden precalcular; riesgo directo para EC-02 |
 | C. Caché del resultado completo por canasta (clave = hash de los productos y cantidades) | Evita repetir el cálculo para canastas idénticas | Las canastas casi nunca se repiten exactas; invalidar exige saber qué claves contienen cada producto; agrega una segunda fuente de verdad |
-| D. Vista materializada «último precio vigente por presentación y establecimiento» | Consultas muy rápidas | Infraestructura nueva y refresco programado; ya está prevista en ADR-0002 como plan de escalamiento del núcleo, no como diseño de la canasta |
+| D. Vista materializada «último precio vigente por presentación y establecimiento» | Consultas muy rápidas | Infraestructura nueva y refresco programado; ya está prevista en ADR-0004 como plan de escalamiento del núcleo, no como diseño de la canasta |
 
 ## Decisión
 **A.** El selector de la canasta pide a `comparacion.selectors` las filas vigentes de los productos de
@@ -45,7 +45,7 @@ canasta no tiene estado de precios propio.
 - (+) EC-02 se cumple por construcción: un precio nuevo invalida la clave del producto y la siguiente
   canasta que lo contenga ya lo ve.
 - (+) Un solo camino de lectura para la comparación y la canasta: el precio oficial (ADR-018) y la
-  vigencia (ADR-0003) llegan iguales a ambas.
+  vigencia (ADR-0005) llegan iguales a ambas.
 - (+) `comparacion/selectors.py` recibe solo un cambio aditivo (M-18 = 0 cambios estructurales).
 - (−) El primer cálculo con la caché fría trae los 20 productos en un lote; es la consulta más pesada
   del sistema. Se mide en k6 con caché fría y caliente.
@@ -53,7 +53,7 @@ canasta no tiene estado de precios propio.
   mismo monolito y está cubierto por pruebas.
 - **Riesgo aceptado:** con 20 claves distintas, la tasa de aciertos de la caché baja si muchas
   personas arman canastas muy diferentes. Si k6 no alcanza el umbral, el paso siguiente es D
-  (ADR-0002), no B.
+  (ADR-0004), no B.
 - **Evidencia que haría revisar la decisión:** p95 > 3 s en k6 con caché caliente, o un número de
   consultas que crezca con el tamaño de la canasta.
 

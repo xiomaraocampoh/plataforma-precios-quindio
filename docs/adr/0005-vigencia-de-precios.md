@@ -1,6 +1,6 @@
-# ADR-0003: Ventanas de vigencia de precios
+# ADR-0005: Ventanas de vigencia de precios
 
-- **Estado:** Propuesto
+- **Estado:** Aceptado (validado con usuarios en noviembre de 2026; aprobado por el equipo el 2026-11-27)
 - **Preguntas de diseño:** 2, 8
 - **Escenarios / métricas:** EC-02, D-02, D-03
 

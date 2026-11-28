@@ -2,7 +2,7 @@
 
 Separación lectura/escritura "CQRS ligero": misma BD, caminos de código distintos.
 Si la prueba de carga (EC-04) no alcanza p95 ≤ 2 s, el siguiente paso es una vista
-materializada / tabla de lectura alimentada por los servicios de escritura (ver ADR-0002).
+materializada / tabla de lectura alimentada por los servicios de escritura (ver ADR-0004).
 """
 
 import logging

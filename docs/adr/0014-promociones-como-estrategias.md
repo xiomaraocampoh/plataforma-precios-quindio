@@ -1,4 +1,4 @@
-# ADR-014: Modelar las promociones como estrategias, fuera del criterio de orden
+# ADR-0014: Modelar las promociones como estrategias, fuera del criterio de orden
 
 - **Estado:** Aceptado por el equipo el 2026-11-25 (D-3 = conservar `es_promocion` y agregar `promociones`)
 - **Fecha:** 2026-11-16

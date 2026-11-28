@@ -1,6 +1,6 @@
 # ADR-0023: Sembrar los datos y las cuentas de prueba desde las migraciones
 
-- **Estado:** Propuesto
+- **Estado:** Aceptado (aprobado por el equipo el 2026-11-27)
 - **Fecha:** 2026-11-16
 - **Autores:** Equipo; redactado con apoyo de IA
 - **Escenarios de calidad afectados:** EC-02 (vigencia), EC-03 (anomalías), seguridad (M-13, M-15)

@@ -1,6 +1,6 @@
 # ADR-0030: Asistente de compras con la API de Anthropic: la IA interpreta, el dominio calcula
 
-- **Estado:** Propuesto (requiere la aprobación del equipo y de la propietaria antes de activarse, como el ADR-022)
+- **Estado:** Aceptado (aprobado por el equipo el 2026-11-27); la función sigue apagada si no hay clave
 - **Fecha:** 2026-11-24
 - **Autores:** Equipo; borrador con apoyo de IA, pendiente de revisión humana
 - **Escenarios relacionados:** EC-14 (propio), EC-07 (Anexo 1), EC-06; Ley 1581 de 2012

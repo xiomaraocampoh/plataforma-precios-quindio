@@ -1,6 +1,6 @@
 # ADR-0024: Fotos de producto guardadas en la base de datos y subidas desde el panel
 
-- **Estado:** Propuesto
+- **Estado:** Aceptado (aprobado por el equipo el 2026-11-27)
 - **Fecha:** 2026-11-19
 - **Autores:** Equipo; redactado con apoyo de IA
 - **Escenarios de calidad afectados:** EC-01 (registro rápido), EC-04 (carga), EC-06 (neutralidad)

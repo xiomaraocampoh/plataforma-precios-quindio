@@ -71,7 +71,7 @@ Las reglas de cálculo se desarrollan con TDD (`tests/unit/canasta/`), como exig
 |---|---|---|
 | Comparación por varios productos | `comparacion/selectors.py::_calcular_filas_de(producto_ids)` trae las filas vigentes de N productos con un número constante de consultas | Se reutiliza; no hay que escribir otra consulta de precios |
 | Caché por producto | `primeras_filas` hace `cache.get_many` de las claves y calcula las que faltan en un solo lote | El mismo patrón sirve para 20 productos |
-| Vigencia | El selector ya descarta precios vencidos (`es_vigente`, ADR-0003) | Un precio vencido nunca llega a la canasta |
+| Vigencia | El selector ya descarta precios vencidos (`es_vigente`, ADR-0005) | Un precio vencido nunca llega a la canasta |
 | Normalización | `catalogo/domain/normalizacion.py::precio_por_unidad`, `a_unidad_base`, `exigir_comparables` | Se usan tal cual (CLAUDE.md: nunca a mano) |
 | Filtros | `comparacion/domain/filtros.py` (municipio, barrio) | Se reutilizan sobre las filas |
 | Orden neutral | `ranking.py::_clave_neutral` (precio por unidad → nombre → id) | **No se toca.** El orden de la canasta es otra función, en `canasta/domain` |

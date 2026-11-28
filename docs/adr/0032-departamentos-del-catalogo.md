@@ -1,6 +1,6 @@
 # ADR-0032: Departamentos amplios sobre las categorías del catálogo
 
-- **Estado:** Propuesto
+- **Estado:** Aceptado (aprobado por el equipo el 2026-11-27)
 - **Fecha:** 2026-11-26
 - **Autores:** Equipo; redactado con apoyo de IA
 - **Escenarios de calidad afectados:** EC-01 (encontrar rápido), EC-06 (neutralidad)
